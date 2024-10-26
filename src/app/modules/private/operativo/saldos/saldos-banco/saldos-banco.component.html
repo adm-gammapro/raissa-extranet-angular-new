@@ -1,0 +1,110 @@
+<app-header></app-header>
+<p-confirmDialog />
+<p-messages [value]="messages"></p-messages>
+<p-panel header="Saldos">
+    <div class="flex border-round bg-gray-100 m-1 border-1 border-300">
+        <div class="w-12 flex align-items-center justify-content-center">
+            <div class="formgrid grid w-12 flex  pt-5">
+                
+                <div class="field col-12 md:col-2">
+                </div>
+                
+                <div class="field col-12 md:col-3 text-center">
+                    <p-button label="Mostrar resumen" 
+                            pTooltip="Resumen" 
+                            [text]="true" [raised]="true" severity="secondary" 
+                            (onClick)="mostrarResumen();"
+                            styleClass="w-full"/>
+                </div>
+                <div class="field col-12 md:col-3 text-center">
+                    <p-button label="Actualizar saldos y movimientos" 
+                            pTooltip="Actualizar" 
+                            [text]="true" [raised]="true" severity="secondary" 
+                            (onClick)="actualizarSaldosMovimientos();"
+                            styleClass="w-full"/>
+                </div>
+                <div class="field col-12 md:col-2 text-center">
+                    <p-button label="Volver" 
+                            pTooltip="Volver" 
+                            [text]="true" [raised]="true" severity="secondary" 
+                            [routerLink]="['/saldos']"
+                            styleClass="w-full"/>
+                </div>
+
+                <div class="field col-12 md:col-2">
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <div class="flex border-round p-1 m-1 border-1 border-300">
+        <div class="w-12 p-1 flex align-items-center justify-content-center">
+
+            <p-table [value]="resumen.saldosCuenta" 
+                    selectionMode="single" 
+                    class="w-full"
+                    [styleClass]="'p-datatable-sm'">
+                <ng-template pTemplate="header">
+                    <tr class="custom-header">
+                        <th style="width:15%">Banco</th>
+                        <th style="width:15%">Abreviatura</th>
+                        <th style="width:15%">Nro de cuenta</th>
+                        <th style="width:10%">Moneda</th>
+                        <th style="width:15%; text-align: right;">Saldo</th>
+                        <th style="width:20%; text-align: center;">Última Actualización</th>
+                        <th style="width:10%; text-align: center;">Acciones</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-saldo>
+                    <tr>
+                        <td>{{saldo.banco}}</td>
+                        <td>{{saldo.abreviaturaBanco}}</td>
+                        <td>{{saldo.cuenta}}</td>
+                        <td>{{saldo.moneda}}</td>
+                        <td style="text-align: right">{{saldo.saldoDisponibleformato}}</td>
+                        <td style="text-align: center;">{{saldo.fechaActualizacion}}</td>
+                        <td style="text-align: center;">
+                            <p-button icon="pi pi-list-check" 
+                                    [rounded]="true" 
+                                    [text]="true" 
+                                    type="button" 
+                                    pRipple
+                                    severity="secondary"
+                                    pTooltip="Movimientos" 
+                                    [routerLink]="['/movimientos',saldo.idCuenta,saldo.bitacora,saldo.idBanco,'-','-','T',5,0]"
+                                    tooltipPosition="top" />
+                            <p-button icon="pi pi-refresh" 
+                                    [rounded]="true" 
+                                    [text]="true" 
+                                    type="button" 
+                                    pRipple
+                                    severity="secondary"
+                                    pTooltip="Actualizar por banco" 
+                                    tooltipPosition="top" />
+                        </td>
+                    </tr>
+
+
+                </ng-template>
+            </p-table>
+
+        </div>
+    </div>
+</p-panel>
+<p-dialog [modal]="true" [(visible)]="loading" [style]="{ width: '20rem' }" closable="false">
+    <div class="flex align-items-center gap-3 mb-3">
+        <span class="p-text-secondary block mb-5">Procesando actualización</span>
+    </div>
+    
+    <div class="card flex justify-content-center">
+        <p-progressSpinner 
+            styleClass="w-4rem h-4rem" 
+            strokeWidth="8" 
+            fill="var(--surface-ground)" 
+            animationDuration=".5s" />
+    </div>
+</p-dialog>
+
+<p-dialog [modal]="true" [(visible)]="resumenSaldos" [style]="{ width: '45rem'}">
+    <app-resumen-general-modal [resumen]="resumen" (cerrarModal)="cerrarModal()"></app-resumen-general-modal>
+</p-dialog>

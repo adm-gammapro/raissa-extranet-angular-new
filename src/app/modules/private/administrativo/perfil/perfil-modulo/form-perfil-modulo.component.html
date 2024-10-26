@@ -1,0 +1,38 @@
+<div class="card">
+    <p-pickList 
+        [source]="modulosNoAsignados" 
+        [target]="modulosAsignados" 
+        sourceHeader="Módulos no asignados"
+        targetHeader="Módulos asignados" 
+        [dragdrop]="true" 
+        [responsive]="true"
+        [sourceStyle]="{ height: '30rem' }" 
+        [targetStyle]="{ height: '30rem' }" 
+        [showSourceControls]="false"
+        [showTargetControls]="false"
+        breakpoint="800px">
+            <ng-template let-modulo pTemplate="item">
+                <div class="flex flex-wrap p-2 align-items-center gap-3">
+                    <div class="flex-1 flex flex-column gap-2">
+                        <span class="font-bold">
+                            {{ modulo.descripcionOpcion }}
+                        </span>
+                    </div>
+                </div>
+            </ng-template>
+    </p-pickList>
+</div>
+<div class="w-12 p-3 flex align-items-center justify-content-center">
+    <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+            <p-button label="Guardar" 
+                    pTooltip="Guardar" 
+                    [outlined]="true" 
+                    severity="secondary" 
+                    (onClick)="guardarListas();"/>
+        </div>
+        <div class="field col-12 md:col-6">
+            <p-button label="Cancelar" severity="secondary" (onClick)="cerrar()" />
+        </div>
+    </div>
+</div>

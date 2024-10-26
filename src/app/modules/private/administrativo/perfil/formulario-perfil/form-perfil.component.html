@@ -1,0 +1,139 @@
+<app-header></app-header>
+<p-toast />
+<p-confirmDialog/>
+<form [formGroup]="perfilForm">
+    <p-panel header="Formulario perfil">
+        <div class="flex border-round bg-gray-100 p-3 m-3 border-1 border-300">
+
+            <div class="w-12 p-3 flex align-items-center justify-content-center">
+                <div class="formgrid grid">
+                    <div>
+                        <input type="hidden" formControlName="codigo" id="codigo">
+                    </div>
+                    
+                    <div class="field col-12 md:col-3">
+                        <label for="descripcion" class="pl-1">Descripción
+                            <span *ngIf="isFieldRequired('descripcion')" style="color: red;">*</span>
+                        </label>
+                        <input id="descripcion" 
+                            type="text"
+                            pInputText
+                            maxlength="50"
+                            (input)="filterAlphanumeric($event)"
+                            formControlName="descripcion"
+                            [ngClass]="(perfilForm.get('descripcion')?.errors?.['required'] || perfilForm.get('descripcion')?.errors?.['maxlength']) && perfilForm.get('descripcion')?.touched ? 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
+                        <div *ngIf="perfilForm.get('descripcion')?.errors?.['required'] && perfilForm.get('descripcion')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                        <div *ngIf="perfilForm.get('descripcion')?.errors?.['maxlength'] && perfilForm.get('descripcion')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                    </div>
+                    
+                    <div class="field col-12 md:col-2">
+                        <label for="abreviatura" class="pl-1">Abreviatura
+                            <span *ngIf="isFieldRequired('abreviatura')" style="color: red;">*</span>
+                        </label>
+                        <input id="abreviatura" 
+                            type="text"
+                            (input)="filterAlphanumeric($event);"
+                            formControlName="abreviatura"
+                            pInputText 
+                            maxlength="20"
+                            [ngClass]="(perfilForm.get('abreviatura')?.errors?.['required'] || perfilForm.get('abreviatura')?.errors?.['maxlength'] ) && perfilForm.get('abreviatura')?.touched ? 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
+                        <div *ngIf="perfilForm.get('abreviatura')?.errors?.['required'] && perfilForm.get('abreviatura')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                        <div *ngIf="perfilForm.get('abreviatura')?.errors?.['maxlength'] && perfilForm.get('abreviatura')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-3">
+                        <label for="nombreComercial" class="pl-1">Nombre comercial
+                            <span *ngIf="isFieldRequired('nombreComercial')" style="color: red;">*</span>
+                        </label>
+                        <input id="nombreComercial" 
+                            type="text"
+                            pInputText
+                            (input)="filterAlphanumeric($event)"
+                            formControlName="nombreComercial"
+                            maxlength="50"
+                            [ngClass]="(perfilForm.get('nombreComercial')?.errors?.['required'] || perfilForm.get('nombreComercial')?.errors?.['maxlength']) && perfilForm.get('nombreComercial')?.touched ? 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
+                        <div *ngIf="perfilForm.get('nombreComercial')?.errors?.['maxlength'] && perfilForm.get('nombreComercial')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                        <div *ngIf="perfilForm.get('nombreComercial')?.errors?.['required'] && perfilForm.get('nombreComercial')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                    </div>                    
+                    
+                    <div class="field col-12 md:col-2">
+                        <label for="fechaCaducidad" class="pl-1">Fecha de caducidad
+                            <span *ngIf="isFieldRequired('fechaCaducidad')" style="color: red;">*</span>
+                        </label>
+                        <p-calendar id="fechaCaducidad"
+                                    [readonlyInput]="true"
+                                    formControlName="fechaCaducidad"
+                                    styleClass="w-full"
+                                    dateFormat="dd/mm/yy"
+                                    placeholder="Selecciona una fecha"/>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="codigoAplicacion" class="pl-1">Aplicación
+                            <span *ngIf="isFieldRequired('codigoAplicacion')" style="color: red;">*</span>
+                        </label>
+                        <p-dropdown
+                            id="codigoAplicacion" 
+                            [options]="aplicaciones" 
+                            formControlName="codigoAplicacion"
+                            [showClear]="true" 
+                            styleClass="w-full"
+                            [ngClass]="(perfilForm.get('codigoAplicacion')?.errors?.['required']) && perfilForm.get('codigoAplicacion')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            [panelStyleClass]="(perfilForm.get('codigoAplicacion')?.errors?.['required']) && perfilForm.get('codigoAplicacion')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            optionLabel="descripcion" 
+                            optionValue="codigo"
+                            placeholder="Selecciona aplicación">
+                        </p-dropdown>
+
+                        <div *ngIf="perfilForm.get('codigoAplicacion')?.errors?.['required'] && perfilForm.get('codigoAplicacion')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                    </div>
+                    
+                    <div class="field col-12 md:col-5"></div>
+                    <div class="field col-12 md:col-1">
+                        <p-button label="Guardar" 
+                                pTooltip="Guardar" 
+                                [outlined]="true" 
+                                severity="secondary" 
+                                (onClick)="guardar();"
+                                [styleClass]="'w-full'"/>
+                    </div>
+                    <div class="field col-12 md:col-1">
+                        <p-button label="Volver" 
+                                pTooltip="Volver" 
+                                [outlined]="true" 
+                                severity="secondary" 
+                                [routerLink]="['/perfil']"
+                                [styleClass]="'w-full'"/>
+                    </div>
+                    <div class="field col-12 md:col-5"></div>
+                </div>
+            </div>
+
+        </div>
+    </p-panel>
+
+    
+</form>
+    

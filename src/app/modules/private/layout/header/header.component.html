@@ -1,0 +1,30 @@
+<div class="card">
+    <p-toolbar>
+        <div class="p-toolbar-group-start">
+            
+            <p-button icon="pi pi-bars" class="mr-2" (onClick)="sidebarVisible = true"  severity="secondary"/>
+            <img src="assets/images/Raissa-logo-fondo-transparente-pequenio.png" width="150"/>
+        </div>
+        <div class="p-toolbar-group-center">
+
+        </div>
+        <div class="p-toolbar-group-end">
+            <div class="flex align-items-center gap-1">
+                <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
+
+                <p-splitButton label={{usuario}} 
+                                [model]="items" text 
+                                severity="secondary"/>
+                
+            </div>
+        </div>
+    </p-toolbar>
+</div>
+
+
+<div class="card flex justify-content-center">
+    <p-sidebar [(visible)]="sidebarVisible"  styleClass="w-22rem">
+        <h3>Menu</h3>
+        <app-menu></app-menu>
+    </p-sidebar>
+</div>

@@ -1,0 +1,57 @@
+<p-panel header="Resumen de posición de bancos">
+    <div class="flex border-round bg-gray-100 p-3 m-3 border-1 border-300">
+        <div class="w-12 p-3 flex align-items-center justify-content-center">
+            <div class="formgrid grid w-full">
+                <div class="field col-12 md:col-4">
+                    <strong>PEN - Soles</strong>
+                </div>
+                <div class="field col-12 md:col-4">
+                    
+                </div>
+                <div class="field col-12 md:col-4">
+                    <strong>{{resumen.cantidadCuentasSoles}} cuentas</strong>
+                </div>
+                <div class="field col-12 md:col-4">
+                    Saldo Contable: <strong>{{resumen.saldoContableSoles}}</strong>
+                </div>
+                <div class="field col-12 md:col-4">   
+                    Saldo Disponible: <strong>{{resumen.saldoDisponibleSoles}}</strong>                 
+                </div>
+                <div class="field col-12 md:col-4">
+                </div>    
+            </div>
+        </div>
+    </div>
+    <div class="flex border-round bg-gray-100 p-3 m-3 border-1 border-300">
+        <div class="w-12 p-3 flex align-items-center justify-content-center">
+            <div class="formgrid grid w-full">
+                <div class="field col-12 md:col-4">
+                    <strong>USD - Dólares</strong>
+                </div>
+                <div class="field col-12 md:col-4">
+                    
+                </div>
+                <div class="field col-12 md:col-4">
+                    <strong>{{resumen.cantidadCuentaDolares}} cuentas</strong>
+                </div>
+                <div class="field col-12 md:col-4">
+                    Saldo Contable: <strong>{{resumen.saldoContableDolares}}</strong>
+                </div>
+                <div class="field col-12 md:col-4">   
+                    Saldo Disponible: <strong>{{resumen.saldoDisponibleDolares}}</strong>                     
+                </div>
+                <div class="field col-12 md:col-4">
+                </div>    
+            </div>
+        </div>
+    </div>
+</p-panel>
+<ng-template pTemplate="footer">
+    <p-button 
+        label="Cancel" 
+        [text]="true" 
+        severity="secondary" 
+        [raised]="true"
+        (onClick)="cerrar()" />
+    
+</ng-template>

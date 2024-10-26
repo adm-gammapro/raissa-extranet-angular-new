@@ -1,0 +1,241 @@
+<app-header></app-header>
+<p-toast />
+<p-confirmDialog/>
+<form [formGroup]="usuarioForm">
+    <p-panel header="Formulario Usuario">
+        <div class="flex border-round bg-gray-100 p-3 m-3 border-1 border-300">
+
+            <div class="w-12 p-3 flex align-items-center justify-content-center">
+                <div class="formgrid grid">
+                    <div>
+                        <input type="hidden" formControlName="id" id="id">
+                        <input type="hidden" formControlName="password" id="password">
+                        <input type="hidden" formControlName="username" id="username">
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="codigoTipoDocumento" class="pl-1">Tipo de documento
+                            <span *ngIf="isFieldRequired('codigoTipoDocumento')" style="color: red;">*</span>
+                        </label>
+                        <p-dropdown
+                            id="codigoTipoDocumento" 
+                            [options]="tipoDocs" 
+                            formControlName="codigoTipoDocumento"
+                            [showClear]="true" 
+                            styleClass="w-full"
+                            [ngClass]="(usuarioForm.get('codigoTipoDocumento')?.errors?.['required']) && usuarioForm.get('numeroDocumento')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            [panelStyleClass]="(usuarioForm.get('codigoTipoDocumento')?.errors?.['required']) && usuarioForm.get('numeroDocumento')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            optionLabel="abreviatura" 
+                            optionValue="codigo"
+                            placeholder="Selecciona documento">
+                        </p-dropdown>
+
+                        <div *ngIf="usuarioForm.get('codigoTipoDocumento')?.errors?.['required'] && usuarioForm.get('codigoTipoDocumento')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                        <div *ngIf="usuarioForm.get('codigoTipoDocumento')?.errors?.['maxlength'] && usuarioForm.get('codigoTipoDocumento')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="numeroDocumento" class="pl-1">Número de documento
+                            <span *ngIf="isFieldRequired('numeroDocumento')" style="color: red;">*</span>
+                        </label>
+                        <input id="numeroDocumento" 
+                            type="text"
+                            pInputText
+                            (input)="filterNumeric($event)"
+                            formControlName="numeroDocumento"
+                            [ngClass]="(usuarioForm.get('numeroDocumento')?.errors?.['required'] || usuarioForm.get('numeroDocumento')?.errors?.['maxlength']) && usuarioForm.get('numeroDocumento')?.touched ? 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
+                        <div *ngIf="usuarioForm.get('numeroDocumento')?.errors?.['required'] && usuarioForm.get('numeroDocumento')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                    </div>
+                    
+                    <div class="field col-12 md:col-3">
+                        <label for="nombres" class="pl-1">Nombres
+                            <span *ngIf="isFieldRequired('nombres')" style="color: red;">*</span>
+                        </label>
+                        <input id="nombres" 
+                            type="text"
+                            (input)="filterAlphanumeric($event);"
+                            formControlName="nombres"
+                            pInputText 
+                            maxlength="50"
+                            [ngClass]="(usuarioForm.get('nombres')?.errors?.['required'] || usuarioForm.get('nombres')?.errors?.['maxlength'] ) && usuarioForm.get('nombres')?.touched ? 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
+                        <div *ngIf="usuarioForm.get('nombres')?.errors?.['required'] && usuarioForm.get('nombres')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                        <div *ngIf="usuarioForm.get('nombres')?.errors?.['maxlength'] && usuarioForm.get('nombres')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="apePaterno" class="pl-1">Apellido Paterno
+                            <span *ngIf="isFieldRequired('apePaterno')" style="color: red;">*</span>
+                        </label>
+                        <input id="apePaterno" 
+                            type="text"
+                            pInputText
+                            (input)="filterAlphanumeric($event)"
+                            formControlName="apePaterno"
+                            maxlength="9"
+                            [ngClass]="(usuarioForm.get('apePaterno')?.errors?.['required'] || usuarioForm.get('apeMaterno')?.errors?.['maxlength']) && usuarioForm.get('apePaterno')?.touched ? 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
+                        <div *ngIf="usuarioForm.get('apePaterno')?.errors?.['required'] && usuarioForm.get('apePaterno')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                        <div *ngIf="usuarioForm.get('apePaterno')?.errors?.['maxlength'] && usuarioForm.get('apePaterno')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                    </div>
+
+                    <div class="field col-12 md:col-2">
+                        <label for="apeMaterno" class="pl-1">Apellido materno
+                            <span *ngIf="isFieldRequired('apeMaterno')" style="color: red;">*</span>
+                        </label>
+                        <input id="apeMaterno" 
+                            type="text"
+                            pInputText
+                            (input)="filterAlphanumeric($event)"
+                            formControlName="apeMaterno"
+                            [ngClass]="(usuarioForm.get('apeMaterno')?.errors?.['required'] || usuarioForm.get('apeMaterno')?.errors?.['maxlength']) && usuarioForm.get('apeMaterno')?.touched ? 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
+                        <div *ngIf="usuarioForm.get('apeMaterno')?.errors?.['required'] && usuarioForm.get('apeMaterno')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                        <div *ngIf="usuarioForm.get('apeMaterno')?.errors?.['maxlength'] && usuarioForm.get('apeMaterno')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="telefono" class="pl-1">Teléfono
+                            <span *ngIf="isFieldRequired('telefono')" style="color: red;">*</span>
+                        </label>
+                        <input id="telefono" 
+                            type="text"
+                            pInputText
+                            (input)="filterNumeric($event)"
+                            formControlName="telefono"
+                            [ngClass]="(usuarioForm.get('telefono')?.errors?.['required'] || usuarioForm.get('telefono')?.errors?.['maxlength'] || (usuarioForm.get('telefono')?.errors?.['phoneLength'])) && usuarioForm.get('telefono')?.touched ? 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
+                        <div *ngIf="usuarioForm.get('telefono')?.errors?.['required'] && usuarioForm.get('telefono')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                        <div *ngIf="usuarioForm.get('telefono')?.errors?.['maxlength'] && usuarioForm.get('telefono')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                        <div *ngIf="usuarioForm.get('telefono')?.errors?.['phoneLength']"  class="p-error">
+                            El teléfono debe tener como minimo 7 dígitos.
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-3">
+                        <label for="correo" class="pl-1">Correo
+                            <span *ngIf="isFieldRequired('correo')" style="color: red;">*</span>
+                        </label>
+                        <input id="correo" 
+                            type="text"
+                            pInputText
+                            (input)="filterSpecialCharacters($event)"
+                            formControlName="correo"
+                            [ngClass]="(usuarioForm.get('correo')?.errors?.['maxlength'] || usuarioForm.get('correo')?.errors?.['email']) && usuarioForm.get('correo')?.touched ? 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
+                        <div *ngIf="usuarioForm.get('correo')?.errors?.['required'] && usuarioForm.get('correo')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                        <div *ngIf="usuarioForm.get('correo')?.errors?.['maxlength'] && usuarioForm.get('correo')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                        <div *ngIf="usuarioForm.get('correo')?.errors?.['email'] && usuarioForm.get('correo')?.touched" class="p-error">
+                            El formato del correo no es válido.
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="field col-12 md:col-2">
+                        <label for="fechaCambioClave" class="pl-1">Fecha cambio de clave
+                            <span *ngIf="isFieldRequired('fechaCambioClave')" style="color: red;">*</span>
+                        </label>
+                        <p-calendar id="fechaCambioClave"
+                                    [readonlyInput]="true"
+                                    formControlName="fechaCambioClave"
+                                    styleClass="w-full"
+                                    dateFormat="dd/mm/yy"
+                                    placeholder="Selecciona una fecha"/>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="indicadorExpiracion" class="pl-1">Indicador Expiración
+                            <span *ngIf="isFieldRequired('indicadorExpiracion')" style="color: red;">*</span>
+                        </label>
+                        <p-dropdown
+                            id="indicadorExpiracion" 
+                            [options]="expiracion" 
+                            formControlName="indicadorExpiracion"
+                            [showClear]="true" 
+                            styleClass="w-full"
+                            [ngClass]="(usuarioForm.get('indicadorExpiracion')?.errors?.['required']) && usuarioForm.get('indicadorExpiracion')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            [panelStyleClass]="(usuarioForm.get('indicadorExpiracion')?.errors?.['required']) && usuarioForm.get('indicadorExpiracion')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            optionLabel="name" 
+                            optionValue="code"
+                            placeholder="Selecciona Indicador">
+                        </p-dropdown>
+                        <div *ngIf="usuarioForm.get('indicadorExpiracion')?.errors?.['required'] && usuarioForm.get('indicadorExpiracion')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                        <div *ngIf="usuarioForm.get('indicadorExpiracion')?.errors?.['maxlength'] && usuarioForm.get('indicadorExpiracion')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="fechaExpiracionClave" class="pl-1">Fecha de expiración
+                            <span *ngIf="isFieldRequired('fechaExpiracionClave')" style="color: red;">*</span>
+                        </label>
+                        <p-calendar id="fechaExpiracionClave"
+                                    [readonlyInput]="true"
+                                    formControlName="fechaExpiracionClave"
+                                    styleClass="w-full"
+                                    placeholder="Selecciona una fecha"/>
+                    </div>
+                    <div class="field col-12 md:col-10"></div>
+                    <div class="field col-12 md:col-5"></div>
+                    <div class="field col-12 md:col-1">
+                        <p-button label="Guardar" 
+                                pTooltip="Guardar" 
+                                [outlined]="true" 
+                                severity="secondary" 
+                                (onClick)="guardar();"
+                                [styleClass]="'w-full'"/>
+                    </div>
+                    <div class="field col-12 md:col-1">
+                        <p-button label="Volver" 
+                                pTooltip="Volver" 
+                                [outlined]="true" 
+                                severity="secondary" 
+                                [routerLink]="['/usuario']"
+                                [styleClass]="'w-full'"/>
+                    </div>
+                    <div class="field col-12 md:col-5"></div>
+                </div>
+            </div>
+
+        </div>
+    </p-panel>
+
+    
+</form>
+    

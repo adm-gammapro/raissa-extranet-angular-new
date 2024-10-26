@@ -1,0 +1,70 @@
+<app-header></app-header>
+<p-confirmDialog />
+<p-messages [value]="messages"></p-messages>
+<p-panel header="Saldos">
+    <div class="flex border-round bg-gray-100 m-1 border-1 border-300">
+        <div class="w-12 flex align-items-center justify-content-center">
+            <div class="formgrid grid w-12 flex  pt-5">
+                
+                <div class="field col-12 md:col-10">
+                </div>
+                <div class="field col-12 md:col-1 text-right">
+                    <p-button label="Agregar" 
+                            pTooltip="Agregar" 
+                            [outlined]="true" 
+                            severity="secondary" 
+                            [routerLink]="['/form-usuario-cliente', idUsuarioSession]"
+                            styleClass="w-full"/>
+                </div>
+                
+                <div class="field col-12 md:col-1 text-right">
+                    <p-button label="Volver" 
+                            pTooltip="Volver" 
+                            [outlined]="true" 
+                            severity="secondary" 
+                            [routerLink]="['/usuario']"
+                            styleClass="w-full"/>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <div class="flex border-round p-1 m-1 border-1 border-300">
+        <div class="w-12 p-1 flex align-items-center justify-content-center">
+                <p-table
+                    [value]="empresasVinculadas"
+                    selectionMode="single" 
+                    class="w-full"
+                    [styleClass]="'p-datatable-sm'">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width:45%">Empresa</th>
+                            <th style="width:45%">Perfil</th>
+                            <th style="width:10%; text-align: center;">Acciones</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-empresa>
+                        <tr>
+                            <td>{{empresa.cliente}}</td>
+                            <td>{{empresa.perfil}}</td>
+                            
+                            <td style="text-align: center;">
+                                <p-button icon="pi pi-trash" 
+                                        [rounded]="true" 
+                                        [text]="true" 
+                                        type="button" 
+                                        pRipple
+                                        severity="secondary"
+                                        pTooltip="Dar de baja" 
+                                        tooltipPosition="left"
+                                        [disabled]="esBotonDeshabilitado(empresa)" 
+                                        (click)="eliminarFila($event, empresa)"/>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+        </div> 
+    </div>
+
+</p-panel>

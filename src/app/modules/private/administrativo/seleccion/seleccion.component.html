@@ -1,0 +1,50 @@
+<p-toast></p-toast>
+<div class="card">
+    <p-toolbar>
+        <div class="p-toolbar-group-start">
+            <img src="assets/images/Raissa-logo-fondo-transparente-pequenio.png" width="150"/>
+        </div>
+        <div class="p-toolbar-group-center">
+
+        </div>
+        <div class="p-toolbar-group-end">
+            <div class="flex align-items-center gap-2">
+                <div class="p-toolbar-group-end">                    
+                </div>
+            </div>
+        </div>
+    </p-toolbar>
+</div>
+<div class="card flex justify-content-center pt-5">
+    <form [formGroup]="selectionForm">
+        <p-card header="Selección" subheader="Empresas" [style]="{ width: '360px' }">
+            <ng-template pTemplate="header">
+                <img alt="Card" src="assets/images/Raissa-logo-fondo-transparente-mediano.png" />
+            </ng-template>
+            <ng-template pTemplate="body">
+                <div class="card flex justify-content-center">
+                    <p-floatLabel class="w-full">
+                        <p-dropdown [options]="consolidado.empresas" 
+                                    optionLabel="razonSocial"
+                                    optionValue="codigo"
+                                    inputId="seleccion" 
+                                    formControlName="seleccion" 
+                                    [showClear]="true" 
+                                    styleClass="w-full"/>
+                        <label for="seleccion">Seleccionar</label>
+                    </p-floatLabel>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <div class="card flex justify-content-center">
+                    <p-button label="Seleccionar" 
+                              [raised]="true" 
+                              severity="secondary" 
+                              class="w-full"
+                              styleClass="w-full" 
+                              (onClick)="seleccionarEmpresa();"/>
+                </div>
+            </ng-template>
+        </p-card>
+    </form>
+</div>

@@ -1,0 +1,177 @@
+<app-header></app-header>
+<p-confirmDialog />
+    <p-messages [value]="messages"></p-messages>
+    <form [formGroup]="usuarioSearchForm">
+        <p-panel header="Usuario">
+            <div class="flex border-round bg-gray-100 m-1 border-1 border-300">
+                <div class="w-12 flex align-items-center justify-content-center">
+                    <div class="formgrid grid w-12 flex  pt-5">
+                        <div class="field col-12 md:col-2">
+                            <p-floatLabel>
+                                <input id="nombreSearch" 
+                                        type="text"
+                                        pInputText
+                                        (input)="filterAlphanumericoSinEspacio($event)"
+                                        formControlName="nombreSearch"
+                                        [ngClass]="'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'"
+                                        styleClass="w-full">
+                                <label for="nombreSearch">Usuario</label>
+                            </p-floatLabel>
+    
+                        </div>
+                        <div class="field col-12 md:col-2">
+                            <p-floatLabel>
+                                <p-dropdown 
+                                    formControlName="estadoSearch"
+                                    [options]="estados"
+                                    optionLabel="descripcion"
+                                    optionValue="valor" 
+                                    placeholder="Selecciona estado" 
+                                    class="text-base text-color surface-overlay surface-border border-round outline-none focus:border-primary"
+                                    styleClass="w-full"/>
+                                <label for="numDocSearch">Estado</label>
+                            </p-floatLabel>
+                        </div>
+                        <div class="field col-12 md:col-5">
+                        </div>
+                        <div class="field col-12 md:col-1 text-right">
+                            <p-button label="Buscar" 
+                                    pTooltip="Buscar" 
+                                    [outlined]="true" 
+                                    severity="secondary" 
+                                    (onClick)="busqueda();"
+                                    styleClass="w-full"/>
+                        </div>
+                        <div class="field col-12 md:col-1 text-right">
+                            <p-button label="Limpiar" 
+                                    pTooltip="Limpiar" 
+                                    [outlined]="true" 
+                                    severity="secondary" 
+                                    (onClick)="reloadPage();"
+                                    styleClass="w-full"/>
+                        </div>
+                        <div class="field col-12 md:col-1 text-right">
+                            <p-button label="Agregar" 
+                                    pTooltip="Agregar" 
+                                    [outlined]="true" 
+                                    severity="secondary" 
+                                    [routerLink]="['/form-usuario', 0]"
+                                    styleClass="w-full"/>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="flex border-round p-1 m-1 border-1 border-300">
+                <div class="w-12 p-1 flex align-items-center justify-content-center">
+                    <p-table
+                        [value]="usuarios"
+                        selectionMode="single" 
+                        class="w-full"
+                        [styleClass]="'p-datatable-sm'">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width:10%">Usuario</th>
+                                <th style="width:10%">Nombres</th>
+                                <th style="width:10%">Apellido Paterno</th>
+                                <th style="width:10%">Apellido Materno</th>
+                                <th style="width:10%">Fecha Cambio Clave</th>
+                                <th style="width:5%">Expiracion</th>
+                                <th style="width:10%">Fecha Expiración</th>
+                                <th style="width:10%">Correo</th>
+                                <th style="width:5%">Telefono</th>
+                                <th style="width:5%">Estado</th>
+                                <th style="width:15%; text-align: center;">Acciones</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-usuario>
+                            <tr>
+                                <td>{{usuario.username}}</td>
+                                <td>{{usuario.nombres}}</td>
+                                <td>{{usuario.apePaterno}}</td>
+                                <td>{{usuario.apeMaterno}}</td>
+                                <td>{{usuario.fechaCambioClave}}</td>
+                                <td>{{usuario.indicadorExpiracion}}</td>
+                                <td>{{usuario.fechaExpiracionClave}}</td>
+                                <td>{{usuario.correo}}</td>
+                                <td>{{usuario.telefono}}</td>
+                                <td>{{usuario.estadoRegistro}}</td>
+                                <td style="text-align: right;">
+                                    <p-button icon="pi pi-key" 
+                                            [rounded]="true" 
+                                            [text]="true" 
+                                            type="button" 
+                                            pRipple
+                                            severity="secondary"
+                                            pTooltip="Resetear Password" 
+                                            tooltipPosition="top"
+                                            [disabled]="esBotonDeshabilitado(usuario)"
+                                            (onClick)="showDialog(usuario.id)"/>
+                                    <p-button icon="pi pi-sliders-h" 
+                                            [rounded]="true" 
+                                            [text]="true" 
+                                            type="button" 
+                                            pRipple
+                                            severity="secondary"
+                                            pTooltip="Vincular Empresas" 
+                                            tooltipPosition="top"
+                                            [disabled]="esBotonDeshabilitado(usuario)" 
+                                            [routerLink]="['/usuario-empresa', usuario.id ]"/>
+                                    <p-button icon="pi pi-users" 
+                                            [rounded]="true" 
+                                            [text]="true" 
+                                            type="button" 
+                                            pRipple
+                                            severity="secondary"
+                                            pTooltip="Vincular Perfiles"
+                                            tooltipPosition="top" 
+                                            [disabled]="esBotonDeshabilitado(usuario)"
+                                            (onClick)="mostrarModal(usuario.id)"/>
+                                    <p-button icon="pi pi-file-edit" 
+                                            [rounded]="true" 
+                                            [text]="true" 
+                                            type="button" 
+                                            pRipple
+                                            severity="secondary"
+                                            pTooltip="Editar" 
+                                            tooltipPosition="top" 
+                                            [disabled]="esBotonDeshabilitado(usuario)" 
+                                            [routerLink]="['/form-usuario', usuario.id ]"/>
+                                    <p-button icon="pi pi-trash" 
+                                            [rounded]="true" 
+                                            [text]="true" 
+                                            type="button" 
+                                            pRipple
+                                            severity="secondary"
+                                            pTooltip="Dar de baja" 
+                                            tooltipPosition="left"
+                                            [disabled]="esBotonDeshabilitado(usuario)" 
+                                            (click)="eliminarFila($event, usuario)"/>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                    
+                </div> 
+            </div>
+            <app-paginator *ngIf="paginator" [paginatorInput] = "paginator" (paginatorOutput)="cambioPagina($event)"></app-paginator>
+        </p-panel>
+    </form>
+    <p-dialog [modal]="true" [(visible)]="mostrarHijo" [style]="{ width: '50rem'}">
+        <app-form-usuario-perfil (cerrarModal)="cerrarModal()"></app-form-usuario-perfil>
+        <div class="flex justify-content-end gap-2">
+        </div>
+    </p-dialog>
+
+    <p-dialog header="Resetear Password" [modal]="true" [(visible)]="visibleResetPassword" [style]="{ width: '40rem' }">
+        <span class="p-text-secondary block mb-5">Actualizar Password</span>
+        <div class="flex align-items-center gap-3 mb-3">
+            <label for="username" class="font-semibold w-10rem">Nuevo password</label>
+            <input pInputText id="username" class="flex-auto" autocomplete="off" [(ngModel)]="passwordReset"/>
+        </div>
+        <div class="flex justify-content-end gap-2">
+            <p-button label="Cancelar" severity="secondary" (onClick)="visibleResetPassword = false" />
+            <p-button label="Guardar" (onClick)="resetPassword()" />
+        </div>
+    </p-dialog>
+    

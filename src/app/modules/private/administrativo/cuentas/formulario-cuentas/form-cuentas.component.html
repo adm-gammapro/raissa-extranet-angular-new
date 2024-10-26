@@ -1,0 +1,186 @@
+<app-header></app-header>
+<p-toast />
+<p-confirmDialog/>
+<form [formGroup]="cuentaForm">
+    <p-panel header="Formulario cuentas">
+        <div class="flex border-round bg-gray-100 p-3 m-3 border-1 border-300">
+
+            <div class="w-12 p-3 flex align-items-center justify-content-center">
+                <div class="formgrid grid w-full">
+                    <div>
+                        <input type="hidden" formControlName="codigo" id="codigo">
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="numeroCuenta" class="pl-1">Número de cuenta
+                            <span *ngIf="isFieldRequired('numeroCuenta')" style="color: red;">*</span>
+                        </label>
+                        <input id="numeroCuenta" 
+                            type="text"
+                            pInputText
+                            maxlength="23"
+                            (input)="filterNumeric($event)"
+                            formControlName="numeroCuenta"
+                            [ngClass]="(cuentaForm.get('numeroCuenta')?.errors?.['required'] || cuentaForm.get('numeroCuenta')?.errors?.['maxlength']) && cuentaForm.get('numeroCuenta')?.touched ? 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
+                        <div *ngIf="cuentaForm.get('numeroCuenta')?.errors?.['required'] && cuentaForm.get('numeroCuenta')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                        <div *ngIf="cuentaForm.get('numeroCuenta')?.errors?.['maxlength'] && cuentaForm.get('numeroCuenta')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="codigoInstitucionFinanciera" class="pl-1">Intitución financiera
+                            <span *ngIf="isFieldRequired('codigoInstitucionFinanciera')" style="color: red;">*</span>
+                        </label>
+                        <p-dropdown
+                            id="codigoInstitucionFinanciera" 
+                            [options]="bancos" 
+                            formControlName="codigoInstitucionFinanciera"
+                            [showClear]="true" 
+                            styleClass="w-full"
+                            [ngClass]="(cuentaForm.get('codigoInstitucionFinanciera')?.errors?.['required']) && cuentaForm.get('codigoInstitucionFinanciera')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            [panelStyleClass]="(cuentaForm.get('codigoInstitucionFinanciera')?.errors?.['required']) && cuentaForm.get('codigoInstitucionFinanciera')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            optionLabel="nombre" 
+                            optionValue="codigo"
+                            [filter]="true"
+                            filterBy="nombre" 
+                            placeholder="Selecciona institución financiera">
+                        </p-dropdown>
+
+                        <div *ngIf="cuentaForm.get('codigoInstitucionFinanciera')?.errors?.['required'] && cuentaForm.get('codigoInstitucionFinanciera')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="monedaCuenta" class="pl-1">Moneda
+                            <span *ngIf="isFieldRequired('monedaCuenta')" style="color: red;">*</span>
+                        </label>
+                        <p-dropdown
+                            id="monedaCuenta" 
+                            [options]="monedas" 
+                            formControlName="monedaCuenta"
+                            [showClear]="true" 
+                            styleClass="w-full"
+                            [ngClass]="(cuentaForm.get('monedaCuenta')?.errors?.['required']) && cuentaForm.get('monedaCuenta')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            [panelStyleClass]="(cuentaForm.get('monedaCuenta')?.errors?.['required']) && cuentaForm.get('monedaCuenta')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            optionLabel="descripcion" 
+                            optionValue="valor"
+                            placeholder="Selecciona Moneda">
+                        </p-dropdown>
+
+                        <div *ngIf="cuentaForm.get('monedaCuenta')?.errors?.['required'] && cuentaForm.get('monedaCuenta')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="codigoAgrupacion" class="pl-1">Agrupación
+                            <span *ngIf="isFieldRequired('codigoAgrupacion')" style="color: red;">*</span>
+                        </label>
+                        <p-dropdown
+                            id="codigoAgrupacion" 
+                            [options]="agrupaciones" 
+                            formControlName="codigoAgrupacion"
+                            [showClear]="true" 
+                            styleClass="w-full"
+                            [ngClass]="(cuentaForm.get('codigoAgrupacion')?.errors?.['required']) && cuentaForm.get('codigoAgrupacion')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            [panelStyleClass]="(cuentaForm.get('codigoAgrupacion')?.errors?.['required']) && cuentaForm.get('codigoAgrupacion')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            optionLabel="nombreAgrupacionCliente" 
+                            optionValue="codigo"
+                            placeholder="Selecciona Agrupacion">
+                        </p-dropdown>
+
+                        <div *ngIf="cuentaForm.get('codigoAgrupacion')?.errors?.['required'] && cuentaForm.get('codigoAgrupacion')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="frecuencia" class="pl-1">Frecuencia
+                            <span *ngIf="isFieldRequired('frecuencia')" style="color: red;">*</span>
+                        </label>
+                        <p-dropdown
+                            id="frecuencia" 
+                            [options]="frecuencias" 
+                            formControlName="codigoFrecuenciaActualizacion"
+                            [showClear]="true" 
+                            styleClass="w-full"
+                            [ngClass]="(cuentaForm.get('frecuencia')?.errors?.['required']) && cuentaForm.get('frecuencia')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            [panelStyleClass]="(cuentaForm.get('frecuencia')?.errors?.['required']) && cuentaForm.get('frecuencia')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            optionLabel="descripcion" 
+                            optionValue="codigo"
+                            placeholder="Selecciona frecuencia">
+                        </p-dropdown>
+
+                        <div *ngIf="cuentaForm.get('frecuencia')?.errors?.['required'] && cuentaForm.get('frecuencia')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="tipoCuenta" class="pl-1">Tipo cuenta
+                            <span *ngIf="isFieldRequired('tipoCuenta')" style="color: red;">*</span>
+                        </label>
+                        <p-dropdown
+                            id="tipoCuenta" 
+                            [options]="tipoCuentas" 
+                            formControlName="tipoCuenta"
+                            [showClear]="true" 
+                            styleClass="w-full"
+                            [ngClass]="(cuentaForm.get('tipoCuenta')?.errors?.['required']) && cuentaForm.get('tipoCuenta')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            [panelStyleClass]="(cuentaForm.get('tipoCuenta')?.errors?.['required']) && cuentaForm.get('tipoCuenta')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            optionLabel="descripcion" 
+                            optionValue="valor"
+                            placeholder="Selecciona tipo cuenta">
+                        </p-dropdown>
+
+                        <div *ngIf="cuentaForm.get('tipoCuenta')?.errors?.['required'] && cuentaForm.get('tipoCuenta')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-5"></div>
+                    <div class="field col-12 md:col-1">
+                        <p-button label="Guardar" 
+                                pTooltip="Guardar" 
+                                [outlined]="true" 
+                                severity="secondary" 
+                                (onClick)="guardar();"
+                                [styleClass]="'w-full'"/>
+                    </div>
+                    <div class="field col-12 md:col-1">
+                        <p-button label="Volver" 
+                                pTooltip="Volver" 
+                                [outlined]="true" 
+                                severity="secondary" 
+                                [routerLink]="['/cuentas']"
+                                [styleClass]="'w-full'"/>
+                    </div>
+                    <div class="field col-12 md:col-5"></div>
+                </div>
+            </div>
+
+        </div>
+    </p-panel>
+
+    
+</form>
+    

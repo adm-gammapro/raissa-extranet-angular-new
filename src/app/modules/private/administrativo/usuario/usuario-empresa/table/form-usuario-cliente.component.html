@@ -1,0 +1,97 @@
+<app-header></app-header>
+<p-toast />
+<p-confirmDialog/>
+<form [formGroup]="usuarioClienteForm">
+    <p-panel header="Formulario cuentas">
+        <div class="flex border-round bg-gray-100 p-3 m-3 border-1 border-300">
+
+            <div class="w-12 p-3 flex align-items-center justify-content-center">
+                <div class="formgrid grid w-full">
+                    <div>
+                        <input type="hidden" formControlName="codigo" id="codigo">
+                    </div>
+                    <div class="field col-12 md:col-4">
+                        
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="codigoEmpresa" class="pl-1">Empresa
+                            <span *ngIf="isFieldRequired('codigoEmpresa')" style="color: red;">*</span>
+                        </label>
+                        <p-dropdown
+                            id="codigoEmpresa" 
+                            [options]="empresas" 
+                            formControlName="codigoEmpresa"
+                            [showClear]="true" 
+                            styleClass="w-full"
+                            [ngClass]="(usuarioClienteForm.get('codigoEmpresa')?.errors?.['required']) && usuarioClienteForm.get('codigoEmpresa')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            [panelStyleClass]="(usuarioClienteForm.get('codigoEmpresa')?.errors?.['required']) && usuarioClienteForm.get('codigoEmpresa')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            optionLabel="razonSocial" 
+                            optionValue="codigo"
+                            (onChange)="onPerfilesChange($event)"
+                            placeholder="Selecciona empresa">
+                        </p-dropdown>
+
+                        <div *ngIf="usuarioClienteForm.get('codigoEmpresa')?.errors?.['required'] && usuarioClienteForm.get('codigoEmpresa')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="codigoPerfil" class="pl-1">Perfil
+                            <span *ngIf="isFieldRequired('codigoPerfil')" style="color: red;">*</span>
+                        </label>
+                        <p-dropdown
+                            id="codigoPerfil" 
+                            [options]="perfiles" 
+                            formControlName="codigoPerfil"
+                            [showClear]="true" 
+                            styleClass="w-full"
+                            [ngClass]="(usuarioClienteForm.get('codigoPerfil')?.errors?.['required']) && usuarioClienteForm.get('codigoPerfil')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            [panelStyleClass]="(usuarioClienteForm.get('codigoPerfil')?.errors?.['required']) && usuarioClienteForm.get('codigoPerfil')?.touched ? 
+                                'dropdown-invalid' : 
+                                'dropdown-valid'"
+                            optionLabel="descripcion" 
+                            optionValue="codigo"
+                            placeholder="Selecciona Perfil">
+                        </p-dropdown>
+
+                        <div *ngIf="usuarioClienteForm.get('codigoPerfil')?.errors?.['required'] && usuarioClienteForm.get('codigoPerfil')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-4">
+                        
+                    </div>
+                    
+                    <div class="field col-12 md:col-5"></div>
+                    <div class="field col-12 md:col-1">
+                        <p-button label="Guardar" 
+                                pTooltip="Guardar" 
+                                [outlined]="true" 
+                                severity="secondary" 
+                                (onClick)="guardar();"
+                                [styleClass]="'w-full'"/>
+                    </div>
+                    <div class="field col-12 md:col-1">
+                        <p-button label="Volver" 
+                                pTooltip="Volver" 
+                                [outlined]="true" 
+                                severity="secondary" 
+                                [routerLink]="['/usuario-empresa',idUsuario]"
+                                [styleClass]="'w-full'"/>
+                    </div>
+                    <div class="field col-12 md:col-5"></div>
+                </div>
+            </div>
+
+        </div>
+    </p-panel>
+
+    
+</form>
+    

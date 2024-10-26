@@ -1,0 +1,82 @@
+<app-header></app-header>
+<p-toast />
+<p-confirmDialog/>
+<form [formGroup]="agrupacionForm">
+    <p-panel header="Formulario agrupación">
+        <div class="flex border-round bg-gray-100 p-3 m-3 border-1 border-300">
+
+            <div class="w-12 p-3 flex align-items-center justify-content-center">
+                <div class="formgrid grid w-full">
+                    <div>
+                        <input type="hidden" formControlName="codigo" id="codigo">
+                    </div>
+                    <div class="field col-12 md:col-3"></div>
+                    <div class="field col-12 md:col-3">
+                        <label for="interfazCuentaProvieneCliente" class="pl-1">Interfaz cuenta
+                            <span *ngIf="isFieldRequired('interfazCuentaProvieneCliente')" style="color: red;">*</span>
+                        </label>
+                        <input id="interfazCuentaProvieneCliente" 
+                            type="text"
+                            pInputText
+                            maxlength="15"
+                            (input)="filterAlphanumeric($event)"
+                            formControlName="interfazCuentaProvieneCliente"
+                            [ngClass]="(agrupacionForm.get('interfazCuentaProvieneCliente')?.errors?.['required'] || agrupacionForm.get('interfazCuentaProvieneCliente')?.errors?.['maxlength']) && agrupacionForm.get('interfazCuentaProvieneCliente')?.touched ? 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
+                        <div *ngIf="agrupacionForm.get('interfazCuentaProvieneCliente')?.errors?.['required'] && agrupacionForm.get('interfazCuentaProvieneCliente')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                        <div *ngIf="agrupacionForm.get('interfazCuentaProvieneCliente')?.errors?.['maxlength'] && agrupacionForm.get('interfazCuentaProvieneCliente')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                    </div>
+                    
+                    <div class="field col-12 md:col-3">
+                        <label for="nombreAgrupacionCliente" class="pl-1">Nombre agrupación
+                            <span *ngIf="isFieldRequired('nombreAgrupacionCliente')" style="color: red;">*</span>
+                        </label>
+                        <input id="nombreAgrupacionCliente" 
+                            type="text"
+                            (input)="filterAlphanumeric($event);"
+                            formControlName="nombreAgrupacionCliente"
+                            pInputText 
+                            maxlength="20"
+                            [ngClass]="(agrupacionForm.get('nombreAgrupacionCliente')?.errors?.['required'] || agrupacionForm.get('nombreAgrupacionCliente')?.errors?.['maxlength'] ) && agrupacionForm.get('nombreAgrupacionCliente')?.touched ? 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
+                        <div *ngIf="agrupacionForm.get('nombreAgrupacionCliente')?.errors?.['required'] && agrupacionForm.get('nombreAgrupacionCliente')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                        <div *ngIf="agrupacionForm.get('nombreAgrupacionCliente')?.errors?.['maxlength'] && agrupacionForm.get('nombreAgrupacionCliente')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-3"></div>
+                    <div class="field col-12 md:col-5"></div>
+                    <div class="field col-12 md:col-1">
+                        <p-button label="Guardar" 
+                                pTooltip="Guardar" 
+                                [outlined]="true" 
+                                severity="secondary" 
+                                (onClick)="guardar();"
+                                [styleClass]="'w-full'"/>
+                    </div>
+                    <div class="field col-12 md:col-1">
+                        <p-button label="Volver" 
+                                pTooltip="Volver" 
+                                [outlined]="true" 
+                                severity="secondary" 
+                                [routerLink]="['/agrupacion']"
+                                [styleClass]="'w-full'"/>
+                    </div>
+                    <div class="field col-12 md:col-5"></div>
+                </div>
+            </div>
+
+        </div>
+    </p-panel>
+
+    
+</form>
+    

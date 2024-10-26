@@ -1,0 +1,15 @@
+<div class="card flex justify-content-center">
+    <p-card header="Raissa" subheader="Extranet" [style]="{ width: '360px' }">
+        <ng-template pTemplate="header">
+            <img alt="Card" src="assets/images/Raissa-logo-fondo-blanco-mediano.png" />
+        </ng-template>
+        <p>
+            Se cerró sesión con éxito!
+        </p>
+        <ng-template pTemplate="footer">
+            <div class="flex gap-3 mt-1">
+                <p-button label="Volver" [raised]="true" severity="secondary" class="w-full" styleClass="w-full" [routerLink]="['/content-web']"/>
+            </div>
+        </ng-template>
+    </p-card>
+</div>

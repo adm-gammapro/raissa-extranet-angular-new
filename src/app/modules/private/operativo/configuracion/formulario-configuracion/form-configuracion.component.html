@@ -1,0 +1,179 @@
+<app-header></app-header>
+<p-toast />
+<p-confirmDialog/>
+<form [formGroup]="configuracionForm">
+    <p-panel header="Formulario de configuración de tareas">
+        <div class="flex border-round bg-gray-100 p-3 m-3 border-1 border-300">
+
+            <div class="w-12 p-3 flex align-items-center justify-content-center">
+                <div class="formgrid grid w-full">
+                    <div>
+                        <input type="hidden" formControlName="codigoJobCliente" id="codigoJobCliente">
+                    </div>
+                    <div class="field col-12 md:col-4"></div>
+                    <div class="field col-12 md:col-4">
+                        <label for="descripcionJobCliente" class="pl-1">Descripción de programación
+                            <span *ngIf="isFieldRequired('descripcionJobCliente')" style="color: red;">*</span>
+                        </label>
+                        <input id="descripcionJobCliente" 
+                            type="text"
+                            pInputText
+                            maxlength="15"
+                            (input)="filterAlphanumeric($event)"
+                            formControlName="descripcionJobCliente"
+                            [ngClass]="(configuracionForm.get('descripcionJobCliente')?.errors?.['required'] || configuracionForm.get('descripcionJobCliente')?.errors?.['maxlength']) && configuracionForm.get('descripcionJobCliente')?.touched ? 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
+                        <div *ngIf="configuracionForm.get('descripcionJobCliente')?.errors?.['required'] && configuracionForm.get('descripcionJobCliente')?.touched" class="p-error">
+                            El campo es requerido
+                        </div>
+                        <div *ngIf="configuracionForm.get('descripcionJobCliente')?.errors?.['maxlength'] && configuracionForm.get('descripcionJobCliente')?.touched" class="p-error">
+                            Ha excedido el número máximo de caracteres permitidos
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-4"></div>
+
+                    <div class="field col-12 md:col-3"></div>
+                    <div class="field col-12 md:col-2">
+                            <p-card header="Lunes">
+                                <p-dropdown 
+                                    id="inputGroupLunes"
+                                    [options]="datos" 
+                                    formControlName="inputGroupLunes"
+                                    [checkmark]="true" 
+                                    [showClear]="true"
+                                    [optionLabel]="'label'" 
+                                    [optionValue]="'value'"
+                                    styleClass="w-full"
+                                    placeholder="Selecciona horario"/>
+                                <input type="hidden" id="codigoGroupLunes" formControlName="codigoGroupLunes">
+                            </p-card>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                            <p-card header="Martes">
+                                <p-dropdown 
+                                    id="inputGroupMartes"
+                                    [options]="datos" 
+                                    formControlName="inputGroupMartes"
+                                    [checkmark]="true" 
+                                    optionLabel="name" 
+                                    [showClear]="true"
+                                    optionLabel="label" 
+                                    optionValue="value"
+                                    placeholder="Selecciona horario"/>
+                                <input type="hidden" id="codigoGroupMartes" formControlName="codigoGroupMartes">
+                            </p-card>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <p-card header="Miércoles">
+                            <p-dropdown 
+                                id="inputGroupMiercoles"
+                                [options]="datos" 
+                                formControlName="inputGroupMiercoles"
+                                [checkmark]="true" 
+                                optionLabel="name" 
+                                [showClear]="true"
+                                optionLabel="label" 
+                                optionValue="value"
+                                placeholder="Selecciona horario" />
+                            <input type="hidden" id="codigoGroupMiercoles" formControlName="codigoGroupMiercoles">
+                        </p-card>
+                        
+                    </div>
+                    <div class="field col-12 md:col-3"></div>
+
+                    <div class="field col-12 md:col-3"></div>
+                    <div class="field col-12 md:col-2">
+                            <p-card header="Jueves">
+                                <p-dropdown 
+                                    id="inputGroupJueves"
+                                    [options]="datos" 
+                                    formControlName="inputGroupJueves"
+                                    [checkmark]="true" 
+                                    optionLabel="name" 
+                                    [showClear]="true"
+                                    optionLabel="label" 
+                                    optionValue="value"
+                                    placeholder="Selecciona horario" />
+                                <input type="hidden" id="codigoGroupJueves" formControlName="codigoGroupJueves">
+                            </p-card>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                            <p-card header="Viernes">
+                                <p-dropdown 
+                                    id="inputGroupViernes"
+                                    [options]="datos" 
+                                    formControlName="inputGroupViernes"
+                                    [checkmark]="true" 
+                                    optionLabel="name" 
+                                    [showClear]="true"
+                                    optionLabel="label" 
+                                    optionValue="value"
+                                    placeholder="Selecciona horario" />
+                                <input type="hidden" id="codigoGroupViernes" formControlName="codigoGroupViernes">
+                            </p-card>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <p-card header="Sábado">
+                            <p-dropdown 
+                                id="inputGroupSabado"
+                                [options]="datos" 
+                                formControlName="inputGroupSabado"
+                                [checkmark]="true" 
+                                optionLabel="name" 
+                                [showClear]="true"
+                                optionLabel="label" 
+                                optionValue="value"
+                                placeholder="Selecciona horario" />
+                            <input type="hidden" id="codigoGroupSabado" formControlName="codigoGroupSabado">
+                        </p-card>
+                        
+                    </div>
+                    <div class="field col-12 md:col-3"></div>
+
+                    <div class="field col-12 md:col-5"></div>
+                    <div class="field col-12 md:col-2">
+                        <p-card header="Domingo">
+                            <p-dropdown 
+                            id="inputGroupDomingo"
+                            [options]="datos" 
+                            formControlName="inputGroupDomingo"
+                            [checkmark]="true" 
+                            optionLabel="name" 
+                            [showClear]="true"
+                            optionLabel="label" 
+                            optionValue="value"
+                            placeholder="Selecciona horario" />
+                        <input type="hidden" id="codigoGroupDomingo" formControlName="codigoGroupDomingo">
+                        </p-card>
+                        
+                    </div>
+                    <div class="field col-12 md:col-5"></div>
+
+                    <div class="field col-12 md:col-5"></div>
+                    <div class="field col-12 md:col-1">
+                        <p-button label="Guardar" 
+                                pTooltip="Guardar" 
+                                [outlined]="true" 
+                                severity="secondary" 
+                                (onClick)="guardar();"
+                                [styleClass]="'w-full'"/>
+                    </div>
+                    <div class="field col-12 md:col-1">
+                        <p-button label="Volver" 
+                                pTooltip="Volver" 
+                                [outlined]="true" 
+                                severity="secondary" 
+                                [routerLink]="['/configuracion']"
+                                [styleClass]="'w-full'"/>
+                    </div>
+                    <div class="field col-12 md:col-5"></div>
+                </div>
+            </div>
+
+        </div>
+    </p-panel>
+
+    
+</form>
+    
