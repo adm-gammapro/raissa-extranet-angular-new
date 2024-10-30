@@ -37,6 +37,7 @@ export class FormUsuarioClienteComponent implements OnInit {
   public usuarioClienteForm: FormGroup;
   idUsuarioSession: string = "";
   idUsuario!: number;
+  usuarioCliente!: UsuarioCliente;
 
   constructor(private confirmationService: ConfirmationService, 
     private activatedRoute: ActivatedRoute,
@@ -49,7 +50,7 @@ export class FormUsuarioClienteComponent implements OnInit {
     private usuarioService: UsuarioService) {
 
       this.usuarioClienteForm = this.formBuilder.group({
-        codigoEmpresa: new FormControl(0, [Validators.required]),
+        codigoCliente: new FormControl(0, [Validators.required]),
         codigoPerfil: new FormControl(0, [Validators.required]),
         codigo: new FormControl(0)
       });
@@ -75,6 +76,12 @@ export class FormUsuarioClienteComponent implements OnInit {
     this.getEmpresas();
     this.activatedRoute.paramMap.subscribe (params => {
       this.idUsuario = Number(params.get('id'));
+
+      this.usuarioClienteForm.patchValue({
+        codigo: null,
+        codigoCliente: null,
+        codigoPerfil: null
+      });
     })
   }
 
@@ -89,6 +96,45 @@ export class FormUsuarioClienteComponent implements OnInit {
   }
 
   guardar() {
+    if (this.usuarioClienteForm.valid) {
+      this.confirmationService.confirm({
+        message: '¿Está seguro de guardar este registro?',
+        header: 'Confirmación',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Si', // Etiqueta del botón 'Aceptar'
+        rejectLabel: 'No',
+        accept: () => {
 
+        this.usuarioCliente = this.usuarioClienteForm.value;
+        this.usuarioCliente.codigoUsuario = this.idUsuario;
+
+        this.usuarioService.vincularEmpresaPerfil(this.usuarioCliente).subscribe({
+          next:(response) => {
+            const messages: Message[] = [
+              { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro existosamente`, life: 5000 }
+            ];
+            this.messagesService.setMessages(messages);
+          },
+          error: (err) => {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message, life: 5000 });
+          },
+          complete: () => {
+            this.router.navigate(['/usuario-empresa',this.idUsuario])
+          }
+        });  
+      },reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'Rechazado', detail: 'No se guardó registro', life: 5000 });
+      }
+    });
+
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error de Validación',
+        detail: 'Se deben ingresar los campos obligatorios y en el formato requerido.', 
+        life: 5000
+      });
+      this.usuarioClienteForm.markAllAsTouched();
+    } 
   }
 }

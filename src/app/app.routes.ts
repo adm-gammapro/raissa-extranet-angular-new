@@ -21,8 +21,8 @@ import { FormConfiguracionComponent } from './modules/private/operativo/configur
 import { SaldosComponent } from './modules/private/operativo/saldos/saldos.component';
 import { SaldosBancoComponent } from './modules/private/operativo/saldos/saldos-banco/saldos-banco.component';
 import { MovimientosComponent } from './modules/private/operativo/saldos/movimientos/movimientos.component';
-import { TableUsuarioClienteComponent } from './modules/private/administrativo/usuario/usuario-empresa/form/table-usuario-cliente.component';
-import { FormUsuarioClienteComponent } from './modules/private/administrativo/usuario/usuario-empresa/table/form-usuario-cliente.component';
+import { TableUsuarioClienteComponent } from './modules/private/administrativo/usuario/usuario-empresa/table/table-usuario-cliente.component';
+import { FormUsuarioClienteComponent } from './modules/private/administrativo/usuario/usuario-empresa/form/form-usuario-cliente.component';
 
 export const routes: Routes = [
     /*{

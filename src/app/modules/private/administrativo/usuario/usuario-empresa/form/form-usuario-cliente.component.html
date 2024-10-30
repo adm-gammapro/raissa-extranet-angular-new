@@ -14,19 +14,19 @@
                         
                     </div>
                     <div class="field col-12 md:col-2">
-                        <label for="codigoEmpresa" class="pl-1">Empresa
-                            <span *ngIf="isFieldRequired('codigoEmpresa')" style="color: red;">*</span>
+                        <label for="codigoCliente" class="pl-1">Empresa
+                            <span *ngIf="isFieldRequired('codigoCliente')" style="color: red;">*</span>
                         </label>
                         <p-dropdown
-                            id="codigoEmpresa" 
+                            id="codigoCliente" 
                             [options]="empresas" 
-                            formControlName="codigoEmpresa"
+                            formControlName="codigoCliente"
                             [showClear]="true" 
                             styleClass="w-full"
-                            [ngClass]="(usuarioClienteForm.get('codigoEmpresa')?.errors?.['required']) && usuarioClienteForm.get('codigoEmpresa')?.touched ? 
+                            [ngClass]="(usuarioClienteForm.get('codigoCliente')?.errors?.['required']) && usuarioClienteForm.get('codigoCliente')?.touched ? 
                                 'dropdown-invalid' : 
                                 'dropdown-valid'"
-                            [panelStyleClass]="(usuarioClienteForm.get('codigoEmpresa')?.errors?.['required']) && usuarioClienteForm.get('codigoEmpresa')?.touched ? 
+                            [panelStyleClass]="(usuarioClienteForm.get('codigoCliente')?.errors?.['required']) && usuarioClienteForm.get('codigoCliente')?.touched ? 
                                 'dropdown-invalid' : 
                                 'dropdown-valid'"
                             optionLabel="razonSocial" 
@@ -35,7 +35,7 @@
                             placeholder="Selecciona empresa">
                         </p-dropdown>
 
-                        <div *ngIf="usuarioClienteForm.get('codigoEmpresa')?.errors?.['required'] && usuarioClienteForm.get('codigoEmpresa')?.touched" class="p-error">
+                        <div *ngIf="usuarioClienteForm.get('codigoCliente')?.errors?.['required'] && usuarioClienteForm.get('codigoCliente')?.touched" class="p-error">
                             El campo es requerido
                         </div>
                     </div>

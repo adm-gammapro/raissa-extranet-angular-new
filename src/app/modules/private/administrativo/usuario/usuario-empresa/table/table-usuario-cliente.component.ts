@@ -29,6 +29,7 @@ export class TableUsuarioClienteComponent implements OnInit {
   messages: Message[] = [];
   empresasVinculadas: UsuarioCliente[] = [];
   idUsuarioSession!: string;
+  idUsuario!: number;
 
   constructor(private confirmationService: ConfirmationService, 
               private activatedRoute: ActivatedRoute,
@@ -44,10 +45,9 @@ export class TableUsuarioClienteComponent implements OnInit {
 
   ngOnInit() {
     this.activatedRoute.paramMap.subscribe (params => {
-      let idUsuario: number;
-      idUsuario = Number(params.get('id'));
+      this.idUsuario = Number(params.get('id'));
                       
-      this.usuarioService.getUsuariosEmpresas(idUsuario, Number(this.idUsuarioSession)).subscribe(response => {
+      this.usuarioService.getUsuariosEmpresas(this.idUsuario, Number(this.idUsuarioSession)).subscribe(response => {
         this.empresasVinculadas = response;
       });
     })
@@ -63,7 +63,7 @@ export class TableUsuarioClienteComponent implements OnInit {
       rejectIcon:"No",
       rejectButtonStyleClass:"p-button-text",
       accept: () => {
-              this.usuarioService.eliminar(usuarioCliente.codigo).subscribe(
+              this.usuarioService.desVincularEmpresa(usuarioCliente.codigo).subscribe(
                 response => {
                   const messages: Message[] = [
                     { severity: 'success', summary: 'Confirmación', detail: 'Registro dado de baja', life: 5000 }

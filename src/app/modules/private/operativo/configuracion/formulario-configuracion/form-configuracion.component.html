@@ -18,7 +18,7 @@
                         <input id="descripcionJobCliente" 
                             type="text"
                             pInputText
-                            maxlength="15"
+                            maxlength="100"
                             (input)="filterAlphanumeric($event)"
                             formControlName="descripcionJobCliente"
                             [ngClass]="(configuracionForm.get('descripcionJobCliente')?.errors?.['required'] || configuracionForm.get('descripcionJobCliente')?.errors?.['maxlength']) && configuracionForm.get('descripcionJobCliente')?.touched ? 

@@ -182,10 +182,9 @@ export class UsuarioService {
     );
   }
 
-  public desVincularEmpresa(idEmpresa: number, idUsuario: number) {
+  public desVincularEmpresa(idUsuarioCliente: number) {
     let usuarioCliente: UsuarioCliente = new UsuarioCliente();
-    usuarioCliente.codigoCliente = idEmpresa;
-    usuarioCliente.codigoUsuario = idUsuario;
+    usuarioCliente.codigo = idUsuarioCliente;
       
     const headers = new HttpHeaders({
     });

@@ -122,8 +122,8 @@ export class SaldosService {
     ejecucion.codigoAgrupacion = codigoAgrupacion;
     ejecucion.codigoCliente = codigoCliente;
     ejecucion.codigoIfi = codigoIfi;
-    ejecucion.fechaFinMov = fechaFinMov;
-    ejecucion.fechaInicioMov = fechaInicioMov;
+    //ejecucion.fechaFinMov = fechaFinMov;
+    //ejecucion.fechaInicioMov = fechaInicioMov;
     ejecucion.numeroCuenta = numeroCuenta;
 
     const headers = new HttpHeaders({
@@ -165,8 +165,8 @@ export class SaldosService {
     fechaFinMov: string) {
     let ejecucion: Ejecucion = new Ejecucion();
     ejecucion.codigoCliente = codigoCliente;
-    ejecucion.fechaFinMov = fechaFinMov;
-    ejecucion.fechaInicioMov = fechaInicioMov;
+    //ejecucion.fechaFinMov = fechaFinMov;
+    //ejecucion.fechaInicioMov = fechaInicioMov;
     ejecucion.codigoIfi = codigoIfi;
 
     const headers = new HttpHeaders({

@@ -11,6 +11,7 @@ export class Saldos {
     saldoDisponible: number;
     saldoDisponibleformato: string;
     fechaActualizacion: string;
+    fechaUltimaActualizacion: string;
     bitacora: number;
 
     constructor() {
@@ -26,6 +27,7 @@ export class Saldos {
         this.saldoDisponible = 0.0;
         this.saldoDisponibleformato = "0,00";
         this.fechaActualizacion = "";
+        this.fechaUltimaActualizacion = "";
         this.bitacora = 0;
     }
     

@@ -10,8 +10,8 @@
                 </div>
                 
                 <div class="field col-12 md:col-3 text-center">
-                    <p-button label="Mostrar resumen" 
-                            pTooltip="Resumen" 
+                    <p-button label="Mostrar Posición por banco" 
+                            pTooltip="Posición por banco" 
                             [text]="true" [raised]="true" severity="secondary" 
                             (onClick)="mostrarResumen();"
                             styleClass="w-full"/>
@@ -47,11 +47,12 @@
                 <ng-template pTemplate="header">
                     <tr class="custom-header">
                         <th style="width:15%">Banco</th>
-                        <th style="width:15%">Abreviatura</th>
+                        <th style="width:10%">Abreviatura</th>
                         <th style="width:15%">Nro de cuenta</th>
                         <th style="width:10%">Moneda</th>
-                        <th style="width:15%; text-align: right;">Saldo</th>
-                        <th style="width:20%; text-align: center;">Última Actualización</th>
+                        <th style="width:10%; text-align: right;">Saldo</th>
+                        <th style="width:15%; text-align: center;">Actualizado a...</th>
+                        <th style="width:15%; text-align: center;">Última Actualización</th>
                         <th style="width:10%; text-align: center;">Acciones</th>
                     </tr>
                 </ng-template>
@@ -62,6 +63,7 @@
                         <td>{{saldo.cuenta}}</td>
                         <td>{{saldo.moneda}}</td>
                         <td style="text-align: right">{{saldo.saldoDisponibleformato}}</td>
+                        <td style="text-align: center;">{{saldo.fechaUltimaActualizacion}}</td>
                         <td style="text-align: center;">{{saldo.fechaActualizacion}}</td>
                         <td style="text-align: center;">
                             <p-button icon="pi pi-list-check" 
@@ -79,6 +81,7 @@
                                     type="button" 
                                     pRipple
                                     severity="secondary"
+                                    (onClick)="actualizarSaldosMovimientosPorCuenta(saldo.codigoAgrupacion, saldo.cuenta, saldo.idBanco);"
                                     pTooltip="Actualizar por banco" 
                                     tooltipPosition="top" />
                         </td>

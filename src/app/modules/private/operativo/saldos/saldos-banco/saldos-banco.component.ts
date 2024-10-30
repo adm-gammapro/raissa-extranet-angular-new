@@ -56,16 +56,46 @@ export class SaldosBancoComponent {
     var fechaInicial = this.transform('2024-01-01','yyyy-MM-dd');
 
     if (fechaActual != null && fechaInicial != null) {
-      this.saldosService.actualizarSaldosMovimientosGeneral(Number(this.idEmpresa),
+      this.saldosService.actualizarSaldosMovimientosPorBanco(Number(this.idEmpresa),
+                                                            this.idBanco,
                                                             fechaInicial, 
-                                                            fechaActual).subscribe(
-        (response) => {
-          this.reloadPage();
+                                                            fechaActual).subscribe({
+        next:(response) => {
           this.loading = false;  // Ocultar el spinner
+          this.reloadPage();
         },
-        (error)=>{
+        error: (err) => {
           this.loading = false;
-        }) 
+        }
+      });
+    }
+  }
+
+  actualizarSaldosMovimientosPorCuenta(codigoAgrupacion: number, numeroCuenta: string, idBanco: string){
+    this.loading = true;
+    const dateActual = new Date();
+    const dateInicial = new Date();
+
+    dateInicial.setDate(dateActual.getDate() - 120);
+
+    var fechaActual = this.transform('2023-12-03','yyyy-MM-dd');
+    var fechaInicial = this.transform('2023-11-01','yyyy-MM-dd');
+
+    if (fechaActual != null && fechaInicial != null) {
+      this.saldosService.actualizarSaldosMovimientos(Number(this.idEmpresa), 
+                                                    codigoAgrupacion, 
+                                                    idBanco, 
+                                                    numeroCuenta, 
+                                                    fechaInicial, 
+                                                    fechaActual).subscribe({
+        next:(response) => {
+          this.loading = false;  // Ocultar el spinner
+          this.reloadPage();
+        },
+          error: (err) => {
+          this.loading = false;
+        }
+      });
     }
   }
 

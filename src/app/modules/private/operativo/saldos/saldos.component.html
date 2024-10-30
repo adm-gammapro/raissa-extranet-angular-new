@@ -10,16 +10,18 @@
                 </div>
                 
                 <div class="field col-12 md:col-3 text-center">
-                    <p-button label="Mostrar resumen" 
-                            pTooltip="Resumen" 
-                            [text]="true" [raised]="true" severity="secondary" 
+                    <p-button label="Mostrar posición general de bancos" 
+                            pTooltip="Posición general de bancos" 
+                            [outlined]="true" 
+                            severity="secondary"
                             (onClick)="mostrarResumen();"
                             styleClass="w-full"/>
                 </div>
                 <div class="field col-12 md:col-3 text-center">
                     <p-button label="Actualizar saldos y movimientos" 
                             pTooltip="Actualizar" 
-                            [text]="true" [raised]="true" severity="secondary" 
+                            [outlined]="true" 
+                            severity="secondary" 
                             (onClick)="actualizarSaldosMovimientos();"
                             styleClass="w-full"/>
                 </div>

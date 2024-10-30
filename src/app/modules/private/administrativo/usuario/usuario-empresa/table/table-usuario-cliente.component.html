@@ -13,7 +13,7 @@
                             pTooltip="Agregar" 
                             [outlined]="true" 
                             severity="secondary" 
-                            [routerLink]="['/form-usuario-cliente', idUsuarioSession]"
+                            [routerLink]="['/form-usuario-cliente', idUsuario]"
                             styleClass="w-full"/>
                 </div>
                 
@@ -39,6 +39,7 @@
                     [styleClass]="'p-datatable-sm'">
                     <ng-template pTemplate="header">
                         <tr>
+                            <th style="width:45%">Usuario</th>
                             <th style="width:45%">Empresa</th>
                             <th style="width:45%">Perfil</th>
                             <th style="width:10%; text-align: center;">Acciones</th>
@@ -46,6 +47,7 @@
                     </ng-template>
                     <ng-template pTemplate="body" let-empresa>
                         <tr>
+                            <td>{{empresa.usuario}}</td>
                             <td>{{empresa.cliente}}</td>
                             <td>{{empresa.perfil}}</td>
                             

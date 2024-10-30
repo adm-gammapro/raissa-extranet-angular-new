@@ -191,7 +191,7 @@ export class FormConfiguracionComponent {
             rejectIcon:"No",
             rejectButtonStyleClass:"p-button-text",
             accept: () => {
-              if (this.configuracion.codigoJobCliente == null || this.configuracion.codigoJobCliente == 0) {
+              //if (this.configuracion.codigoJobCliente == null || this.configuracion.codigoJobCliente == 0) {
                 this.configuracionService.create(this.configuracion).subscribe({
                   next:(response) => {
                     const messages: Message[] = [
@@ -206,9 +206,9 @@ export class FormConfiguracionComponent {
                     this.router.navigate(['/configuracion'])
                   }
                 });
-              } else {
+              //} else {
                 
-              }
+              //}
             },
             reject: () => {
               this.messageService.add({ severity: 'error', summary: 'Rechazado', detail: 'No se realizó registro', life: 5000 });
