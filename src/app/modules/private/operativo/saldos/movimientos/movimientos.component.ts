@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
 import { environment } from '../../../../../../environments/environment';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
 import { PaginatorComponent } from '../../../commons/paginator/paginator.component';
 import { HeaderComponent } from '../../../layout/header/header.component';
-import { MenuComponent } from '../../../layout/menu/menu.component';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { SaldosService } from '../../../../../service/modules/private/operativo/saldos.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -21,8 +20,7 @@ import { Paginator } from '../../../../../apis/model/commons/paginator';
     CommonModule,
     ...PRIME_NG_MODULES,
     PaginatorComponent,
-    HeaderComponent,
-    MenuComponent],
+    HeaderComponent],
   providers: [ConfirmationService, MessageService, SaldosService],
   templateUrl: './movimientos.component.html',
   styleUrl: './movimientos.component.scss'
@@ -48,9 +46,9 @@ export class MovimientosComponent {
 
   paginator: Paginator = new Paginator();//esta variable se debe declarar para usar el paginador de los apis, no de primeng
 
-  constructor(private activatedRoute: ActivatedRoute,
-              private router: Router, 
-              private saldosService: SaldosService) {
+  constructor(private readonly activatedRoute: ActivatedRoute,
+              private readonly router: Router, 
+              private readonly saldosService: SaldosService) {
       if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
         this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
       }
@@ -168,7 +166,7 @@ export class MovimientosComponent {
         this.tipoSeleccionado = tipoMovimiento;
       }
 
-      this.saldosService.getMovimientos(this.idCuenta, this.bitacora, fechaInicial, fechaFinal, tipoMovimiento, this.paginator.cantidadRegistros, this.paginator.numeroPagina).subscribe(response => {
+      this.saldosService.getMovimientos(Number(this.idEmpresa),this.idCuenta, fechaInicial, fechaFinal, tipoMovimiento, this.paginator.cantidadRegistros, this.paginator.numeroPagina).subscribe(response => {
         this.detalleSaldos = response.movimientos.content as DetalleSaldos[];
         this.paginador = response.movimientos;
         this.nombreBanco = response.nombreBanco;
@@ -179,10 +177,5 @@ export class MovimientosComponent {
         this.paginator.primerRegistroVisualizado = response.movimientos.pageable.offset;
       });
     })
-  }
-
-  transform(value: string, formato: string) {
-    var datePipe = new DatePipe("en-US");
-    return datePipe.transform(value, formato);
   }
 }

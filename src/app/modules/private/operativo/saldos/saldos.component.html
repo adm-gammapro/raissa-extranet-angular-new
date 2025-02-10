@@ -1,16 +1,16 @@
 <app-header></app-header>
 <p-confirmDialog />
 <p-messages [value]="messages"></p-messages>
-<p-panel header="Saldos">
+<p-panel header="Posición general de bancos">
     <div class="flex border-round bg-gray-100 m-1 border-1 border-300">
         <div class="w-12 flex align-items-center justify-content-center">
             <div class="formgrid grid w-12 flex  pt-5">
                 
-                <div class="field col-12 md:col-3">
+                <div class="field col-12 md:col-2">
                 </div>
                 
                 <div class="field col-12 md:col-3 text-center">
-                    <p-button label="Mostrar posición general de bancos" 
+                    <p-button label="Mostrar resumen de saldos" 
                             pTooltip="Posición general de bancos" 
                             [outlined]="true" 
                             severity="secondary"
@@ -25,8 +25,17 @@
                             (onClick)="actualizarSaldosMovimientos();"
                             styleClass="w-full"/>
                 </div>
+
+                <div class="field col-12 md:col-2 text-center">
+                    <p-button label="Reportes" 
+                            pTooltip="Reportes" 
+                            [outlined]="true" 
+                            severity="secondary"
+                            (onClick)="mostrarReporte();"
+                            styleClass="w-full"/>
+                </div>
                 
-                <div class="field col-12 md:col-3">
+                <div class="field col-12 md:col-2">
                 </div>
             </div>
         </div>
@@ -41,9 +50,9 @@
                     [styleClass]="'p-datatable-sm'">
                 <ng-template pTemplate="header">
                     <tr class="custom-header">
-                        <th style="width:50%">Banco</th>
-                        <th style="width:40%">Abreviatura</th>
-                        <th style="width:10%; text-align: center;">Acciones</th>
+                        <th id="banco" style="width:50%">Banco</th>
+                        <th id="abreviatura" style="width:40%">Abreviatura</th>
+                        <th id="acciones" style="width:10%; text-align: center;">Acciones</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-saldo>
@@ -84,6 +93,116 @@
     </div>
 </p-dialog>
 
-<p-dialog [modal]="true" [(visible)]="resumenSaldos" [style]="{ width: '45rem'}">
+<p-dialog [modal]="true" [(visible)]="resumenSaldos" [style]="{ width: '40rem'}">
     <app-resumen-general-modal [resumen]="resumen" (cerrarModal)="cerrarModal()"></app-resumen-general-modal>
+</p-dialog>
+
+
+<p-dialog header="Gestor de reportes" [modal]="true" [(visible)]="descarga" [style]="{ width: '80rem' }">
+    <form [formGroup]="descargaForm">
+        <span class="p-text-secondary block mb-6">Datos de búsqueda</span>
+        <div class="flex items-center gap-1 mb-2">
+            <div class="field col-12 md:col-1"></div>
+            <div class="field col-12 md:col-3">
+                <label for="numeroCuenta">Número de cuenta</label>
+                <input id="numeroCuenta" 
+                    type="text"
+                    pInputText
+                    maxlength="23"
+                    (input)="filterNumeric($event)"
+                    formControlName="numeroCuenta"
+                    [ngClass]="'w-full'">
+
+            </div>
+
+            <div class="field col-12 md:col-3">
+                <label for="fechas">Rango de fechas</label>
+                <p-calendar 
+                        inputId="fechas"
+                        formControlName="rangeDates"
+                        selectionMode="range" 
+                        [readonlyInput]="true" 
+                        dateFormat="dd/mm/yy"
+                        appendTo="body"
+                        styleClass="w-full"
+                        [showClear]="true" />
+            </div>
+
+            <div class="field col-12 md:col-4">
+                <label for="codigoInstitucionFinanciera">Intitución financiera</label>
+                <p-dropdown
+                    id="codigoInstitucionFinanciera" 
+                    [options]="bancos" 
+                    formControlName="codigoInstitucionFinanciera"
+                    [showClear]="true" 
+                    styleClass="w-full"
+                    optionLabel="nombre" 
+                    optionValue="codigo"
+                    [filter]="true"
+                    filterBy="nombre" 
+                    placeholder="Selecciona institución financiera"
+                    appendTo="body">
+                </p-dropdown>
+            </div>
+            <div class="field col-12 md:col-1"></div>
+        </div>
+        <div class="flex items-center gap-1 mb-2">
+            <div class="field col-12 md:col-1"></div>
+            <div class="field col-12 md:col-3">
+                <label for="monedaCuenta">Moneda</label>
+                <p-dropdown
+                    id="monedaCuenta" 
+                    [options]="monedas" 
+                    formControlName="monedaCuenta"
+                    [showClear]="true" 
+                    styleClass="w-full"
+                    optionLabel="descripcion" 
+                    optionValue="valor"
+                    placeholder="Selecciona Moneda"
+                    appendTo="body">
+                </p-dropdown>
+            </div>
+            <div class="field col-12 md:col-3">
+                <label for="tipoSeleccionado">Tipo movimiento</label>
+                <p-dropdown 
+                    inputId = "tipoSeleccionado"
+                    [options]="tiposMovimiento" 
+                    [showClear]="true" 
+                    formControlName="tipoMovimiento"
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Seleccione tipo de movimiento" 
+                    styleClass="w-full"
+                    appendTo="body"/>
+                    
+            </div>
+            <div class="field col-12 md:col-4">
+                <label for="concepto">Tag concepto</label>
+                <input id="concepto" 
+                    type="text"
+                    pInputText
+                    maxlength="100"
+                    formControlName="concepto"
+                    [ngClass]="'w-full'">
+            </div>
+            <div class="field col-12 md:col-1"></div>
+        </div>
+
+        <div class="flex items-center gap-1 mb-2">
+            <div class="field col-12 md:col-4">
+            </div>
+            
+            <div class="field col-12 md:col-4">
+                <p-button label="Generar" 
+                        pTooltip="Generar reporte" 
+                        [outlined]="true" 
+                        severity="secondary"
+                        (onClick)="generarReporte()"
+                        styleClass="w-full"/>
+            </div>
+            
+            <div class="field col-12 md:col-4">
+            </div>
+        </div>
+    </form>
 </p-dialog>

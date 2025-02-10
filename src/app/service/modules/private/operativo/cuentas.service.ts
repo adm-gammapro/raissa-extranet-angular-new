@@ -1,67 +1,51 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../../authorization/auth.service';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { Cuentas } from '../../../../apis/model/module/private/cuentas';
 import { Frecuencia } from '../../../../apis/model/module/private/frecuencia';
-import { CredencialesCuentas } from '../../../../apis/model/module/private/credenciales-cuentas';
+import { CuentaRequest } from '../../../../apis/model/module/private/operativo/cuenta/request/cuenta-request';
+import { FrecuenciaActualizacionResponse } from '../../../../apis/model/module/private/commons/frecuencia-actualizacion-response';
+import { CuentaResponse } from '../../../../apis/model/module/private/operativo/cuenta/response/cuenta-response';
+import { CuentaCredencialRequest } from '../../../../apis/model/module/private/operativo/cuenta/request/cuenta-credencial-request';
+import { CuentaCredencialResponse } from '../../../../apis/model/module/private/operativo/cuenta/response/cuenta-credencial-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CuentasService {
-  private urlCore: string = environment.url.base + '/core';
-  private urlPlataforma: string = environment.url.base + '/extranet/general';
-  private urlCuenta: string = environment.url.base + '/extranet/cuenta';
-  private urlCuentaCredencial: string = environment.url.base + '/extranet/cuentaCredencial';
+  //private urlCore: string = environment.url.base + '/core';
+  private readonly urlPlataforma: string = environment.url.base + '/extranet/general';
+  private readonly urlCuenta: string = environment.url.base + '/cuenta';
+  private readonly urlCuentaCredencial: string = environment.url.base + '/cuenta-credencial';
 
-  constructor(private http: HttpClient,
-    private router: Router,
-    private authService: AuthService) { }
+  constructor(private readonly http: HttpClient,
+    private readonly authService: AuthService) { }
 
   getCuentas(page: number,
-    estadoRegistro: string,
-    numeroCuenta: string,
-    cantReg: number,
-    idEmpresa: string,
-    idBanco: string,
-    idAgrupacion: number | null): Observable<any> {
+            estadoRegistro: string | undefined,
+            numeroCuenta: string | undefined,
+            cantReg: number,
+            codigoCliente: number,
+            idBanco: string | undefined,
+            idAgrupacion: number | null): Observable<any> {
 
     const params = [
-      `pagina=${page}`,
+      `page=${page}`,
       `estadoRegistro=${estadoRegistro}`,
       `numeroCuenta=${numeroCuenta}`,
-      `cantReg=${cantReg}`,
-      `idEmpresa=${idEmpresa}`,
+      `size=${cantReg}`,
+      `codigoCliente=${codigoCliente}`,
       `idBanco=${idBanco}`,
-      `idAgrupacion=${idAgrupacion}`,
-    ].filter(Boolean).join('&');
+      idAgrupacion !== null && idAgrupacion !== undefined ? `idAgrupacion=${idAgrupacion}` : null,
+    ].filter(param => param !== null).join('&');
 
-    const headers = new HttpHeaders({
-    });
+    const url = `${this.urlCuenta}/list-page-cuenta?${params}`;
 
-    const url = `${this.urlCuenta}/listarCuentaPage?${params}`;
-
-    return this.http.get(url, { headers: headers }).pipe(
+    return this.http.get(url).pipe(
       map((response: any) => {
-        (response.body.content as Cuentas[]).map(cuentas => {
-          cuentas.interfazCuentaProvieneCliente = cuentas.interfazCuentaProvieneCliente?.toUpperCase();
-          cuentas.nombreInstitucionFinanciera = cuentas.nombreInstitucionFinanciera?.toUpperCase();
-          cuentas.codigoFrecuenciaActualizacion = cuentas.codigoFrecuenciaActualizacion?.toUpperCase();
-          cuentas.descripcionFrecuenciaActualizacion = cuentas.descripcionFrecuenciaActualizacion?.toUpperCase();
-          cuentas.ultimaActualizacion = cuentas.ultimaActualizacion?.toUpperCase();
-
-          if (cuentas.estadoRegistro === 'S') {
-            cuentas.estadoRegistro = 'ACTIVO';
-          } else {
-            cuentas.estadoRegistro = 'INACTIVO';
-          }
-
-          return cuentas;
-        });
-        return response.body;
+        return response;
       }),
       catchError(e => {
         this.authService.isNoAutorizado(e);
@@ -70,14 +54,14 @@ export class CuentasService {
     );
   }
 
-  create(cuentas: Cuentas): Observable<Cuentas> {
+  create(cuentas: CuentaRequest): Observable<CuentaResponse> {
     const headers = new HttpHeaders({
     });
 
-    const url = `${this.urlCuenta}/registrar-cuenta`;
+    const url = `${this.urlCuenta}/create-cuenta`;
 
     return this.http.put<any>(url, cuentas, { headers: headers }).pipe(
-      map((response: any) => response.body as Cuentas),
+      map((response: any) => response),
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);
@@ -85,18 +69,37 @@ export class CuentasService {
     );
   }
 
-  eliminar(id: number): Observable<Cuentas> {
+  update(cuentas: CuentaRequest): Observable<CuentaResponse> {
     const headers = new HttpHeaders({
     });
 
-    const url = `${this.urlCuenta}/eliminar-cuenta/${id}`;
+    const url = `${this.urlCuenta}/update-cuenta`;
 
-    return this.http.delete<Cuentas>(url, { headers: headers }).pipe(
+    return this.http.put<any>(url, cuentas, { headers: headers }).pipe(
+      map((response: any) => response),
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);
       })
-    )
+    );
+  }
+
+  eliminar(id: number,
+    codigoCliente: number): Observable<Cuentas> {
+
+    let cuenta: CuentaRequest = new CuentaRequest();
+    cuenta.codigo = id;
+    cuenta.codigoCliente = codigoCliente;
+
+    const url = `${this.urlCuenta}/delete-cuenta`;
+
+    return this.http.post<any>(url, cuenta).pipe(
+      map((response: any) => response),
+      catchError(e => {
+        this.authService.isNoAutorizado(e);
+        return throwError(() => e);
+      })
+    );
   }
 
   getInstitucionesFinancieras(): Observable<Cuentas[]> {
@@ -120,7 +123,7 @@ export class CuentasService {
     );
   }
 
-  getPerfil(id: number): Observable<Cuentas> {
+  /*getPerfil(id: number): Observable<Cuentas> {
     const params = [
       `codigoCuenta=${id}`,
     ].filter(Boolean).join('&');
@@ -139,17 +142,17 @@ export class CuentasService {
         return throwError(() => e);
       })
     );
-  }
+  }*/
 
-  getFrecuencias(): Observable<Frecuencia[]> {
+  getFrecuencias(): Observable<FrecuenciaActualizacionResponse[]> {
     const headers = new HttpHeaders({
     });
 
-    const url = `${this.urlCuenta}/listarFrecuencias`;
+    const url = `${this.urlPlataforma}/list-frecuencias`;
 
     return this.http.get<Frecuencia[]>(url, { headers: headers }).pipe(
       map((response: any) => {
-        return response.body;
+        return response;
       }),
       catchError(e => {
         this.authService.isNoAutorizado(e);
@@ -158,20 +161,16 @@ export class CuentasService {
     );
   }
 
-  getCuenta(id: number): Observable<any> {
-    const params = [
-      `codigoCuenta=${id}`,
-    ].filter(Boolean).join('&');
+  getCuenta(codigo: number,
+            codigoCliente: number): Observable<any> {
+    let cuenta: CuentaRequest = new CuentaRequest();
+    cuenta.codigo = codigo;
+    cuenta.codigoCliente = codigoCliente;
 
-    const headers = new HttpHeaders({
-    });
+    const url = `${this.urlCuenta}/get-cuenta`;
 
-    const url = `${this.urlCuenta}/obtenerCuenta?${params}`;
-
-    return this.http.get(url, { headers: headers }).pipe(
-      map((response: any) => {
-        return response.body;
-      }),
+    return this.http.post<any>(url, cuenta).pipe(
+      map((response: any) => response),
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);
@@ -179,21 +178,15 @@ export class CuentasService {
     );
   }
 
-  getCredencialesCuenta(idCuenta: number, idEmpresa: number) {
-    const params = [
-      `idCuenta=${idCuenta}`,
-      `idEmpresa=${idEmpresa}`,
-    ].filter(Boolean).join('&');
+  getCredencialesCuenta(codigoCuenta: number, codigoCliente: number) {
+    let cuentaCredencial: CuentaCredencialRequest = new CuentaCredencialRequest();
+    cuentaCredencial.codigoCuenta = codigoCuenta;
+    cuentaCredencial.codigoCliente = codigoCliente;
 
-    const headers = new HttpHeaders({
-    });
+    const url = `${this.urlCuentaCredencial}/get-cuentas-credenciales`;
 
-    const url = `${this.urlCuentaCredencial}/getCuentasCredenciales?${params}`;
-
-    return this.http.get(url, { headers: headers }).pipe(
-      map((response: any) => {
-        return response.body;
-      }),
+    return this.http.post<any>(url, cuentaCredencial).pipe(
+      map((response: any) => response as CuentaCredencialResponse),
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);
@@ -201,29 +194,12 @@ export class CuentasService {
     );
   }
 
-  desVincularCredencial(credencial: CredencialesCuentas) {
-    const headers = new HttpHeaders({
-    });
+  registrarVinculoCuentaCredencial(cuentaCredencial: CuentaCredencialRequest) {
 
-    const url = `${this.urlCuentaCredencial}/desvincularCredenciales`;
+    const url = `${this.urlCuentaCredencial}/registrar-cuenta-credencial`;
 
-    return this.http.post<any>(url, credencial, { headers: headers }).pipe(
-      map((response: any) => response.body as CredencialesCuentas),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  vincularCredencial(credencial: CredencialesCuentas) {
-    const headers = new HttpHeaders({
-    });
-
-    const url = `${this.urlCuentaCredencial}/vincularCredenciales`;
-
-    return this.http.post<any>(url, credencial, { headers: headers }).pipe(
-      map((response: any) => response.body as CredencialesCuentas),
+    return this.http.post<any>(url, cuentaCredencial).pipe(
+      map((response: any) => response),
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);

@@ -93,45 +93,43 @@
             </div>
             <div class="flex border-round p-1 m-1 border-1 border-300">
                 <div class="w-12 p-1 flex align-items-center justify-content-center">
-                    <form [formGroup]="form" class="w-full">
                         <p-table
                             [value]="cuentas"
-                            formArrayName="cuentas"
                             selectionMode="single" 
-                            [styleClass]="'w-full'">
+                            class="w-full"
+                            [styleClass]="'p-datatable-sm'">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th style="width:15%">Número de cuenta</th>
-                                    <th style="width:20%">Institución financiera</th>
-                                    <th style="width:10%">Moneda</th>
-                                    <th style="width:15%">Agrupación</th>
-                                    <th style="width:10%">Frecuencia</th>
-                                    <th style="width:10%">Estado</th>
-                                    <th style="width:5%">Credenciales</th>
-                                    <th style="width:15%; text-align: center;">Acciones</th>
+                                    <th id="numeroCuenta" style="width:15%">Número de cuenta</th>
+                                    <th id="banco" style="width:20%">Institución financiera</th>
+                                    <th id="moneda" style="width:10%">Moneda</th>
+                                    <th id="agrupacion" style="width:15%">Agrupación</th>
+                                    <th id="freciencia" style="width:10%">Frecuencia</th>
+                                    <th id="estado" style="width:10%">Estado</th>
+                                    <th id="acciones" style="width:15%; text-align: center;">Acciones</th>
                                 </tr>
                             </ng-template>
-                            <ng-template pTemplate="body" let-cuenta let-i="rowIndex">
-                                <tr [formGroupName]="i">
+                            <ng-template pTemplate="body" let-cuenta>
+                                <tr>
                                     <td>{{cuenta.numeroCuenta}}</td>
                                     <td>{{cuenta.nombreInstitucionFinanciera}}</td>
-                                    <td>{{cuenta.monedaCuenta}}</td>
-                                    <td>{{cuenta.descripcionAgrupacion}}</td>
-                                    <td>{{cuenta.descripcionFrecuenciaActualizacion}}</td>
-                                    <td>{{cuenta.estadoRegistro}}</td>
-                                    <td>
-                                        <p-dropdown 
-                                            [formControlName]="'codigoCredencial'"
-                                            [options]="credenciales"
-                                            optionLabel="nombreProveedor"
-                                            optionValue="codigo"
-                                            placeholder="Selecciona credencial" 
-                                            [styleClass]="'w-full'"
-                                            [appendTo]="'body'"
-                                            [disabled]="esBotonDeshabilitado(cuenta)"
-                                            (onChange)="onCredencialChange($event, cuenta.codigo)"/>
-                                    </td>
+                                    <td>{{cuenta.descripcionMonedaCuenta}}</td>
+                                    <td>{{cuenta.agrupacion.nombreAgrupacionCliente}}</td>
+                                    <td>{{cuenta.frecuenciaActualizacion.descripcionFrecuencia}}</td>
+                                    <td>{{cuenta.estadoRegistro | estadoRegistroLabel}}</td>
                                     <td style="text-align: center;">
+                    
+                                        <p-button icon="pi pi-lock" 
+                                            [rounded]="true" 
+                                            [text]="true" 
+                                            type="button" 
+                                            pRipple
+                                            severity="secondary"
+                                            pTooltip="Vincular credenciales" 
+                                            tooltipPosition="top"
+                                            [disabled]="esBotonDeshabilitado(cuenta)"
+                                            (onClick)="showDialogCredencial(cuenta.codigo)"/>
+
                                         <p-button icon="pi pi-file-edit" 
                                                 [rounded]="true" 
                                                 [text]="true" 
@@ -151,15 +149,44 @@
                                                 pTooltip="Dar de baja" 
                                                 tooltipPosition="left"
                                                 [disabled]="esBotonDeshabilitado(cuenta)" 
-                                                (click)="eliminarFila($event, cuenta)"/>
+                                                (onClick)="eliminarFila($event, cuenta)"/>
                                     </td>
                                 </tr>
                             </ng-template>
                         </p-table>
-                    </form>
                 </div> 
             </div>
             <app-paginator *ngIf="paginator" [paginatorInput] = "paginator" (paginatorOutput)="cambioPagina($event)"></app-paginator>
         </p-panel>
     </form>
     
+    <p-dialog header="Vincular credenciales" [modal]="true" [(visible)]="visibleVinculoCredenciales" [style]="{ width: '40rem' }">
+        <form [formGroup]="credencialForm">
+            <span class="p-text-secondary block mb-5">Credenciales</span>
+            <div class="flex align-items-center gap-3 mb-4">
+                <label for="codigoCredencial" class="font-semibold w-10rem">Credencial</label>
+                <p-dropdown
+                                id="codigoCredencial" 
+                                [options]="credenciales" 
+                                formControlName="codigoCredencial"
+                                [showClear]="true" 
+                                styleClass="w-full"
+                                [ngClass]="(credencialForm.get('codigoCredencial')?.errors?.['required']) && credencialForm.get('codigoCredencial')?.touched ? 
+                                    'dropdown-invalid' : 
+                                    'dropdown-valid'"
+                                [panelStyleClass]="(credencialForm.get('codigoCredencial')?.errors?.['required']) && credencialForm.get('codigoCredencial')?.touched ? 
+                                    'dropdown-invalid' : 
+                                    'dropdown-valid'"
+                                optionLabel="nombreReferencial" 
+                                optionValue="codigo"
+                                placeholder="Selecciona Credencial"
+                                appendTo="body">
+                            </p-dropdown>
+            </div>
+            <div class="flex justify-content-end gap-2">
+                <p-button label="Guardar" pTooltip="Guardar" [outlined]="true" severity="secondary" (onClick)="vincularCredenciales()" [styleClass]="'w-full'"/>
+                <p-button label="Cancelar" pTooltip="Cancelar" [outlined]="true" severity="secondary" (onClick)="visibleVinculoCredenciales = false" [styleClass]="'w-full'" />
+                
+            </div>
+        </form>
+    </p-dialog>

@@ -4,7 +4,6 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, 
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { PaginatorComponent } from '../../commons/paginator/paginator.component';
 import { HeaderComponent } from '../../layout/header/header.component';
-import { MenuComponent } from '../../layout/menu/menu.component';
 import { AgrupacionService } from '../../../../service/modules/private/operativo/agrupacion.service';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { Agrupacion } from '../../../../apis/model/module/private/agrupacion';
@@ -14,6 +13,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MessagesService } from '../../../../service/commons/messages.service';
 import { environment } from '../../../../../environments/environment';
 import { Util } from '../../../../utils/util/util.util';
+import { EstadoRegistroLabelPipe } from '../../../../apis/model/pipe/estado-registro-label.pipe';
+import { AgrupacionRequest } from '../../../../apis/model/module/private/operativo/agrupacion/request/agrupacion-request';
+import { AgrupacionResponse } from '../../../../apis/model/module/private/operativo/agrupacion/response/agrupacion-response';
+import { EstadoRegistroEnum } from '../../../../apis/model/enums/estado-registro';
 
 @Component({
   selector: 'app-agrupacion',
@@ -24,30 +27,30 @@ import { Util } from '../../../../utils/util/util.util';
     ...PRIME_NG_MODULES,
     PaginatorComponent, 
     HeaderComponent,
-    MenuComponent],
+    EstadoRegistroLabelPipe],
 providers: [ConfirmationService, MessageService, AgrupacionService],
 schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './agrupacion.component.html',
   styleUrl: './agrupacion.component.scss'
 })
 export class AgrupacionComponent implements OnInit {
-  public agrupaciones: Agrupacion[] = [];
+  public agrupaciones: AgrupacionResponse[] = [];
   nombreSearch:string | undefined;
   estadoSearch:string | undefined;
   messages: Message[] = [];
   public agrupacionSearchForm: FormGroup;
   estados: Estado[] = Estado.estados;
-  private idEmpresa: string = "";
+  idEmpresa: string = "";
 
   paginator: Paginator = new Paginator();//esta variable se debe declarar para usar el paginador de los apis, no de primeng
 
-  constructor(private confirmationService: ConfirmationService, 
-    private activatedRoute: ActivatedRoute,
-    private router: Router, 
-    private formBuilder: FormBuilder,
-    private messageService: MessageService,
-    private messagesService: MessagesService,
-    private agrupacionService: AgrupacionService) {
+  constructor(private readonly confirmationService: ConfirmationService, 
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router, 
+    private readonly formBuilder: FormBuilder,
+    private readonly messageService: MessageService,
+    private readonly messagesService: MessagesService,
+    private readonly agrupacionService: AgrupacionService) {
 
       this.agrupacionSearchForm = this.formBuilder.group({
         nombreSearch: new FormControl(this.nombreSearch, [Validators.maxLength(50)]),
@@ -78,7 +81,7 @@ export class AgrupacionComponent implements OnInit {
   }
 
   esBotonDeshabilitado(agrupacion: Agrupacion): boolean {
-    return agrupacion.estadoRegistro === "INACTIVO";
+    return Util.mapEstadoRegistro(agrupacion.estadoRegistro) === EstadoRegistroEnum.NO_VIGENTE;
   }
 
   eliminarFila(event: Event, agrupacionParam: Agrupacion) {
@@ -91,7 +94,15 @@ export class AgrupacionComponent implements OnInit {
       rejectIcon:"No",
       rejectButtonStyleClass:"p-button-text",
       accept: () => {
-            this.agrupacionService.eliminar(agrupacionParam.codigo).subscribe(
+            let agrupacion: AgrupacionRequest = {
+                  codigo: agrupacionParam.codigo,
+                  codigoCliente: Number(this.idEmpresa),
+                  interfazCuentaProvieneCliente: "",
+                  nombreAgrupacionCliente: "",
+                  razonSocialCliente: ""
+                };
+
+            this.agrupacionService.eliminar(agrupacion).subscribe(
               response => {
                 const messages: Message[] = [
                   { severity: 'success', summary: 'Confirmación', detail: 'Registro dado de baja', life: 5000 }
@@ -145,7 +156,7 @@ export class AgrupacionComponent implements OnInit {
       }
 
       this.agrupacionService.getAgrupaciones(this.paginator.numeroPagina, this.estadoSearch, this.nombreSearch, this.paginator.cantidadRegistros, this.idEmpresa).subscribe(response => {
-        this.agrupaciones = response.content as Agrupacion[];
+        this.agrupaciones = response.content as AgrupacionResponse[];
         //estos valores se usan para catualizar los valores del paginador
         this.paginator.totalRegistros = response.totalElements;
         this.paginator.primerRegistroVisualizado = response.pageable.offset;
@@ -174,7 +185,7 @@ export class AgrupacionComponent implements OnInit {
       this.estadoSearch = "T";
     }
 
-    this.router.navigate(['/perfil',this.paginator.numeroPagina,this.paginator.cantidadRegistros,this.nombreSearch,this.estadoSearch]);
+    this.router.navigate(['/agrupacion',this.paginator.numeroPagina,this.paginator.cantidadRegistros,this.estadoSearch,this.nombreSearch]);
   }
 
   reloadPage() {

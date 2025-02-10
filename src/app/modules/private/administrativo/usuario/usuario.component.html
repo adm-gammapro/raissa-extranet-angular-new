@@ -71,17 +71,17 @@
                         [styleClass]="'p-datatable-sm'">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th style="width:10%">Usuario</th>
-                                <th style="width:10%">Nombres</th>
-                                <th style="width:10%">Apellido Paterno</th>
-                                <th style="width:10%">Apellido Materno</th>
-                                <th style="width:10%">Fecha Cambio Clave</th>
-                                <th style="width:5%">Expiracion</th>
-                                <th style="width:10%">Fecha Expiración</th>
-                                <th style="width:10%">Correo</th>
-                                <th style="width:5%">Telefono</th>
-                                <th style="width:5%">Estado</th>
-                                <th style="width:15%; text-align: center;">Acciones</th>
+                                <th id="usuario" style="width:10%">Usuario</th>
+                                <th id="nombres" style="width:10%">Nombres</th>
+                                <th id="apePat" style="width:10%">Apellido Paterno</th>
+                                <th id="apeMat" style="width:10%">Apellido Materno</th>
+                                <th id="fecCambioClave" style="width:10%">Fecha Cambio Clave</th>
+                                <th id="expiracion" style="width:5%">Expiracion</th>
+                                <th id="fecExpiracion" style="width:10%">Fecha Expiración</th>
+                                <th id="correo" style="width:10%">Correo</th>
+                                <th id="telefono" style="width:5%">Telefono</th>
+                                <th id="estado" style="width:5%">Estado</th>
+                                <th id="acciones" style="width:15%; text-align: center;">Acciones</th>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-usuario>
@@ -146,7 +146,7 @@
                                             pTooltip="Dar de baja" 
                                             tooltipPosition="left"
                                             [disabled]="esBotonDeshabilitado(usuario)" 
-                                            (click)="eliminarFila($event, usuario)"/>
+                                            (onClick)="eliminarFila($event, usuario)"/>
                                 </td>
                             </tr>
                         </ng-template>

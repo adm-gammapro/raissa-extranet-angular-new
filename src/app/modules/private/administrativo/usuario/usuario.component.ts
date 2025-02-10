@@ -3,7 +3,6 @@ import { HeaderComponent } from "../../layout/header/header.component";
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
-import { MenuComponent } from '../../layout/menu/menu.component';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { UsuarioService } from '../../../../service/modules/private/administrativo/usuario.service';
 import { Usuario } from '../../../../apis/model/module/private/usuario';
@@ -25,7 +24,6 @@ import { FormUsuarioPerfilComponent } from './usuario-perfil/form-usuario-perfil
             ...PRIME_NG_MODULES,
             PaginatorComponent, 
             HeaderComponent,
-            MenuComponent,
             FormUsuarioPerfilComponent],
 providers: [ConfirmationService, MessageService, UsuarioService],
 schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -35,26 +33,26 @@ schemas: [CUSTOM_ELEMENTS_SCHEMA],
 export class UsuarioComponent {
   @ViewChild(FormUsuarioPerfilComponent) formUsuarioPerfilComponent!: FormUsuarioPerfilComponent;
   usuarios!: Usuario[];
-  nombreSearch:String | undefined;
-  estadoSearch:String | undefined;
+  nombreSearch:string | undefined;
+  estadoSearch:string | undefined;
   messages: Message[] = [];
   mostrarHijo = false;
   public usuarioSearchForm: FormGroup;
   estados: Estado[] = Estado.estados;
-  private idEmpresa: string = "";
+  idEmpresa: string = "";
   visibleResetPassword: boolean = false;
   public idUsuarioReset!: number;
   public passwordReset!: string;
 
   paginator: Paginator = new Paginator();//esta variable se debe declarar para usar el paginador de los apis, no de primeng
 
-  constructor(private confirmationService: ConfirmationService, 
-    private activatedRoute: ActivatedRoute,
-    private router: Router, 
-    private formBuilder: FormBuilder,
-    private messageService: MessageService, 
-    private usuarioService: UsuarioService,
-    private messagesService: MessagesService) {
+  constructor(private readonly confirmationService: ConfirmationService, 
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router, 
+    private readonly formBuilder: FormBuilder,
+    private readonly messageService: MessageService, 
+    private readonly usuarioService: UsuarioService,
+    private readonly messagesService: MessagesService) {
 
       this.usuarioSearchForm = this.formBuilder.group({
         nombreSearch: new FormControl(this.nombreSearch, [Validators.maxLength(50)]),

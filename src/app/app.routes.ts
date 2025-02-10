@@ -23,6 +23,7 @@ import { SaldosBancoComponent } from './modules/private/operativo/saldos/saldos-
 import { MovimientosComponent } from './modules/private/operativo/saldos/movimientos/movimientos.component';
 import { TableUsuarioClienteComponent } from './modules/private/administrativo/usuario/usuario-empresa/table/table-usuario-cliente.component';
 import { FormUsuarioClienteComponent } from './modules/private/administrativo/usuario/usuario-empresa/form/form-usuario-cliente.component';
+import { MonitorComponent } from './modules/private/operativo/monitor/monitor.component';
 
 export const routes: Routes = [
     /*{
@@ -68,4 +69,6 @@ export const routes: Routes = [
     { path: 'saldos', component: SaldosComponent},
     { path: 'saldos-banco/:idBanco', component: SaldosBancoComponent},
     { path: 'movimientos/:idCuenta/:bitacora/:idBanco/:fechaInicial/:fechaFinal/:tipoMovimiento/:cantReg/:pagina', component: MovimientosComponent},
+
+    { path: 'monitor', component: MonitorComponent},
 ];

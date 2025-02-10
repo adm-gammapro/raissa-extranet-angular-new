@@ -4,7 +4,6 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, 
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { PaginatorComponent } from '../../commons/paginator/paginator.component';
 import { HeaderComponent } from '../../layout/header/header.component';
-import { MenuComponent } from '../../layout/menu/menu.component';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { AgrupacionService } from '../../../../service/modules/private/operativo/agrupacion.service';
 import { Proveedor } from '../../../../apis/model/module/private/proveedor';
@@ -15,6 +14,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../../../environments/environment';
 import { Util } from '../../../../utils/util/util.util';
 import { ProveedorService } from '../../../../service/modules/private/operativo/proveedor.service';
+import { ProveedorResponse } from '../../../../apis/model/module/private/operativo/proveedor/response/proveedor-response';
+import { EstadoRegistroLabelPipe } from '../../../../apis/model/pipe/estado-registro-label.pipe';
 
 @Component({
   selector: 'app-proveedor',
@@ -25,30 +26,30 @@ import { ProveedorService } from '../../../../service/modules/private/operativo/
     ...PRIME_NG_MODULES,
     PaginatorComponent, 
     HeaderComponent,
-    MenuComponent],
+        EstadoRegistroLabelPipe],
 providers: [ConfirmationService, MessageService, AgrupacionService],
 schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './proveedor.component.html',
   styleUrl: './proveedor.component.scss'
 })
 export class ProveedorComponent implements OnInit {
-  public proveedores: Proveedor[] = [];
+  public proveedores: ProveedorResponse[] = [];
   nombreSearch:string | undefined;
   estadoSearch:string | undefined;
   messages: Message[] = [];
   public proveedorSearchForm: FormGroup;
   estados: Estado[] = Estado.estados;
-  private idEmpresa: string = "";
+  idEmpresa: string = "";
 
   paginator: Paginator = new Paginator();//esta variable se debe declarar para usar el paginador de los apis, no de primeng
 
-  constructor(private confirmationService: ConfirmationService, 
-    private activatedRoute: ActivatedRoute,
-    private router: Router, 
-    private formBuilder: FormBuilder,
-    private messageService: MessageService,
-    private messagesService: MessagesService,
-    private proveedorService: ProveedorService) {
+  constructor(private readonly confirmationService: ConfirmationService, 
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router, 
+    private readonly formBuilder: FormBuilder,
+    private readonly messageService: MessageService,
+    private readonly messagesService: MessagesService,
+    private readonly proveedorService: ProveedorService) {
 
       this.proveedorSearchForm = this.formBuilder.group({
         nombreSearch: new FormControl(this.nombreSearch, [Validators.maxLength(50)]),
@@ -146,7 +147,7 @@ export class ProveedorComponent implements OnInit {
       }
 
       this.proveedorService.getProveedores(this.paginator.numeroPagina, this.estadoSearch, this.nombreSearch, this.paginator.cantidadRegistros, Number(this.idEmpresa)).subscribe(response => {
-        this.proveedores = response.content as Proveedor[];
+        this.proveedores = response.content as ProveedorResponse[];
         //estos valores se usan para catualizar los valores del paginador
         this.paginator.totalRegistros = response.totalElements;
         this.paginator.primerRegistroVisualizado = response.pageable.offset;

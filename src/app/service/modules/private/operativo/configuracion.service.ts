@@ -65,8 +65,7 @@ export class ConfiguracionService {
 
   getAplicacionEntorno(codigoEmpresa: string): Observable<AplicacionEntorno> {
     const params = [
-      `codigoEmpresa=${codigoEmpresa}`,
-      `estadoRegistro=S`,
+      `codigoCliente=${codigoEmpresa}`,
     ].filter(Boolean).join('&');
 
     const headers = new HttpHeaders({
@@ -76,7 +75,7 @@ export class ConfiguracionService {
 
     return this.http.get(url, { headers: headers }).pipe(
       map((response: any) => {
-        return response.body;
+        return response;
       }),
       catchError(e => {
         this.authService.isNoAutorizado(e);

@@ -79,13 +79,7 @@ export class AuthService {
     }
 
     if (e.status == 403) {
-      /*Swal.fire({
-        title: 'Error!',
-        text: 'No se pudo verificar acceso a la aplicación',
-        icon: 'error'
-      });*/
       console.log('No se pudo verificar acceso a la aplicación');
-      //this.router.navigate(['/content-web']);
       return true;
     }
     return false;

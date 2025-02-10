@@ -9,13 +9,15 @@ import { MessagesService } from '../../../../service/commons/messages.service';
 import { CredencialesService } from '../../../../service/modules/private/operativo/credenciales.service';
 import { environment } from '../../../../../environments/environment';
 import { Util } from '../../../../utils/util/util.util';
-import { Proveedor } from '../../../../apis/model/module/private/proveedor';
 import { ProveedorService } from '../../../../service/modules/private/operativo/proveedor.service';
 import { CommonModule } from '@angular/common';
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { PaginatorComponent } from '../../commons/paginator/paginator.component';
 import { HeaderComponent } from '../../layout/header/header.component';
-import { MenuComponent } from '../../layout/menu/menu.component';
+import { CredencialesResponse } from '../../../../apis/model/module/private/operativo/credenciales/response/credenciales-response';
+import { ProveedorResponse } from '../../../../apis/model/module/private/operativo/proveedor/response/proveedor-response';
+import { EstadoRegistroLabelPipe } from '../../../../apis/model/pipe/estado-registro-label.pipe';
+import { EstadoRegistroEnum } from '../../../../apis/model/enums/estado-registro';
 
 @Component({
   selector: 'app-credenciales',
@@ -26,14 +28,14 @@ import { MenuComponent } from '../../layout/menu/menu.component';
     ...PRIME_NG_MODULES,
     PaginatorComponent, 
     HeaderComponent,
-    MenuComponent],
-providers: [ConfirmationService, MessageService, CredencialesService, ProveedorService],
+    EstadoRegistroLabelPipe],
+providers: [ConfirmationService, MessageService],
 schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './credenciales.component.html',
   styleUrl: './credenciales.component.scss'
 })
 export class CredencialesComponent implements OnInit {
-  public credenciales: Credenciales[] = [];
+  public credenciales: CredencialesResponse[] = [];
   nombreSearch:string | undefined;
   proveedorSearch!:string;
   estadoSearch:string | undefined;
@@ -41,18 +43,18 @@ export class CredencialesComponent implements OnInit {
   public credencialesSearchForm: FormGroup;
   estados: Estado[] = Estado.estados;
   idEmpresa: string = "";
-  public proveedores: Proveedor[] = [];
+  proveedores: ProveedorResponse[] = [];
 
   paginator: Paginator = new Paginator();//esta variable se debe declarar para usar el paginador de los apis, no de primeng
 
-  constructor(private confirmationService: ConfirmationService, 
-    private activatedRoute: ActivatedRoute,
-    private router: Router, 
-    private formBuilder: FormBuilder,
-    private messageService: MessageService,
-    private messagesService: MessagesService,
-    private credencialesService: CredencialesService,
-    private proveedorService: ProveedorService) {
+  constructor(private readonly confirmationService: ConfirmationService, 
+              private readonly activatedRoute: ActivatedRoute,
+              private readonly router: Router, 
+              private readonly formBuilder: FormBuilder,
+              private readonly messageService: MessageService,
+              private readonly messagesService: MessagesService,
+              private readonly credencialesService: CredencialesService,
+              private readonly proveedorService: ProveedorService) {
 
       this.credencialesSearchForm = this.formBuilder.group({
         nombreSearch: new FormControl(this.nombreSearch, [Validators.maxLength(50)]),
@@ -83,9 +85,9 @@ export class CredencialesComponent implements OnInit {
     Util.filterAlphanumeric(event, this.credencialesSearchForm);
   }
 
-  esBotonDeshabilitado(credenciales: Credenciales): boolean {
-    return credenciales.estadoRegistro === "INACTIVO";
-  }
+  esBotonDeshabilitado(cuenta: CredencialesResponse): boolean {
+      return Util.mapEstadoRegistro(cuenta.estadoRegistro) === EstadoRegistroEnum.NO_VIGENTE;
+    }
 
   eliminarFila(event: Event, credencialesParam: Credenciales) {
     this.confirmationService.confirm({
@@ -97,7 +99,7 @@ export class CredencialesComponent implements OnInit {
       rejectIcon:"No",
       rejectButtonStyleClass:"p-button-text",
       accept: () => {
-            this.credencialesService.eliminar(credencialesParam.codigo).subscribe(
+            this.credencialesService.eliminar(credencialesParam.codigo, Number(this.idEmpresa)).subscribe(
               response => {
                 const messages: Message[] = [
                   { severity: 'success', summary: 'Confirmación', detail: 'Registro dado de baja', life: 5000 }
@@ -116,57 +118,31 @@ export class CredencialesComponent implements OnInit {
   ngOnInit() {
     this.getProveedores();
     this.activatedRoute.paramMap.subscribe (params => {
-      let pagina: number;
-      let proveedor: string;
-      let referencia: string;
-      let estado: string
-      let cantReg: number;
+      let pagina = Util.parseOrDefault(params.get('pagina'), 0);
+      let estado = params.get('estadoSearch') ?? "T";
+      let proveedor = params.get('proveedorSearch') ?? "";
+      let referencia = params.get('nombreSearch') ?? "";
+      let cantReg = Util.parseOrDefault(params.get('cantReg'),5);
 
-      pagina = Number(params.get('pagina'));
-      referencia = String(params.get('nombreSearch'));
-      estado = String(params.get('estadoSearch'));
-      proveedor = String(params.get('proveedorSearch'));
-      cantReg = Number(params.get('cantReg'));
+      this.paginator.numeroPagina = pagina;
+      this.nombreSearch = referencia;
+      this.proveedorSearch = proveedor;
 
-      if(!pagina){
-        this.paginator.numeroPagina = 0;
-      } else {
-        this.paginator.numeroPagina = pagina;
-      }
-
-      if(!referencia || referencia == "null") {
-        this.nombreSearch = "";
-      } else {
-        this.nombreSearch = referencia;
-      }
-
-      if(!proveedor || proveedor == "null") {
-        this.proveedorSearch = "";
-      } else {
-        this.proveedorSearch = proveedor;
-      }
-
-      if(!estado || estado == "null" || estado == "T"){
+      if(estado == "T"){
         this.estadoSearch = "";
       } else {
         this.estadoSearch = estado;
       }
       
-      if(!cantReg){
-        this.paginator.cantidadRegistros = 5;
-      } else {
-        this.paginator.cantidadRegistros = cantReg;
-      }
+      this.paginator.cantidadRegistros = cantReg;
 
-      this.credencialesService.getCredenciales(this.paginator.numeroPagina, this.estadoSearch, this.nombreSearch, this.proveedorSearch, this.paginator.cantidadRegistros, this.idEmpresa).subscribe(response => {
-        this.credenciales = response.content as Credenciales[];
+      this.credencialesService.getCredenciales(this.paginator.numeroPagina, this.estadoSearch, this.nombreSearch, this.proveedorSearch, this.paginator.cantidadRegistros, Number(this.idEmpresa)).subscribe(response => {
+        this.credenciales = response.content as CredencialesResponse[];
         //estos valores se usan para catualizar los valores del paginador
         this.paginator.totalRegistros = response.totalElements;
         this.paginator.primerRegistroVisualizado = response.pageable.offset;
 
-        if(!estado || estado == "T" || estado == "null"){
-          this.estadoSearch = "T";
-        }
+        this.estadoSearch = estado;
 
         this.credencialesSearchForm.patchValue({
           nombreSearch: this.nombreSearch,
@@ -204,7 +180,11 @@ export class CredencialesComponent implements OnInit {
 
   getProveedores(): void {
     this.proveedorService.getAllProveedor(Number(this.idEmpresa)).subscribe(response => {
-      this.proveedores = response as Proveedor[];
+      this.proveedores = response;
     });
+  }
+
+  ocultarValor(valor: string): string {
+    return '*'.repeat(valor.length);
   }
 }

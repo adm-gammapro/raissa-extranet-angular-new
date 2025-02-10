@@ -1,22 +1,24 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderComponent } from '../../../layout/header/header.component';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { CuentasService } from '../../../../../service/modules/private/operativo/cuentas.service';
 import { SaldosService } from '../../../../../service/modules/private/operativo/saldos.service';
 import { AgrupacionService } from '../../../../../service/modules/private/operativo/agrupacion.service';
-import { Cuentas } from '../../../../../apis/model/module/private/cuentas';
-import { Frecuencia } from '../../../../../apis/model/module/private/frecuencia';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessagesService } from '../../../../../service/commons/messages.service';
 import { environment } from '../../../../../../environments/environment';
 import { Moneda } from '../../../../../apis/model/commons/moneda';
 import { Agrupacion } from '../../../../../apis/model/module/private/agrupacion';
-import { Banco } from '../../../../../apis/model/module/private/banco';
 import { Util } from '../../../../../utils/util/util.util';
 import { TipoCuenta } from '../../../../../apis/model/module/private/tipo-cuenta';
+import { CuentaResponse } from '../../../../../apis/model/module/private/operativo/cuenta/response/cuenta-response';
+import { CuentaRequest } from '../../../../../apis/model/module/private/operativo/cuenta/request/cuenta-request';
+import { FrecuenciaActualizacionResponse } from '../../../../../apis/model/module/private/commons/frecuencia-actualizacion-response';
+import { InstitucionFinancieraService } from '../../../../../service/commons/institucion-financiera.service';
+import { InstitucionFinancieraResponse } from '../../../../../apis/model/module/private/commons/institucion-financiera-response';
 
 @Component({
   selector: 'app-form-cuentas',
@@ -31,27 +33,28 @@ import { TipoCuenta } from '../../../../../apis/model/module/private/tipo-cuenta
   styleUrl: './form-cuentas.component.scss'
 })
 export class FormCuentasComponent {
-  cuenta: Cuentas = new Cuentas();
+  cuentaResponse!: CuentaResponse;
+  cuentaRequest!: CuentaRequest;
   public cuentaForm: FormGroup;
   public idEmpresa: string = "";
   monedas: Moneda[] = Moneda.monedas;
   tipoCuentas: TipoCuenta[] = TipoCuenta.tipoCuentas;
   public agrupaciones: Agrupacion[] = [];
-  public bancos: Banco[]=[];
-  public frecuencias: Frecuencia[] = [];
+  public bancos: InstitucionFinancieraResponse[]=[];
+  public frecuencias: FrecuenciaActualizacionResponse[] = [];
 
-  constructor(private router: Router, 
-              private confirmationService: ConfirmationService, 
-              private formBuilder: FormBuilder,
-              private messageService: MessageService, 
-              private activatedRoute: ActivatedRoute,
-              private messagesService: MessagesService,
-              private saldosService: SaldosService,
-              private cuentasService: CuentasService,
-              private agrupacionService: AgrupacionService) {
+  constructor(private readonly router: Router, 
+              private readonly confirmationService: ConfirmationService, 
+              private readonly formBuilder: FormBuilder,
+              private readonly messageService: MessageService, 
+              private readonly activatedRoute: ActivatedRoute,
+              private readonly messagesService: MessagesService,
+              private readonly cuentasService: CuentasService,
+              private readonly agrupacionService: AgrupacionService,
+              private readonly institucionFinancieraService: InstitucionFinancieraService) {
 
     this.cuentaForm = this.formBuilder.group({
-      codigo: new FormControl(this.cuenta.codigo),
+      codigo: [null],
       numeroCuenta: ['', [Validators.required, Validators.maxLength(23)]],
       codigoInstitucionFinanciera: ['', Validators.required],
       monedaCuenta: ['', Validators.required],
@@ -73,13 +76,13 @@ export class FormCuentasComponent {
 
   public cargarFrecuencia(): void {
     this.cuentasService.getFrecuencias().subscribe(response => {
-      this.frecuencias = response as Frecuencia[];
+      this.frecuencias = response;
     });
   }
 
   public cargarBanco(): void {
-    this.saldosService.getAllBancos(Number(this.idEmpresa)).subscribe(response => {
-      this.bancos = response as Banco[];
+    this.institucionFinancieraService.getAllBancos(Number(this.idEmpresa)).subscribe(response => {
+      this.bancos = response;
     });
   }
 
@@ -87,17 +90,17 @@ export class FormCuentasComponent {
     this.activatedRoute.params.subscribe(params => {
       let id = params['id']
       if(id){
-        this.cuentasService.getCuenta(id).subscribe(response=> {
-          this.cuenta = response;
+        this.cuentasService.getCuenta(id, Number(this.idEmpresa)).subscribe(response=> {
+          this.cuentaResponse = response;
 
           this.cuentaForm.patchValue({
-            codigo: this.cuenta.codigo,
-            numeroCuenta: this.cuenta.numeroCuenta,
-            codigoInstitucionFinanciera: this.cuenta.codigoInstitucionFinanciera,
-            monedaCuenta: this.cuenta.monedaCuenta,
-            codigoAgrupacion: this.cuenta.codigoAgrupacion,
-            codigoFrecuenciaActualizacion: this.cuenta.codigoFrecuenciaActualizacion,
-            tipoCuenta: this.cuenta.tipoCuenta
+            codigo: this.cuentaResponse.codigo,
+            numeroCuenta: this.cuentaResponse.numeroCuenta,
+            codigoInstitucionFinanciera: this.cuentaResponse.codigoInstitucionFinanciera,
+            monedaCuenta: this.cuentaResponse.monedaCuenta,
+            codigoAgrupacion: this.cuentaResponse.agrupacion.codigo,
+            codigoFrecuenciaActualizacion: this.cuentaResponse.frecuenciaActualizacion.codigo,
+            tipoCuenta: this.cuentaResponse.tipoCuenta
           });
         });
       }
@@ -114,10 +117,28 @@ export class FormCuentasComponent {
           acceptLabel: 'Si', // Etiqueta del botón 'Aceptar'
           rejectLabel: 'No',
           accept: () => {
-              
-              this.cuenta = this.cuentaForm.value;
-              this.cuentasService.create(this.cuenta).subscribe({
-                next:(response) => {
+
+            this.cuentaRequest = this.cuentaForm.value;
+            this.cuentaRequest.codigoCliente = Number(this.idEmpresa);
+            this.cuentaRequest.interfazCuentaProvieneCliente = "1";//Se envia desde extranet
+            if (this.cuentaRequest.codigo) {
+              this.cuentasService.update(this.cuentaRequest).subscribe({
+                next: () => {
+                  const messages: Message[] = [
+                    { severity: 'success', summary: 'Confirmación', detail: `Se Actualizó registro existosamente`, life: 5000 }
+                  ];
+                  this.messagesService.setMessages(messages);
+                },
+                error: (err) => {
+                  this.messageService.add({ severity: 'error', summary: 'Error', detail: Util.validaMensajeError(err), life: 5000 });
+                },
+                complete: () => {
+                  this.router.navigate(['/cuentas'])
+                }
+              });
+            } else {
+              this.cuentasService.create(this.cuentaRequest).subscribe({
+                next: () => {
                   const messages: Message[] = [
                     { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro existosamente`, life: 5000 }
                   ];
@@ -129,7 +150,8 @@ export class FormCuentasComponent {
                 complete: () => {
                   this.router.navigate(['/cuentas'])
                 }
-             })
+              });
+            }
           },reject: () => {
             this.messageService.add({ severity: 'error', summary: 'Rechazado', detail: 'No se guardó registro', life: 5000 });
         }

@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../../authorization/auth.service';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { Proveedor } from '../../../../apis/model/module/private/proveedor';
+import { ProveedorResponse } from '../../../../apis/model/module/private/operativo/proveedor/response/proveedor-response';
+import { ProveedorRequest } from '../../../../apis/model/module/private/operativo/proveedor/request/proveedor-request';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProveedorService {
-  private urlProveedor: string = environment.url.base + '/extranet/proveedor';
+  private readonly urlProveedor: string = environment.url.base + '/extranet/proveedor';
 
-  constructor(private http: HttpClient,
-    private router: Router,
-    private authService: AuthService) { }
+  constructor(private readonly http: HttpClient,
+    private readonly authService: AuthService) { }
 
   getProveedores(page: number,
     estadoRegistro: string,
@@ -27,38 +27,17 @@ export class ProveedorService {
       `estadoRegistro=${estadoRegistro}`,
       `nombre=${nombreProveedor}`,
       `cantReg=${cantReg}`,
-      `codigoEmpresa=${codigoEmpresa}`,
+      `codigoCliente=${codigoEmpresa}`,
     ].filter(Boolean).join('&');
 
     const headers = new HttpHeaders({
     });
 
-    const url = `${this.urlProveedor}/listarProveedorPage?${params}`;
+    const url = `${this.urlProveedor}/list-page-proveedor?${params}`;
 
     return this.http.get(url, { headers: headers }).pipe(
       map((response: any) => {
-        (response.body.content as Proveedor[]).map(proveedor => {
-          proveedor.nombre = proveedor.nombre?.toUpperCase();
-          proveedor.codigo = proveedor.codigo?.toUpperCase();
-          proveedor.referencia = proveedor.referencia?.toUpperCase();
-          proveedor.codigoInstitucionFinanciera = proveedor.codigoInstitucionFinanciera?.toUpperCase();
-          proveedor.nombreInstitucionFinanciera = proveedor.nombreInstitucionFinanciera?.toUpperCase();
-
-          if (proveedor.estadoRegistro === 'S') {
-            proveedor.estadoRegistro = 'ACTIVO';
-          } else {
-            proveedor.estadoRegistro = 'INACTIVO';
-          }
-
-          if (proveedor.indicadorValorAdicional) {
-            proveedor.descripcionIndicadorAdicional = 'Si';
-          } else {
-            proveedor.descripcionIndicadorAdicional = 'No';
-          }
-
-          return proveedor;
-        });
-        return response.body;
+        return response;
       }),
       catchError(e => {
         this.authService.isNoAutorizado(e);
@@ -67,14 +46,11 @@ export class ProveedorService {
     );
   }
 
-  create(proveedor: Proveedor): Observable<Proveedor> {
-    const headers = new HttpHeaders({
-    });
-
+  create(proveedor: ProveedorRequest): Observable<ProveedorResponse> {
     const url = `${this.urlProveedor}/registrar-proveedor`;
 
-    return this.http.put<any>(url, proveedor, { headers: headers }).pipe(
-      map((response: any) => response.body as Proveedor),
+    return this.http.put<any>(url, proveedor).pipe(
+      map((response: any) => response),
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);
@@ -95,19 +71,16 @@ export class ProveedorService {
     )
   }
 
-  getProveedor(id: string): Observable<Proveedor> {
+  getProveedor(id: string): Observable<ProveedorResponse> {
     const params = [
-      `codigo=${id}`,
+      `codigoProveedor=${id}`,
     ].filter(Boolean).join('&');
 
-    const headers = new HttpHeaders({
-    });
+    const url = `${this.urlProveedor}/get-proveedor?${params}`;
 
-    const url = `${this.urlProveedor}/obtenerProveedor?${params}`;
-
-    return this.http.get(url, { headers: headers }).pipe(
+    return this.http.get(url).pipe(
       map((response: any) => {
-        return response.body;
+        return response;
       }),
       catchError(e => {
         this.authService.isNoAutorizado(e);
@@ -116,19 +89,38 @@ export class ProveedorService {
     );
   }
 
-  getAllProveedor(codigoEmpresa: number): Observable<Proveedor[]> {
+  getAllProveedor(codigoCliente: number): Observable<ProveedorResponse[]> {
     const params = [
-      `codigoEmpresa=${codigoEmpresa}`,
+      `codigoCliente=${codigoCliente}`,
     ].filter(Boolean).join('&');
 
     const headers = new HttpHeaders({
     });
 
-    const url = `${this.urlProveedor}/listarAllProveedor?${params}`;
+    const url = `${this.urlProveedor}/list-all-proveedor?${params}`;
 
     return this.http.get(url, { headers: headers }).pipe(
       map((response: any) => {
-        return response.body;
+        return response;
+      }),
+      catchError(e => {
+        this.authService.isNoAutorizado(e);
+        return throwError(() => e);
+      })
+    );
+  }
+
+  getProveedoresClienteBanco(codigoCliente: number, codigoBanco: string): Observable<ProveedorResponse[]> {
+    const params = [
+      `codigoCliente=${codigoCliente}`,
+      `codigoBanco=${codigoBanco}`,
+    ].filter(Boolean).join('&');
+
+    const url = `${this.urlProveedor}/list-proveedor-banco?${params}`;
+
+    return this.http.get(url).pipe(
+      map((response: any) => {
+        return response;
       }),
       catchError(e => {
         this.authService.isNoAutorizado(e);

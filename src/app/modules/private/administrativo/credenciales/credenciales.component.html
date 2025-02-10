@@ -84,23 +84,25 @@
                         [styleClass]="'p-datatable-sm'">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th style="width:15%">Empresa</th>
-                                <th style="width:20%">Proveedor</th>
-                                <th style="width:15%">Usuario</th>
-                                <th style="width:15%">Clave</th>
-                                <th style="width:15%">Valor adicional</th>
-                                <th style="width:5%">Estado</th>
-                                <th style="width:15%; text-align: center;">Acciones</th>
+                                <th id="empresa" style="width:15%">Empresa</th>
+                                <th id="proveedor" style="width:20%">Proveedor</th>
+                                <th id="referencia" style="width:20%">Referencia</th>
+                                <th id="usuario" style="width:15%">Usuario</th>
+                                <th id="clave" style="width:15%">Clave</th>
+                                <th id="valorAdicional" style="width:15%">Valor adicional</th>
+                                <th id="estado" style="width:5%">Estado</th>
+                                <th id="acciones" style="width:15%; text-align: center;">Acciones</th>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-credencial>
                             <tr>
-                                <td>{{credencial.razonSocial}}</td>
-                                <td>{{credencial.nombreProveedor}}</td>
-                                <td>{{credencial.usuario}}</td>
-                                <td>{{credencial.clave}}</td>
+                                <td>{{credencial.razonSocialCliente}}</td>
+                                <td>{{credencial.proveedor.nombre}}</td>
+                                <td>{{credencial.nombreReferencial}}</td>
+                                <td>{{ocultarValor(credencial.usuario)}}</td>
+                                <td>{{ocultarValor(credencial.clave)}}</td>
                                 <td>{{credencial.referencia}}</td>                              
-                                <td>{{credencial.estadoRegistro}}</td>
+                                <td>{{credencial.estadoRegistro | estadoRegistroLabel}}</td>
                                 <td style="text-align: center;">
                                     <p-button icon="pi pi-file-edit" 
                                             [rounded]="true" 
@@ -121,7 +123,7 @@
                                             pTooltip="Dar de baja" 
                                             tooltipPosition="left"
                                             [disabled]="esBotonDeshabilitado(credencial)" 
-                                            (click)="eliminarFila($event, credencial)"/>
+                                            (onClick)="eliminarFila($event, credencial)"/>
                                 </td>
                             </tr>
                         </ng-template>

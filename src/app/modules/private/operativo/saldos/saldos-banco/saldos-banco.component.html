@@ -10,14 +10,14 @@
                 </div>
                 
                 <div class="field col-12 md:col-3 text-center">
-                    <p-button label="Mostrar Posición por banco" 
+                    <p-button label="Mostrar resumen de saldos por banco" 
                             pTooltip="Posición por banco" 
                             [text]="true" [raised]="true" severity="secondary" 
                             (onClick)="mostrarResumen();"
                             styleClass="w-full"/>
                 </div>
                 <div class="field col-12 md:col-3 text-center">
-                    <p-button label="Actualizar saldos y movimientos" 
+                    <p-button label="Actualizar saldos y movimientos por banco" 
                             pTooltip="Actualizar" 
                             [text]="true" [raised]="true" severity="secondary" 
                             (onClick)="actualizarSaldosMovimientos();"
@@ -46,14 +46,14 @@
                     [styleClass]="'p-datatable-sm'">
                 <ng-template pTemplate="header">
                     <tr class="custom-header">
-                        <th style="width:15%">Banco</th>
-                        <th style="width:10%">Abreviatura</th>
-                        <th style="width:15%">Nro de cuenta</th>
-                        <th style="width:10%">Moneda</th>
-                        <th style="width:10%; text-align: right;">Saldo</th>
-                        <th style="width:15%; text-align: center;">Actualizado a...</th>
-                        <th style="width:15%; text-align: center;">Última Actualización</th>
-                        <th style="width:10%; text-align: center;">Acciones</th>
+                        <th id="banco" style="width:15%">Banco</th>
+                        <th id="abreviatura" style="width:10%">Abreviatura</th>
+                        <th id="cuenta" style="width:15%">Nro de cuenta</th>
+                        <th id="moneda" style="width:10%">Moneda</th>
+                        <th id="saldo" style="width:10%; text-align: right;">Saldo</th>
+                        <th id="actualizacion" style="width:15%; text-align: center;">Actualizado a...</th>
+                        <th id="ultimaActualizacion" style="width:15%; text-align: center;">Última Actualización</th>
+                        <th id="acciones" style="width:10%; text-align: center;">Acciones</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-saldo>
@@ -81,8 +81,8 @@
                                     type="button" 
                                     pRipple
                                     severity="secondary"
-                                    (onClick)="actualizarSaldosMovimientosPorCuenta(saldo.codigoAgrupacion, saldo.cuenta, saldo.idBanco);"
-                                    pTooltip="Actualizar por banco" 
+                                    (onClick)="actualizarSaldosMovimientosPorCuenta(saldo.idCuenta);"
+                                    pTooltip="Actualizar saldos por cuenta" 
                                     tooltipPosition="top" />
                         </td>
                     </tr>
@@ -110,4 +110,16 @@
 
 <p-dialog [modal]="true" [(visible)]="resumenSaldos" [style]="{ width: '45rem'}">
     <app-resumen-general-modal [resumen]="resumen" (cerrarModal)="cerrarModal()"></app-resumen-general-modal>
+</p-dialog>
+
+<p-dialog header="Cuenta tokenizada" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+    <span class="p-text-secondary block mb-8">Ingrese información sensible</span>
+    <div class="flex items-center gap-4 mb-4">
+        <label for="token" class="font-semibold w-24">Token</label>
+        <input pInputText id="token" class="flex-auto" autocomplete="off" />
+    </div>
+    
+    <div class="flex justify-end gap-2">
+        <p-button label="Enviar" (onClick)="visible = false" />
+    </div>
 </p-dialog>

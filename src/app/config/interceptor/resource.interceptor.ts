@@ -14,7 +14,7 @@ export const resourceInterceptor: HttpInterceptorFn = (request: HttpRequest<any>
       const token: string | null = tokenService.getAccessToken();
       let headersConfig = {
         'Authorization': token ? `Bearer ${token}` : '',
-        'Content-Type': 'application/json', // Aquí agregas el Content-Type
+        'Content-Type': 'application/json',
       };
       request = request.clone({ setHeaders: headersConfig }); 
     } else {
@@ -24,18 +24,3 @@ export const resourceInterceptor: HttpInterceptorFn = (request: HttpRequest<any>
 
   return next(request);
 };
-
-
-/*constructor(private tokenService: TokenService) {}
-
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    let intReq = request;
-
-    const token = this.tokenService.getAccessToken();
-
-    if(token != null && request.url.includes('resource')) {
-      intReq = request.clone({headers: request.headers.set('authorization', 'Bearer ' + token)})
-    }
-
-    return next.handle(intReq);
-  }*/

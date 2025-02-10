@@ -1,66 +1,41 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../authorization/auth.service';
 import { catchError, map, Observable, throwError } from 'rxjs';
-import { Credenciales } from '../../../../apis/model/module/private/credenciales';
-import { Agrupacion } from '../../../../apis/model/module/private/agrupacion';
+import { CredencialesResponse } from '../../../../apis/model/module/private/operativo/credenciales/response/credenciales-response';
+import { CredencialesRequest } from '../../../../apis/model/module/private/operativo/credenciales/request/credenciales-request';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CredencialesService {
-  private urlCredenciales = environment.url.base + '/extranet/credencial';
+  private readonly urlCredenciales = environment.url.base + '/credenciales';
 
-  constructor(private http: HttpClient,
-    private router: Router,
-    private authService: AuthService) { }
+  constructor(private readonly http: HttpClient,
+    private readonly authService: AuthService) { }
 
   getCredenciales(page: number,
     estadoRegistro: string,
     referencia: string,
     proveedor: string,
-    cantReg: number,
-    idEmpresa: string): Observable<any> {
+    size: number,
+    codigoCliente: number): Observable<any> {
 
     const params = [
-      `pagina=${page}`,
+      `page=${page}`,
       `estadoRegistro=${estadoRegistro}`,
       `referencia=${referencia}`,
       `proveedor=${proveedor}`,
-      `cantReg=${cantReg}`,
-      `idEmpresa=${idEmpresa}`,
+      `size=${size}`,
+      `codigoCliente=${codigoCliente}`,
     ].filter(Boolean).join('&');
 
-    const headers = new HttpHeaders({
-    });
+    const url = `${this.urlCredenciales}/list-credenciales-page?${params}`;
 
-    const url = `${this.urlCredenciales}/listarCredencialesPage?${params}`;
-
-    return this.http.get(url, { headers: headers }).pipe(
+    return this.http.get(url).pipe(
       map((response: any) => {
-        (response.body.content as Credenciales[]).map(credencial => {
-          credencial.codigo = credencial.codigo;
-          credencial.usuario = credencial.usuario;
-          credencial.clave = credencial.clave;
-          credencial.referencia = credencial.referencia?.toUpperCase();
-          credencial.codigoProveedor = credencial.codigoProveedor;
-          credencial.nombreProveedor = credencial.nombreProveedor?.toUpperCase();
-          credencial.codigoCliente = credencial.codigoCliente;
-          credencial.razonSocial = credencial.razonSocial?.toUpperCase();
-          credencial.codigoFrecuencia = credencial.codigoFrecuencia;
-          credencial.descripcionFrecuencia = credencial.descripcionFrecuencia?.toUpperCase();
-
-          if (credencial.estadoRegistro === 'S') {
-            credencial.estadoRegistro = 'ACTIVO';
-          } else {
-            credencial.estadoRegistro = 'INACTIVO';
-          }
-
-          return credencial;
-        });
-        return response.body;
+        return response;
       }),
       catchError(e => {
         this.authService.isNoAutorizado(e);
@@ -69,14 +44,11 @@ export class CredencialesService {
     );
   }
 
-  create(credencial: Credenciales): Observable<Credenciales> {
-    const headers = new HttpHeaders({
-    });
+  create(credencial: CredencialesRequest): Observable<CredencialesResponse> {
+    const url = `${this.urlCredenciales}/create-credencial`;
 
-    const url = `${this.urlCredenciales}/registrar-credencial`;
-
-    return this.http.put<any>(url, credencial, { headers: headers }).pipe(
-      map((response: any) => response.body as Credenciales),
+    return this.http.put<any>(url, credencial).pipe(
+      map((response: any) => response as CredencialesResponse),
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);
@@ -84,12 +56,11 @@ export class CredencialesService {
     );
   }
 
-  eliminar(id: number): Observable<Credenciales> {
-    const headers = new HttpHeaders({
-    });
+  update(credencial: CredencialesRequest): Observable<CredencialesResponse> {
+    const url = `${this.urlCredenciales}/update-credencial`;
 
-    const url = `${this.urlCredenciales}/eliminar-credencial/${id}`;
-    return this.http.delete<Credenciales>(url, { headers: headers }).pipe(
+    return this.http.put<any>(url, credencial).pipe(
+      map((response: any) => response as CredencialesResponse),
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);
@@ -97,57 +68,50 @@ export class CredencialesService {
     );
   }
 
-  getCredencial(id: number): Observable<Credenciales> {
+  eliminar(codigo: number,
+          codigoCliente: number): Observable<CredencialesResponse> {
+    let credencial: CredencialesRequest = new CredencialesRequest();
+      credencial.codigo = codigo;
+      credencial.codigoCliente = codigoCliente;
+
+    const url = `${this.urlCredenciales}/delete-credencial`;
+
+    return this.http.post<any>(url, credencial).pipe(
+      map((response: any) => response as CredencialesResponse),
+      catchError(e => {
+        this.authService.isNoAutorizado(e);
+        return throwError(() => e);
+      })
+    );
+  }
+
+  getCredencial(codigo: number,
+                codigoCliente: number): Observable<CredencialesResponse> {
+    let credencial: CredencialesRequest = new CredencialesRequest();
+      credencial.codigo = codigo;
+      credencial.codigoCliente = codigoCliente;
+
+    const url = `${this.urlCredenciales}/get-credencial`;
+
+    return this.http.post<any>(url, credencial).pipe(
+      map((response: any) => response as CredencialesResponse),
+      catchError(e => {
+        this.authService.isNoAutorizado(e);
+        return throwError(() => e);
+      })
+    );
+  }
+
+  getCredencialesPorEmpresa(codigoCliente: number) {
     const params = [
-      `codigo=${id}`,
+      `codigoCliente=${codigoCliente}`,
     ].filter(Boolean).join('&');
 
-    const headers = new HttpHeaders({
-    });
+    const url = `${this.urlCredenciales}/list-credenciales-cliente?${params}`;
 
-    const url = `${this.urlCredenciales}/obtenerCredencial?${params}`;
-
-    return this.http.get(url, { headers: headers }).pipe(
+    return this.http.get(url).pipe(
       map((response: any) => {
-        return response.body;
-      }),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  getAllCredenciales(): Observable<Agrupacion[]> {
-    const headers = new HttpHeaders({
-    });
-
-    const url = `${this.urlCredenciales}/listarAllAgrupacion`;
-
-    return this.http.get(url, { headers: headers }).pipe(
-      map((response: any) => {
-        return response.body;
-      }),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  getCredencialesPorEmpresa(idEmpresa: number) {
-    const params = [
-      `idEmpresa=${idEmpresa}`,
-    ].filter(Boolean).join('&');
-
-    const headers = new HttpHeaders({
-    });
-
-    const url = `${this.urlCredenciales}/listarCredencialesPorEmpresa?${params}`;
-
-    return this.http.get(url, { headers: headers }).pipe(
-      map((response: any) => {
-        return response.body;
+        return response;
       }),
       catchError(e => {
         this.authService.isNoAutorizado(e);

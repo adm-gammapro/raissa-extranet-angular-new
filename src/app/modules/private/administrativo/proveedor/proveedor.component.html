@@ -50,14 +50,6 @@
                                     (onClick)="reloadPage();"
                                     styleClass="w-full"/>
                         </div>
-                        <!--<div class="field col-12 md:col-1 text-right">
-                            <p-button label="Agregar" 
-                                    pTooltip="Agregar" 
-                                    [outlined]="true" 
-                                    severity="secondary" 
-                                    [routerLink]="['/form-proveedor', 0]"
-                                    styleClass="w-full"/>
-                        </div>-->
                     </div>
                 </div>
                 
@@ -71,21 +63,21 @@
                         [styleClass]="'p-datatable-sm'">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th style="width:20%">Nombre</th>
-                                <th style="width:15%">Referencia</th>
-                                <th style="width:15%">Entidad Financiera</th>
-                                <th style="width:15%">Requiere valor adicional</th>
-                                <th style="width:5%">Estado</th>
-                                <th style="width:15%; text-align: center;">Acciones</th>
+                                <th id="nombre" style="width:20%">Nombre</th>
+                                <th id="referencia" style="width:15%">Referencia</th>
+                                <th id="entidadFinanciera" style="width:15%">Entidad Financiera</th>
+                                <th id="valorAdicional" style="width:15%">Requiere valor adicional</th>
+                                <th id="estado" style="width:5%">Estado</th>
+                                <th id="acciones" style="width:15%; text-align: center;">Acciones</th>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-proveedor>
                             <tr>
                                 <td>{{proveedor.nombre}}</td>
                                 <td>{{proveedor.referencia}}</td>
-                                <td>{{proveedor.nombreInstitucionFinanciera}}</td>
-                                <td>{{proveedor.descripcionIndicadorAdicional}}</td>
-                                <td>{{proveedor.estadoRegistro}}</td>
+                                <td>{{proveedor.institucionFinanciera.nombre}}</td>
+                                <td>{{ proveedor.indicadorValorAdicional ? 'Sí' : 'No' }}</td>
+                                <td>{{proveedor.estadoRegistro | estadoRegistroLabel}}</td>
                                 <td style=" text-align: center;">
                                     <p-button icon="pi pi-file-edit" 
                                             [rounded]="true" 
@@ -106,7 +98,7 @@
                                             pTooltip="Dar de baja" 
                                             tooltipPosition="left"
                                             [disabled]="true" 
-                                            (click)="eliminarFila($event, proveedor)"/>
+                                            (onClick)="eliminarFila($event, proveedor)"/>
                                 </td>
                             </tr>
                         </ng-template>

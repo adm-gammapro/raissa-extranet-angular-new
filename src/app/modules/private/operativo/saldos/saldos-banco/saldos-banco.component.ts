@@ -1,10 +1,8 @@
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
-import { PaginatorComponent } from '../../../commons/paginator/paginator.component';
 import { HeaderComponent } from '../../../layout/header/header.component';
-import { MenuComponent } from '../../../layout/menu/menu.component';
 import { ResumenGeneralModalComponent } from '../resumen-general/resumen-general-modal.component';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { SaldosService } from '../../../../../service/modules/private/operativo/saldos.service';
@@ -19,9 +17,8 @@ import { Resumen } from '../../../../../apis/model/module/private/resumen';
     ReactiveFormsModule,
     CommonModule,
     ...PRIME_NG_MODULES,
-    PaginatorComponent,
     HeaderComponent,
-    MenuComponent, ResumenGeneralModalComponent],
+    ResumenGeneralModalComponent],
   providers: [ConfirmationService, MessageService, SaldosService],
   templateUrl: './saldos-banco.component.html',
   styleUrl: './saldos-banco.component.scss'
@@ -34,9 +31,9 @@ export class SaldosBancoComponent {
   messages: Message[] = [];
   private idBanco: string ="";
 
-  constructor(private activatedRoute: ActivatedRoute,
-              private router: Router, 
-              private saldosService: SaldosService) {
+  constructor(private readonly activatedRoute: ActivatedRoute,
+              private readonly router: Router, 
+              private readonly saldosService: SaldosService) {
       if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
         this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
       }
@@ -44,23 +41,25 @@ export class SaldosBancoComponent {
 
   actualizarSaldosMovimientos() {
     this.loading = true;
-    const dateActual = new Date();
-    const dateInicial = new Date();
 
-    dateInicial.setDate(dateActual.getDate() - 120);
+    this.saldosService.actualizarSaldosMovimientosPorBanco(Number(this.idEmpresa),
+      this.idBanco).subscribe({
+        next: () => {
+          this.loading = false;  // Ocultar el spinner
+          this.reloadPage();
+        },
+        error: () => {
+          this.loading = false;
+        }
+      });
+  }
 
-    var fechaActual = this.transform(dateActual.toString(),'yyyy-MM-dd');
-    var fechaInicial = this.transform(dateInicial.toString(),'yyyy-MM-dd');
+  actualizarSaldosMovimientosPorCuenta(codigoCuenta: number) {
+    this.loading = true;
 
-    var fechaActual = this.transform('2024-10-19','yyyy-MM-dd');
-    var fechaInicial = this.transform('2024-01-01','yyyy-MM-dd');
-
-    if (fechaActual != null && fechaInicial != null) {
-      this.saldosService.actualizarSaldosMovimientosPorBanco(Number(this.idEmpresa),
-                                                            this.idBanco,
-                                                            fechaInicial, 
-                                                            fechaActual).subscribe({
-        next:(response) => {
+    this.saldosService.actualizarSaldosMovimientos(Number(this.idEmpresa),
+      codigoCuenta).subscribe({
+        next: () => {
           this.loading = false;  // Ocultar el spinner
           this.reloadPage();
         },
@@ -68,35 +67,6 @@ export class SaldosBancoComponent {
           this.loading = false;
         }
       });
-    }
-  }
-
-  actualizarSaldosMovimientosPorCuenta(codigoAgrupacion: number, numeroCuenta: string, idBanco: string){
-    this.loading = true;
-    const dateActual = new Date();
-    const dateInicial = new Date();
-
-    dateInicial.setDate(dateActual.getDate() - 120);
-
-    var fechaActual = this.transform('2023-12-03','yyyy-MM-dd');
-    var fechaInicial = this.transform('2023-11-01','yyyy-MM-dd');
-
-    if (fechaActual != null && fechaInicial != null) {
-      this.saldosService.actualizarSaldosMovimientos(Number(this.idEmpresa), 
-                                                    codigoAgrupacion, 
-                                                    idBanco, 
-                                                    numeroCuenta, 
-                                                    fechaInicial, 
-                                                    fechaActual).subscribe({
-        next:(response) => {
-          this.loading = false;  // Ocultar el spinner
-          this.reloadPage();
-        },
-          error: (err) => {
-          this.loading = false;
-        }
-      });
-    }
   }
 
   mostrarResumen() {
@@ -115,7 +85,7 @@ export class SaldosBancoComponent {
 
   private cargarSaldos(): void {
     this.saldosService.getSaldosPorCuenta(this.idEmpresa, this.idBanco).subscribe(response => {
-      this.resumen = response as Resumen;
+      this.resumen = response;
     });
   }
 
@@ -125,12 +95,13 @@ export class SaldosBancoComponent {
     });
   }
 
-  transform(value: string, formato: string) {
-    var datePipe = new DatePipe("en-US");
-    return datePipe.transform(value, formato);
-  }
-
   cerrarModal(): void {
     this.resumenSaldos = false;
   }
+
+  visible: boolean = false;
+
+    showDialog() {
+        this.visible = true;
+    }
 }

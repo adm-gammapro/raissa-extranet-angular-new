@@ -1,18 +1,19 @@
 import { Component } from '@angular/core';
-import { Proveedor } from '../../../../../apis/model/module/private/proveedor';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../../layout/header/header.component';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
-import { PerfilService } from '../../../../../service/modules/private/administrativo/perfil.service';
 import { ProveedorService } from '../../../../../service/modules/private/operativo/proveedor.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessagesService } from '../../../../../service/commons/messages.service';
 import { environment } from '../../../../../../environments/environment';
 import { Util } from '../../../../../utils/util/util.util';
 import { SaldosService } from '../../../../../service/modules/private/operativo/saldos.service';
-import { Banco } from '../../../../../apis/model/module/private/banco';
+import { ProveedorResponse } from '../../../../../apis/model/module/private/operativo/proveedor/response/proveedor-response';
+import { ProveedorRequest } from '../../../../../apis/model/module/private/operativo/proveedor/request/proveedor-request';
+import { InstitucionFinancieraService } from '../../../../../service/commons/institucion-financiera.service';
+import { InstitucionFinancieraResponse } from '../../../../../apis/model/module/private/commons/institucion-financiera-response';
 
 @Component({
   selector: 'app-form-proveedor',
@@ -22,27 +23,29 @@ import { Banco } from '../../../../../apis/model/module/private/banco';
     CommonModule,
     HeaderComponent,
     ...PRIME_NG_MODULES],
-    providers: [ConfirmationService, MessageService, PerfilService],
+    providers: [ConfirmationService, MessageService],
   templateUrl: './form-proveedor.component.html',
   styleUrl: './form-proveedor.component.scss'
 })
 export class FormProveedorComponent {
-  proveedor: Proveedor = new Proveedor();
-  public bancos: Banco[] = [];
+  proveedorResponse: ProveedorResponse = new ProveedorResponse();
+  proveedorRequest: ProveedorRequest = new ProveedorRequest();
+  public bancos: InstitucionFinancieraResponse[] = [];
   public proveedorForm: FormGroup;
   public idEmpresa: string = "";
 
-  constructor(private router: Router, 
-              private confirmationService: ConfirmationService, 
-              private formBuilder: FormBuilder,
-              private messageService: MessageService, 
-              private proveedorService: ProveedorService, 
-              private activatedRoute: ActivatedRoute,
-              private messagesService: MessagesService,
-              private saldosService: SaldosService) {
+  constructor(private readonly router: Router, 
+              private readonly confirmationService: ConfirmationService, 
+              private readonly formBuilder: FormBuilder,
+              private readonly messageService: MessageService, 
+              private readonly proveedorService: ProveedorService, 
+              private readonly activatedRoute: ActivatedRoute,
+              private readonly messagesService: MessagesService,
+              private readonly saldosService: SaldosService,
+              private readonly institucionFinancieraService: InstitucionFinancieraService) {
 
     this.proveedorForm = this.formBuilder.group({
-      codigo: new FormControl(this.proveedor.codigo),
+      codigo: [null],
       nombre: ['', [Validators.required, Validators.maxLength(15)]],
       referencia: ['', Validators.required],
       codigoInstitucionFinanciera: ['', Validators.required],
@@ -54,8 +57,8 @@ export class FormProveedorComponent {
   }
 
   public cargarBancos(): void {
-    this.saldosService.getAllBancos(Number(this.idEmpresa)).subscribe(response => {
-      this.bancos = response as Banco[];
+    this.institucionFinancieraService.getAllBancos(Number(this.idEmpresa)).subscribe(response => {
+      this.bancos = response;
     });
   }
 
@@ -70,10 +73,10 @@ export class FormProveedorComponent {
           rejectLabel: 'No',
           accept: () => {
               
-              this.proveedor = this.proveedorForm.value;
-              this.proveedor.codigoEmpresa = Number(this.idEmpresa);
+              this.proveedorRequest = this.proveedorForm.value;
+              this.proveedorRequest.codigoCliente = Number(this.idEmpresa);
               
-              this.proveedorService.create(this.proveedor).subscribe({
+              this.proveedorService.create(this.proveedorRequest).subscribe({
                 next:(response) => {
                   const messages: Message[] = [
                     { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro existosamente`, life: 5000 }
@@ -113,13 +116,13 @@ export class FormProveedorComponent {
                       
       if(id!=null && id != ""){
         this.proveedorService.getProveedor(id).subscribe(response => {
-          this.proveedor = response;
+          this.proveedorResponse = response;
 
           this.proveedorForm.patchValue({
-            codigo: this.proveedor.codigo,
-            nombre: this.proveedor.nombre,
-            referencia: this.proveedor.referencia,
-            codigoInstitucionFinanciera: this.proveedor.codigoInstitucionFinanciera
+            codigo: this.proveedorResponse.codigo,
+            nombre: this.proveedorResponse.nombre,
+            referencia: this.proveedorResponse.referencia,
+            codigoInstitucionFinanciera: this.proveedorResponse.institucionFinanciera.codigo
           });
         });
       }

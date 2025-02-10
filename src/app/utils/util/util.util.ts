@@ -1,4 +1,5 @@
 import { AbstractControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
+import { EstadoRegistroEnum, EstadoRegistroValue } from "../../apis/model/enums/estado-registro";
 
 export class Util {
     public static filterAlphanumeric(event: Event, myForm: FormGroup): void {
@@ -188,5 +189,30 @@ export class Util {
         if (control) {
           control.setValue(control.value.toUpperCase(), { emitEvent: false });
         }
+    }
+
+    public static mapEstadoRegistro(valor: string): string {
+      const value = EstadoRegistroEnum[valor as keyof typeof EstadoRegistroEnum];
+      return EstadoRegistroValue[value];
+    }
+
+    public static parseOrDefault(value: string | null, defaultValue: number): number {
+      return value ? Number(value) : defaultValue;
+    }
+
+    public static validaMensajeError(err: any): string {
+      let mensage;
+      if (err.error.message && Array.isArray(err.error.message) && (err.error.exceptionCode === "MethodArgumentNotValidException" || err.error.exceptionCode === "UnexpectedTypeException")) {
+        mensage = "Formulario inválido";
+      } else if (err.error && (err.error.status === 400 || err.error.status === 404)) {
+        mensage = "Error inesperado, por favor comuníquese con sistemas";
+      } else if(err.error.message && err.error.exceptionCode === "500") {
+        mensage = err.error.message;
+      } else if(err.error.message) {
+        mensage = err.error?.message || "Error controlado";
+      } else {
+        mensage = err.error?.detail || "Error desconocido";
       }
+      return mensage;
+    }
 }

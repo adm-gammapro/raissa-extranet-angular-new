@@ -1,25 +1,23 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { AuthService } from '../../../authorization/auth.service';
 import { catchError, map, Observable, throwError } from 'rxjs';
-import { Banco } from '../../../../apis/model/module/private/banco';
 import { Resumen } from '../../../../apis/model/module/private/resumen';
 import { Ejecucion } from '../../../../apis/model/module/private/ejecucion';
+import { EjecucionRequest } from '../../../../apis/model/module/private/operativo/saldos/request/ejecucion-request';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SaldosService {
-  private urlGeneral: string = environment.url.base + '/extranet/general';
-  private urlEjecucion: string = environment.url.base + '/extranet/ejecucion';
+  private readonly urlEjecucion: string = environment.url.base + '/extranet/ejecucion';
+  private readonly urlSaldos: string = environment.url.base + '/saldos';
 
-  constructor(private http: HttpClient,
-    private router: Router,
-    private authService: AuthService) { }
+  constructor(private readonly  http: HttpClient,
+              private readonly  authService: AuthService) { }
 
-  getAllBancos(idEmpresa: number): Observable<Banco[]> {
+  getSaldos(idEmpresa: number): Observable<Resumen> {
     const params = [
       `estadoRegistro=S`,
       `codigoCliente=${idEmpresa}`,
@@ -28,33 +26,11 @@ export class SaldosService {
     const headers = new HttpHeaders({
     });
 
-    const url = `${this.urlGeneral}/listarInstitucionFinancieraEmpresa?${params}`;
-
-    return this.http.get<Banco[]>(url, { headers: headers }).pipe(
-      map((response: any) => {
-        return response.body;
-      }),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  getSaldos(idEmpresa: string): Observable<Resumen> {
-    const params = [
-      `estadoRegistro=S`,
-      `idEmpresa=${idEmpresa}`,
-    ].filter(Boolean).join('&');
-
-    const headers = new HttpHeaders({
-    });
-
-    const url = `${this.urlEjecucion}/listarSaldos?${params}`;
+    const url = `${this.urlSaldos}/list-saldos?${params}`;
 
     return this.http.get<Resumen>(url, { headers: headers }).pipe(
       map((response: any) => {
-        return response.body;
+        return response;
       }),
       catchError(e => {
         this.authService.isNoAutorizado(e);
@@ -65,18 +41,15 @@ export class SaldosService {
 
   getSaldosPorCuenta(idEmpresa: string, idBanco: string): Observable<Resumen> {
     const params = [
-      `idEmpresa=${idEmpresa}`,
+      `codigoCliente=${idEmpresa}`,
       `idBanco=${idBanco}`,
     ].filter(Boolean).join('&');
 
-    const headers = new HttpHeaders({
-    });
+    const url = `${this.urlSaldos}/list-saldos-por-cuenta?${params}`;
 
-    const url = `${this.urlEjecucion}/listarSaldosporCuenta?${params}`;
-
-    return this.http.get<Resumen>(url, { headers: headers }).pipe(
+    return this.http.get<Resumen>(url).pipe(
       map((response: any) => {
-        return response.body;
+        return response;
       }),
       catchError(e => {
         this.authService.isNoAutorizado(e);
@@ -85,10 +58,15 @@ export class SaldosService {
     );
   }
 
-  getMovimientos(idCuenta: number, bitacora: number, fechaInicial: string | null, fechaFinal: string | null, tipoMovimiento: string | null, cantReg: number, pagina: number): Observable<any> {
+  getMovimientos(codigoCliente: number, 
+                idCuenta: number, 
+                fechaInicial: string | null, 
+                fechaFinal: string | null, 
+                tipoMovimiento: string | null, 
+                cantReg: number, pagina: number): Observable<any> {
     const params = [
+      `codigoCliente=${codigoCliente}`,
       `idCuenta=${idCuenta}`,
-      `bitacora=${bitacora}`,
       `fechaInicial=${fechaInicial}`,
       `fechaFinal=${fechaFinal}`,
       `tipoMovimiento=${tipoMovimiento}`,
@@ -99,11 +77,11 @@ export class SaldosService {
     const headers = new HttpHeaders({
     });
 
-    const url = `${this.urlEjecucion}/listarMovimientosPage?${params}`;
+    const url = `${this.urlSaldos}/list-movimientos-page?${params}`;
 
     return this.http.get<any>(url, { headers: headers }).pipe(
       map((response: any) => {
-        return response.body;
+        return response;
       }),
       catchError(e => {
         this.authService.isNoAutorizado(e);
@@ -113,25 +91,16 @@ export class SaldosService {
   }
 
   actualizarSaldosMovimientos(codigoCliente: number,
-    codigoAgrupacion: number,
-    codigoIfi: string,
-    numeroCuenta: string,
-    fechaInicioMov: string,
-    fechaFinMov: string) {
-    let ejecucion: Ejecucion = new Ejecucion();
-    ejecucion.codigoAgrupacion = codigoAgrupacion;
-    ejecucion.codigoCliente = codigoCliente;
-    ejecucion.codigoIfi = codigoIfi;
-    //ejecucion.fechaFinMov = fechaFinMov;
-    //ejecucion.fechaInicioMov = fechaInicioMov;
-    ejecucion.numeroCuenta = numeroCuenta;
+                              codigoCuenta: number) {
 
-    const headers = new HttpHeaders({
-    });
+      let ejecucionRequest: EjecucionRequest = new EjecucionRequest();
+      ejecucionRequest.codigoCliente = codigoCliente;
+      ejecucionRequest.codigoCuenta = codigoCuenta;
+      ejecucionRequest.valorToken = "";
 
-    const url = `${this.urlEjecucion}/ejecutarConsultaOnline`;
+    const url = `${this.urlEjecucion}/ejecutarConsultaPosicionGeneralOnline`;
 
-    return this.http.post<any>(url, ejecucion, { headers: headers }).pipe(
+    return this.http.post<any>(url, ejecucionRequest).pipe(
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);
@@ -139,9 +108,7 @@ export class SaldosService {
     );
   }
 
-  actualizarSaldosMovimientosGeneral(codigoCliente: number,
-                                     fechaInicioMov: string,
-                                     fechaFinMov: string) {
+  actualizarSaldosMovimientosGeneral(codigoCliente: number) {
     let ejecucion: Ejecucion = new Ejecucion();
     ejecucion.codigoCliente = codigoCliente;
     ejecucion.usuarioEjecucionProceso = sessionStorage.getItem(environment.session.USERNAME)!;
@@ -160,13 +127,9 @@ export class SaldosService {
   }
 
   actualizarSaldosMovimientosPorBanco(codigoCliente: number,
-    codigoIfi: string,
-    fechaInicioMov: string,
-    fechaFinMov: string) {
+    codigoIfi: string) {
     let ejecucion: Ejecucion = new Ejecucion();
     ejecucion.codigoCliente = codigoCliente;
-    //ejecucion.fechaFinMov = fechaFinMov;
-    //ejecucion.fechaInicioMov = fechaInicioMov;
     ejecucion.codigoIfi = codigoIfi;
 
     const headers = new HttpHeaders({

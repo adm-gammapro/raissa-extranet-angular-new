@@ -1,1 +1,15 @@
-<p>monitor works!</p>
+<app-header></app-header>
+<p-confirmDialog />
+<p-messages [value]="messages"></p-messages>
+
+  <p-panel header="Formulario credenciales">
+    <div class="flex border-round bg-gray-100 p-3 m-3 border-1 border-300">
+      <div class="w-12 p-3 flex align-items-center justify-content-center">
+        <div class="formgrid grid w-full">
+            Carga de saldos y movimientos.....
+        </div>
+      </div>
+    </div>
+    <p-toast></p-toast>
+          <p-progressBar [value]="value" styleClass="w-full" styleClass="height: 20px;"></p-progressBar>
+  </p-panel>

@@ -1,9 +1,10 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { Message, MessageService } from 'primeng/api';
 import { AuthService } from '../../service/authorization/auth.service';
 import { TokenService } from '../../service/authorization/token.service';
 import { PRIME_NG_MODULES } from '../primeNg/primeng-global-imports';
+import { MessagesService } from '../../service/commons/messages.service';
 
 @Component({
   selector: 'app-authorized',
@@ -21,14 +22,13 @@ export class AuthorizedComponent implements OnInit {
   constructor(private activatedRoute: ActivatedRoute,
     private authService: AuthService,
     private tokenService: TokenService,
-    private messageService: MessageService,
+    private messagesService: MessagesService,
     private router: Router) { }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe( data => {
       this.code = data['code'];
       this.code_verifier = this.tokenService.getVerifier();
-      //this.tokenService.deleteVerifier();
       this.getToken(this.code_verifier, this.code);
     });
   }
@@ -41,13 +41,11 @@ export class AuthorizedComponent implements OnInit {
         this.router.navigate(['/seleccion-empresa']);
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Error!', detail: 'No se pudo validar acceso a la aplicación', life: 5000 });
-      },
-      complete: () => {
-        /*const messages: Message[] = [
-          { severity: 'success', summary: 'Confirmación', detail: 'Se validó el acceso correctamente', life: 5000 }
+        this.tokenService.clear();
+        const messages: Message[] = [
+          { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro existosamente`, life: 5000 }
         ];
-        this.messagesService.setMessages(messages);*/
+        this.messagesService.setMessages(messages);
       }
     });
   }

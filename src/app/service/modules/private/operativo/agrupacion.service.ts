@@ -1,22 +1,21 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../../authorization/auth.service';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { Agrupacion } from '../../../../apis/model/module/private/agrupacion';
 import { Cliente } from '../../../../apis/model/module/private/cliente';
+import { AgrupacionRequest } from '../../../../apis/model/module/private/operativo/agrupacion/request/agrupacion-request';
+import { AgrupacionResponse } from '../../../../apis/model/module/private/operativo/agrupacion/response/agrupacion-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AgrupacionService {
-  private urlextranet: string = environment.url.base + '/extranet/agrupacion';
-  private urlCliente: string = environment.url.base + '/plataforma/cliente';
+  private readonly urlextranet: string = environment.url.base + '/agrupacion';
 
-  constructor(private http: HttpClient,
-    private router: Router,
-    private authService: AuthService) { }
+  constructor(private readonly http: HttpClient,
+    private readonly authService: AuthService) { }
 
   getAgrupaciones(page: number,
     estadoRegistro: string,
@@ -24,35 +23,20 @@ export class AgrupacionService {
     cantReg: number,
     idEmpresa: string): Observable<any> {
     const params = [
-      `pagina=${page}`,
+      `page=${page}`,
       `estadoRegistro=${estadoRegistro}`,
       `nombreAgrupacionCliente=${nombreAgrupacion}`,
-      `cantReg=${cantReg}`,
-      `idEmpresa=${idEmpresa}`,
+      `size=${cantReg}`,
+      `codigoCliente=${idEmpresa}`,
     ].filter(Boolean).join('&');
 
     const headers = new HttpHeaders({
     });
 
-    const url = `${this.urlextranet}/listarAgrupacionPage?${params}`;
+    const url = `${this.urlextranet}/list-page-agrupacion?${params}`;
 
     return this.http.get(url, { headers: headers }).pipe(
-      map((response: any) => {
-        (response.body.content as Agrupacion[]).map(agrupacion => {
-          agrupacion.nombreAgrupacionCliente = agrupacion.nombreAgrupacionCliente?.toUpperCase();
-          agrupacion.interfazCuentaProvieneCliente = agrupacion.interfazCuentaProvieneCliente?.toUpperCase();
-          agrupacion.razonSocialCliente = agrupacion.razonSocialCliente?.toUpperCase();
-
-          if (agrupacion.estadoRegistro === 'S') {
-            agrupacion.estadoRegistro = 'ACTIVO';
-          } else {
-            agrupacion.estadoRegistro = 'INACTIVO';
-          }
-
-          return agrupacion;
-        });
-        return response.body;
-      }),
+      map((response: any) => response),
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);
@@ -64,10 +48,10 @@ export class AgrupacionService {
     const headers = new HttpHeaders({
     });
 
-    const url = `${this.urlextranet}/registrar-agrupacion`;
+    const url = `${this.urlextranet}/create-agrupacion`;
 
     return this.http.put<any>(url, agrupacion, { headers: headers }).pipe(
-      map((response: any) => response.body as Agrupacion),
+      map((response: any) => response as Agrupacion),
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);
@@ -75,17 +59,34 @@ export class AgrupacionService {
     );
   }
 
-  eliminar(id: number): Observable<Agrupacion> {
+  update(agrupacion: Agrupacion): Observable<Agrupacion> {
     const headers = new HttpHeaders({
     });
 
-    const url = `${this.urlextranet}/eliminar-agrupacion/${id}`;
-    return this.http.delete<Agrupacion>(url, { headers: headers }).pipe(
+    const url = `${this.urlextranet}/update-agrupacion`;
+
+    return this.http.put<any>(url, agrupacion, { headers: headers }).pipe(
+      map((response: any) => response as Agrupacion),
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);
       })
-    )
+    );
+  }
+
+  eliminar(agrupacion: AgrupacionRequest): Observable<Agrupacion> {
+    const headers = new HttpHeaders({
+    });
+
+    const url = `${this.urlextranet}/delete-agrupacion`;
+
+    return this.http.post<any>(url, agrupacion, { headers: headers }).pipe(
+      map((response: any) => response as Agrupacion),
+      catchError(e => {
+        this.authService.isNoAutorizado(e);
+        return throwError(() => e);
+      })
+    );
   }
 
   getClientes(): Observable<Cliente[]> {
@@ -109,20 +110,21 @@ export class AgrupacionService {
     );
   }
 
-  getAgrupacion(id: number): Observable<Agrupacion> {
-    const params = [
-      `codigoAgrupacion=${id}`,
-    ].filter(Boolean).join('&');
+  getAgrupacion(codigoAgrupacion: number,
+                codigoCliente: number): Observable<Agrupacion> {
 
-    const headers = new HttpHeaders({
-    });
+    let agrupacion: AgrupacionRequest = {
+      codigo: codigoAgrupacion,
+      codigoCliente: codigoCliente,
+      interfazCuentaProvieneCliente: "",
+      nombreAgrupacionCliente: "",
+      razonSocialCliente: ""
+    };
 
-    const url = `${this.urlextranet}/obtenerAgrupacion?${params}`;
+    const url = `${this.urlextranet}/get-agrupacion`;
 
-    return this.http.get<Agrupacion>(url, { headers: headers }).pipe(
-      map((response: any) => {
-        return response.body;
-      }),
+    return this.http.post<any>(url, agrupacion).pipe(
+      map((response: any) => response as Agrupacion),
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);
@@ -130,19 +132,16 @@ export class AgrupacionService {
     );
   }
 
-  getAllAgrupaciones(idEmpresa: number): Observable<Agrupacion[]> {
+  getAllAgrupaciones(idEmpresa: number): Observable<AgrupacionResponse[]> {
     const params = [
-      `idEmpresa=${idEmpresa}`,
+      `codigoCliente=${idEmpresa}`,
     ].filter(Boolean).join('&');
 
-    const headers = new HttpHeaders({
-    });
+    const url = `${this.urlextranet}/get-all-agrupaciones?${params}`;
 
-    const url = `${this.urlextranet}/listarAllAgrupacion?${params}`;
-
-    return this.http.get<Agrupacion[]>(url, { headers: headers }).pipe(
+    return this.http.get<AgrupacionResponse[]>(url).pipe(
       map((response: any) => {
-        return response.body;
+        return response;
       }),
       catchError(e => {
         this.authService.isNoAutorizado(e);

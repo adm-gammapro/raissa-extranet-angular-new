@@ -29,13 +29,13 @@ export class FormAgrupacionComponent {
   public agrupacionForm: FormGroup;
   public idEmpresa: string = "";
 
-  constructor(private router: Router, 
-              private confirmationService: ConfirmationService, 
-              private formBuilder: FormBuilder,
-              private messageService: MessageService, 
-              private agrupacionService: AgrupacionService, 
-              private activatedRoute: ActivatedRoute,
-              private messagesService: MessagesService) {
+  constructor(private readonly router: Router, 
+              private readonly confirmationService: ConfirmationService, 
+              private readonly formBuilder: FormBuilder,
+              private readonly messageService: MessageService, 
+              private readonly agrupacionService: AgrupacionService, 
+              private readonly activatedRoute: ActivatedRoute,
+              private readonly messagesService: MessagesService) {
 
     this.agrupacionForm = this.formBuilder.group({
       codigo: new FormControl(this.agrupacion.codigo),
@@ -61,21 +61,37 @@ export class FormAgrupacionComponent {
               
               this.agrupacion = this.agrupacionForm.value;
               this.agrupacion.codigoCliente = Number(this.idEmpresa);
-              
-              this.agrupacionService.create(this.agrupacion).subscribe({
-                next:(response) => {
-                  const messages: Message[] = [
-                    { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro existosamente`, life: 5000 }
-                  ];
-                  this.messagesService.setMessages(messages);
-                },
-                error: (err) => {
-                  this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message, life: 5000 });
-                },
-                complete: () => {
-                  this.router.navigate(['/agrupacion'])
-                }
-             })
+              if(this.agrupacion.codigo) {
+                this.agrupacionService.update(this.agrupacion).subscribe({
+                  next:() => {
+                    const messages: Message[] = [
+                      { severity: 'success', summary: 'Confirmación', detail: `Se Actualizó registro existosamente`, life: 5000 }
+                    ];
+                    this.messagesService.setMessages(messages);
+                  },
+                  error: (err) => {
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message, life: 5000 });
+                  },
+                  complete: () => {
+                    this.router.navigate(['/agrupacion'])
+                  }
+                });
+              } else {
+                this.agrupacionService.create(this.agrupacion).subscribe({
+                  next:() => {
+                    const messages: Message[] = [
+                      { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro existosamente`, life: 5000 }
+                    ];
+                    this.messagesService.setMessages(messages);
+                  },
+                  error: (err) => {
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message, life: 5000 });
+                  },
+                  complete: () => {
+                    this.router.navigate(['/agrupacion'])
+                  }
+                });
+              }
           },reject: () => {
             this.messageService.add({ severity: 'error', summary: 'Rechazado', detail: 'No se guardó registro', life: 5000 });
         }
@@ -99,7 +115,7 @@ export class FormAgrupacionComponent {
       id = Number(params.get('id'));
                       
       if(id!=null && id > 0){
-        this.agrupacionService.getAgrupacion(id).subscribe(response => {
+        this.agrupacionService.getAgrupacion(id, Number(this.idEmpresa)).subscribe(response => {
           this.agrupacion = response;
 
           this.agrupacionForm.patchValue({
