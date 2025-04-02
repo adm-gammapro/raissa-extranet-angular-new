@@ -15,17 +15,16 @@ import { PerfilRequest } from '../../../../apis/model/module/private/request/per
 })
 export class UsuarioService {
 
-  private urlSeguridad:string = environment.url.base + '/seguridad';
+  private readonly urlSeguridad:string = environment.url.base + '/seguridad';
 
-  constructor(private http: HttpClient, 
-              private router: Router,
-              private authService: AuthService) { }
+  constructor(private readonly http: HttpClient, 
+              private readonly authService: AuthService) { }
 
   getUsuarios(page: number,
-              estadoRegistro: String,
-              nombreUsuario: String,
+              estadoRegistro: string,
+              nombreUsuario: string,
               cantReg: number,
-              idEmpresa: String): Observable<any> {
+              idEmpresa: string): Observable<any> {
 
     const params = [
             `pagina=${page}`,

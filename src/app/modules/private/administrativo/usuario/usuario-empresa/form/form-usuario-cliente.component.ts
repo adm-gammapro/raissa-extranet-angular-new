@@ -9,7 +9,6 @@ import { UsuarioCliente } from '../../../../../../apis/model/module/private/usua
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../../../../../environments/environment';
 import { HeaderComponent } from '../../../../layout/header/header.component';
-import { MenuComponent } from '../../../../layout/menu/menu.component';
 import { EmpresaService } from '../../../../../../service/modules/private/administrativo/empresa.service';
 import { PerfilService } from '../../../../../../service/modules/private/administrativo/perfil.service';
 import { Empresa } from '../../../../../../apis/model/module/private/empresa';
@@ -23,8 +22,7 @@ import { Util } from '../../../../../../utils/util/util.util';
     ReactiveFormsModule,
     CommonModule,
     ...PRIME_NG_MODULES, 
-    HeaderComponent,
-    MenuComponent],
+    HeaderComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [ConfirmationService, MessageService, MessagesService, UsuarioService, PerfilService, EmpresaService],
   templateUrl: './form-usuario-cliente.component.html',
@@ -39,15 +37,15 @@ export class FormUsuarioClienteComponent implements OnInit {
   idUsuario!: number;
   usuarioCliente!: UsuarioCliente;
 
-  constructor(private confirmationService: ConfirmationService, 
-    private activatedRoute: ActivatedRoute,
-    private router: Router, 
-    private formBuilder: FormBuilder,
-    private messageService: MessageService,
-    private messagesService: MessagesService,
-    private perfilService: PerfilService,
-    private empresaService: EmpresaService,
-    private usuarioService: UsuarioService) {
+  constructor(private readonly confirmationService: ConfirmationService, 
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router, 
+    private readonly formBuilder: FormBuilder,
+    private readonly messageService: MessageService,
+    private readonly messagesService: MessagesService,
+    private readonly perfilService: PerfilService,
+    private readonly empresaService: EmpresaService,
+    private readonly usuarioService: UsuarioService) {
 
       this.usuarioClienteForm = this.formBuilder.group({
         codigoCliente: new FormControl(0, [Validators.required]),
@@ -61,7 +59,7 @@ export class FormUsuarioClienteComponent implements OnInit {
   }
 
   getPerfiles(idEmpresa: number): void {
-    this.perfilService.getPerfilesEmpresa(Number(idEmpresa)).subscribe(response => {
+    this.perfilService.getPerfilesEmpresa(this.idUsuario, Number(idEmpresa)).subscribe(response => {
       this.perfiles = response;
     });
   }

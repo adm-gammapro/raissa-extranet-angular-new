@@ -9,10 +9,10 @@ import { catchError, map, Observable, throwError } from 'rxjs';
 })
 export class EmpresaService {
 
-  private url : string = environment.url.base + '/seguridad';
+  private readonly url : string = environment.url.base + '/seguridad';
 
-  constructor(private http: HttpClient, 
-              private authService: AuthService) { }
+  constructor(private readonly http: HttpClient, 
+              private readonly authService: AuthService) { }
 
   getempresas(user: string):  Observable<any> {
     const params = [

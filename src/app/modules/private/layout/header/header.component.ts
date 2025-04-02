@@ -21,12 +21,14 @@ import { MenuComponent } from '../menu/menu.component';
 })
 export class HeaderComponent implements OnInit {
   sidebarVisible: boolean = false;
-  usuario: String|null = "";
+  usuario!: string|null;
+  nombreEmpresa!: string|null;
   items: MenuItem[] | undefined;
 
-  constructor(private tokenService: TokenService) {
+  constructor(private readonly tokenService: TokenService) {
     if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){
       this.usuario = sessionStorage.getItem(environment.session.NOMBRES_USUARIO);
+      this.nombreEmpresa = sessionStorage.getItem(environment.session.NOMBRE_EMPRESA);
     }
   }
 

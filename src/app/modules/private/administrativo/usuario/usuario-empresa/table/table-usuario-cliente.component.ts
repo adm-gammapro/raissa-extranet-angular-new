@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PRIME_NG_MODULES } from '../../../../../../config/primeNg/primeng-global-imports';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { MessagesService } from '../../../../../../service/commons/messages.service';
@@ -9,7 +9,6 @@ import { UsuarioCliente } from '../../../../../../apis/model/module/private/usua
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../../../../../environments/environment';
 import { HeaderComponent } from '../../../../layout/header/header.component';
-import { MenuComponent } from '../../../../layout/menu/menu.component';
 
 @Component({
   selector: 'app-table-usuario-cliente',
@@ -18,8 +17,7 @@ import { MenuComponent } from '../../../../layout/menu/menu.component';
     ReactiveFormsModule,
     CommonModule,
     ...PRIME_NG_MODULES, 
-    HeaderComponent,
-    MenuComponent],
+    HeaderComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [ConfirmationService, MessageService, MessagesService, UsuarioService],
   templateUrl: './table-usuario-cliente.component.html',
@@ -31,13 +29,12 @@ export class TableUsuarioClienteComponent implements OnInit {
   idUsuarioSession!: string;
   idUsuario!: number;
 
-  constructor(private confirmationService: ConfirmationService, 
-              private activatedRoute: ActivatedRoute,
-              private router: Router, 
-              private formBuilder: FormBuilder,
-              private messageService: MessageService,
-              private messagesService: MessagesService,
-              private usuarioService: UsuarioService) { 
+  constructor(private readonly confirmationService: ConfirmationService, 
+              private readonly activatedRoute: ActivatedRoute,
+              private readonly router: Router,
+              private readonly messageService: MessageService,
+              private readonly messagesService: MessagesService,
+              private readonly usuarioService: UsuarioService) { 
     if (sessionStorage.getItem(environment.session.ID_USUARIO_SESSION) != undefined) {
       this.idUsuarioSession = sessionStorage.getItem(environment.session.ID_USUARIO_SESSION)!;
     }

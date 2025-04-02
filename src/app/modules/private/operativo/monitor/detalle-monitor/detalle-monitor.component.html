@@ -1,0 +1,55 @@
+<app-header></app-header>
+<p-confirmDialog />
+<p-messages [value]="messages"></p-messages>
+<p-panel header="Detalle de procesos">
+    <div class="flex border-round bg-gray-100 m-1 border-1 border-300">
+        <div class="w-12 flex align-items-center justify-content-center">
+            <div class="formgrid grid w-12 flex  pt-5">
+                <div class="field col-12 md:col-11"></div>
+                <div class="field col-12 md:col-1">
+                    <p-button label="Volver" 
+                            pTooltip="Volver" 
+                            [outlined]="true"  severity="secondary" 
+                            [routerLink]="['/monitor']"
+                            styleClass="w-full"
+                            tooltipPosition="left"/>
+                </div>
+
+
+            </div>
+        </div>
+        
+    </div>
+  <div class="flex border-round p-1 m-1 border-1 border-300">
+    <div class="w-12 p-1 flex align-items-center justify-content-center">
+
+      <p-table [value]="detalleServicios" selectionMode="single" class="w-full" [styleClass]="'p-datatable-sm'">
+        <ng-template pTemplate="header">
+          <tr class="custom-header">
+            <th id="cuenta" style="width:20%; text-align: left">Número cuenta</th>
+            <th id="banco" style="width:20%; text-align: left">Entidad Financiera</th>
+            <th id="moneda" style="width:10%; text-align: left;">Moneda</th>
+            <th id="estado" style="width:20%; text-align: center">Estado de proceso</th>
+            <th id="detalle" style="width:30%; text-align: left">Detalle</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-detalleServicios>
+          <tr>
+            <td style="text-align: left">{{detalleServicios.numeroCuenta}}</td>
+            <td style="text-align: left">{{detalleServicios.nombreEntidadFinanciera}}</td>
+            <td style="text-align: left">{{detalleServicios.descripcionMoneda}}</td>
+            <td style="text-align: center">
+                {{ getEstadoProceso(detalleServicios.estadoProceso) }}
+              </td>
+              <td style="text-align: left">
+                {{ detalleServicios.estadoProceso === 'O' ? 'Error en el logueo BBVA' : '' }}
+              </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+    </div>
+  </div>
+  <app-paginator *ngIf="paginator" [paginatorInput]="paginator"
+    (paginatorOutput)="cambioPagina($event)"></app-paginator>
+</p-panel>

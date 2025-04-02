@@ -30,6 +30,8 @@ import { MessagesModule } from 'primeng/messages';
 import { PickListModule } from 'primeng/picklist';
 import { AvatarModule } from 'primeng/avatar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { MeterGroupModule } from 'primeng/metergroup';
 
 export const PRIME_NG_MODULES = [
     ButtonModule,
@@ -63,6 +65,8 @@ export const PRIME_NG_MODULES = [
     MessagesModule,
     PickListModule,
     AvatarModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
+    ProgressBarModule,
+    MeterGroupModule
     // Agrega más módulos aquí
   ];

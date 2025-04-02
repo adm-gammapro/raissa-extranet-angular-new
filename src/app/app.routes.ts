@@ -24,13 +24,14 @@ import { MovimientosComponent } from './modules/private/operativo/saldos/movimie
 import { TableUsuarioClienteComponent } from './modules/private/administrativo/usuario/usuario-empresa/table/table-usuario-cliente.component';
 import { FormUsuarioClienteComponent } from './modules/private/administrativo/usuario/usuario-empresa/form/form-usuario-cliente.component';
 import { MonitorComponent } from './modules/private/operativo/monitor/monitor.component';
+import { DetalleMonitorComponent } from './modules/private/operativo/monitor/detalle-monitor/detalle-monitor.component';
 
 export const routes: Routes = [
     /*{
         path: '**',
         redirectTo: 'content-web'
     },*/
-    { path: '', component: ContentWebComponent },
+    { path: '', redirectTo: 'content', pathMatch: 'full' },
     { path: 'content-web', component: ContentWebComponent },
     { path: 'content', component: ContentComponent },
     { path: 'authorized', component: AuthorizedComponent },
@@ -71,4 +72,8 @@ export const routes: Routes = [
     { path: 'movimientos/:idCuenta/:bitacora/:idBanco/:fechaInicial/:fechaFinal/:tipoMovimiento/:cantReg/:pagina', component: MovimientosComponent},
 
     { path: 'monitor', component: MonitorComponent},
+    { path: 'monitor/:fechaInicio/:fechaFinal/:cantReg/:pagina', component: MonitorComponent},
+
+    { path: 'detalle-monitor/:codigoBitacoraEjecucion', component: DetalleMonitorComponent},
+    { path: 'detalle-monitor/:cantReg/:pagina/:codigoBitacoraEjecucion', component: DetalleMonitorComponent},
 ];

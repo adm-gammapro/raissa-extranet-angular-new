@@ -41,6 +41,7 @@ export class SaldosComponent {
   public bancos: InstitucionFinancieraResponse[]=[];
   monedas: Moneda[] = Moneda.monedas;
   saldosCuentaRequest!: SaldosCuentaSearch;
+  saldosCuentaEnviarRequest!: SaldosCuentaSearch;
   tiposMovimiento: any[] = [];
 
   constructor(private readonly activatedRoute: ActivatedRoute,
@@ -56,7 +57,7 @@ export class SaldosComponent {
     this.descargaForm = this.formBuilder.group({
       rangeDates:[[]],
       numeroCuenta: [''],
-      codigoInstitucionFinanciera: [''],
+      banco: [''],
       monedaCuenta: [''],
       tipoMovimiento: [''],
       concepto: ['']
@@ -147,7 +148,17 @@ export class SaldosComponent {
 
     this.saldosCuentaRequest.codigoCliente = Number(this.idEmpresa)
 
-    this.reportesService.descargarReporteSaldosMovimientos(this.saldosCuentaRequest).subscribe(response => {
+    this.saldosCuentaEnviarRequest = new SaldosCuentaSearch();
+    this.saldosCuentaEnviarRequest.banco = this.saldosCuentaRequest.banco;
+    this.saldosCuentaEnviarRequest.codigoCliente = this.saldosCuentaRequest.codigoCliente;
+    this.saldosCuentaEnviarRequest.concepto = this.saldosCuentaRequest.concepto;
+    this.saldosCuentaEnviarRequest.fechaFin = this.saldosCuentaRequest.fechaFin;
+    this.saldosCuentaEnviarRequest.fechaInicio = this.saldosCuentaRequest.fechaInicio;
+    this.saldosCuentaEnviarRequest.moneda = this.saldosCuentaRequest.moneda;
+    this.saldosCuentaEnviarRequest.numeroCuenta = this.saldosCuentaRequest.numeroCuenta
+    this.saldosCuentaEnviarRequest.tipoMovimiento = this.saldosCuentaRequest.tipoMovimiento;
+
+    this.reportesService.descargarReporteSaldosMovimientos(this.saldosCuentaEnviarRequest).subscribe(response => {
       const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
