@@ -31,6 +31,6 @@ export const environment = {
         grant_type: "authorization_code",
         resource_url: 'http://3.139.76.61:8080/extranet/resource/',//esta es la ruta del servicio del server resource
         logout_url: 'http://18.219.206.33:9000/logout',
-        secret_pkce: 'secret',
+        secret_pkce: 'extranet',
     }
 };

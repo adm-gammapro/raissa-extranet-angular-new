@@ -17,5 +17,5 @@ import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-impo
   styleUrl: './content.component.scss'
 })
 export class ContentComponent {
-
+  
 }
