@@ -16,7 +16,7 @@
                         <label for="codigoTipoDocumento" class="pl-1">Tipo de documento
                             <span *ngIf="isFieldRequired('codigoTipoDocumento')" style="color: red;">*</span>
                         </label>
-                        <p-dropdown
+                        <p-select
                             id="codigoTipoDocumento" 
                             [options]="tipoDocs" 
                             formControlName="codigoTipoDocumento"
@@ -31,7 +31,7 @@
                             optionLabel="abreviatura" 
                             optionValue="codigo"
                             placeholder="Selecciona documento">
-                        </p-dropdown>
+                        </p-select>
 
                         <div *ngIf="usuarioForm.get('codigoTipoDocumento')?.errors?.['required'] && usuarioForm.get('codigoTipoDocumento')?.touched" class="p-error">
                             El campo es requerido
@@ -167,7 +167,7 @@
                         <label for="fechaCambioClave" class="pl-1">Fecha cambio de clave
                             <span *ngIf="isFieldRequired('fechaCambioClave')" style="color: red;">*</span>
                         </label>
-                        <p-calendar id="fechaCambioClave"
+                        <p-datepicker id="fechaCambioClave"
                                     [readonlyInput]="true"
                                     formControlName="fechaCambioClave"
                                     styleClass="w-full"
@@ -178,7 +178,7 @@
                         <label for="indicadorExpiracion" class="pl-1">Indicador Expiración
                             <span *ngIf="isFieldRequired('indicadorExpiracion')" style="color: red;">*</span>
                         </label>
-                        <p-dropdown
+                        <p-select
                             id="indicadorExpiracion" 
                             [options]="expiracion" 
                             formControlName="indicadorExpiracion"
@@ -193,7 +193,7 @@
                             optionLabel="name" 
                             optionValue="code"
                             placeholder="Selecciona Indicador">
-                        </p-dropdown>
+                        </p-select>
                         <div *ngIf="usuarioForm.get('indicadorExpiracion')?.errors?.['required'] && usuarioForm.get('indicadorExpiracion')?.touched" class="p-error">
                             El campo es requerido
                         </div>
@@ -205,7 +205,7 @@
                         <label for="fechaExpiracionClave" class="pl-1">Fecha de expiración
                             <span *ngIf="isFieldRequired('fechaExpiracionClave')" style="color: red;">*</span>
                         </label>
-                        <p-calendar id="fechaExpiracionClave"
+                        <p-datepicker id="fechaExpiracionClave"
                                     [readonlyInput]="true"
                                     formControlName="fechaExpiracionClave"
                                     styleClass="w-full"

@@ -4,9 +4,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
 import { PaginatorComponent } from '../../../commons/paginator/paginator.component';
 import { HeaderComponent } from '../../../layout/header/header.component';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Paginator } from '../../../../../apis/model/commons/paginator';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ProcesoService } from '../../../../../service/modules/private/operativo/proceso.service';
 import { environment } from '../../../../../../environments/environment';
 import { DetalleServicioEjecucionResponse } from '../../../../../apis/model/module/private/operativo/servicio/response/detalle-servicio-ejecucion-response';
@@ -19,7 +19,8 @@ import { DetalleServicioEjecucionResponse } from '../../../../../apis/model/modu
     CommonModule,
     ...PRIME_NG_MODULES,
     PaginatorComponent,
-    HeaderComponent],
+    HeaderComponent,
+    RouterLink],
   providers: [ConfirmationService, MessageService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './detalle-monitor.component.html',
@@ -29,7 +30,6 @@ export class DetalleMonitorComponent implements OnInit {
   detalleServicios!: DetalleServicioEjecucionResponse[];
   paginator: Paginator = new Paginator();//esta variable se debe declarar para usar el paginador de los apis, no de primeng
   idEmpresa!: string;
-  messages: Message[] = [];
   codigoBitacoraEjecucion!: number;
 
   constructor(private readonly router: Router,

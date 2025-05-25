@@ -10,12 +10,12 @@ import { MenuItem } from 'primeng/api';
 })
 export class MenuService {
   private menuItems: MenuItem[] | null = null;
-  private url : string = environment.url.base + '/seguridad';
+  private readonly url : string = environment.url.base + '/seguridad';
 
-  constructor(private http: HttpClient,
-              private authService: AuthService) { }
+  constructor(private readonly http: HttpClient,
+              private readonly authService: AuthService) { }
 
-  getMenuUsuarios(user: string, idEmpresa: string):  Observable<any> {
+  getMenuUsuarios(user: string | null, idEmpresa: string | null):  Observable<any> {
 
     const params = [
       `usuario=${user}`,

@@ -36,7 +36,7 @@
                     <div class="field col-12 md:col-3"></div>
                     <div class="field col-12 md:col-2">
                             <p-card header="Lunes">
-                                <p-dropdown 
+                                <p-select 
                                     id="inputGroupLunes"
                                     [options]="datos" 
                                     formControlName="inputGroupLunes"
@@ -51,7 +51,7 @@
                     </div>
                     <div class="field col-12 md:col-2">
                             <p-card header="Martes">
-                                <p-dropdown 
+                                <p-select 
                                     id="inputGroupMartes"
                                     [options]="datos" 
                                     formControlName="inputGroupMartes"
@@ -66,7 +66,7 @@
                     </div>
                     <div class="field col-12 md:col-2">
                         <p-card header="Miércoles">
-                            <p-dropdown 
+                            <p-select 
                                 id="inputGroupMiercoles"
                                 [options]="datos" 
                                 formControlName="inputGroupMiercoles"
@@ -85,7 +85,7 @@
                     <div class="field col-12 md:col-3"></div>
                     <div class="field col-12 md:col-2">
                             <p-card header="Jueves">
-                                <p-dropdown 
+                                <p-select 
                                     id="inputGroupJueves"
                                     [options]="datos" 
                                     formControlName="inputGroupJueves"
@@ -100,7 +100,7 @@
                     </div>
                     <div class="field col-12 md:col-2">
                             <p-card header="Viernes">
-                                <p-dropdown 
+                                <p-select 
                                     id="inputGroupViernes"
                                     [options]="datos" 
                                     formControlName="inputGroupViernes"
@@ -115,7 +115,7 @@
                     </div>
                     <div class="field col-12 md:col-2">
                         <p-card header="Sábado">
-                            <p-dropdown 
+                            <p-select 
                                 id="inputGroupSabado"
                                 [options]="datos" 
                                 formControlName="inputGroupSabado"
@@ -134,7 +134,7 @@
                     <div class="field col-12 md:col-5"></div>
                     <div class="field col-12 md:col-2">
                         <p-card header="Domingo">
-                            <p-dropdown 
+                            <p-select 
                             id="inputGroupDomingo"
                             [options]="datos" 
                             formControlName="inputGroupDomingo"
@@ -164,7 +164,7 @@
                                 pTooltip="Volver" 
                                 [outlined]="true" 
                                 severity="secondary" 
-                                [routerLink]="['/configuracion']"
+                                (onClick)="mostrarConfiguracion()"
                                 [styleClass]="'w-full'"/>
                     </div>
                     <div class="field col-12 md:col-5"></div>

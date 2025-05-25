@@ -4,13 +4,13 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, 
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { PaginatorComponent } from '../../commons/paginator/paginator.component';
 import { HeaderComponent } from '../../layout/header/header.component';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { AgrupacionService } from '../../../../service/modules/private/operativo/agrupacion.service';
 import { Proveedor } from '../../../../apis/model/module/private/proveedor';
 import { Estado } from '../../../../apis/model/commons/estado';
 import { Paginator } from '../../../../apis/model/commons/paginator';
 import { MessagesService } from '../../../../service/commons/messages.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { environment } from '../../../../../environments/environment';
 import { Util } from '../../../../utils/util/util.util';
 import { ProveedorService } from '../../../../service/modules/private/operativo/proveedor.service';
@@ -26,7 +26,8 @@ import { EstadoRegistroLabelPipe } from '../../../../apis/model/pipe/estado-regi
     ...PRIME_NG_MODULES,
     PaginatorComponent, 
     HeaderComponent,
-        EstadoRegistroLabelPipe],
+        EstadoRegistroLabelPipe,
+        RouterLink],
 providers: [ConfirmationService, MessageService, AgrupacionService],
 schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './proveedor.component.html',
@@ -36,7 +37,6 @@ export class ProveedorComponent implements OnInit {
   public proveedores: ProveedorResponse[] = [];
   nombreSearch:string | undefined;
   estadoSearch:string | undefined;
-  messages: Message[] = [];
   public proveedorSearchForm: FormGroup;
   estados: Estado[] = Estado.estados;
   idEmpresa: string = "";
@@ -95,10 +95,7 @@ export class ProveedorComponent implements OnInit {
       accept: () => {
             this.proveedorService.eliminar(proveedorParam.codigo).subscribe(
               response => {
-                const messages: Message[] = [
-                  { severity: 'success', summary: 'Confirmación', detail: 'Registro dado de baja', life: 5000 }
-                ];
-                this.messagesService.setMessages(messages);
+                this.messagesService.setMessages('Registro dado de baja.');
                 this.reloadPage();
               }
             )
@@ -162,8 +159,6 @@ export class ProveedorComponent implements OnInit {
         });
       });
     });
-
-    this.messages = this.messagesService.getMessages();
   }
 
   busqueda() {

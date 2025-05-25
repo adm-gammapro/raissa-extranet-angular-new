@@ -1,6 +1,6 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Message, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { AuthService } from '../../service/authorization/auth.service';
 import { TokenService } from '../../service/authorization/token.service';
 import { PRIME_NG_MODULES } from '../primeNg/primeng-global-imports';
@@ -19,11 +19,11 @@ export class AuthorizedComponent implements OnInit {
   code_verifier = '';
   code = '';
 
-  constructor(private activatedRoute: ActivatedRoute,
-    private authService: AuthService,
-    private tokenService: TokenService,
-    private messagesService: MessagesService,
-    private router: Router) { }
+  constructor(private readonly activatedRoute: ActivatedRoute,
+    private readonly authService: AuthService,
+    private readonly tokenService: TokenService,
+    private readonly messagesService: MessagesService,
+    private readonly router: Router) { }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe( data => {
@@ -42,10 +42,7 @@ export class AuthorizedComponent implements OnInit {
       },
       error: () => {
         this.tokenService.clear();
-        const messages: Message[] = [
-          { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro existosamente`, life: 5000 }
-        ];
-        this.messagesService.setMessages(messages);
+        this.messagesService.setMessages('Se guardó registro existosamente.');
       }
     });
   }

@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
 import { HeaderComponent } from '../../../layout/header/header.component';
 import { ResumenGeneralModalComponent } from '../resumen-general/resumen-general-modal.component';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { SaldosService } from '../../../../../service/modules/private/operativo/saldos.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../../../../environments/environment';
@@ -28,7 +28,6 @@ export class SaldosBancoComponent {
   resumenSaldos: boolean = false;
   public resumen: Resumen = new Resumen();
   idEmpresa: string = "";
-  messages: Message[] = [];
   private idBanco: string ="";
 
   constructor(private readonly activatedRoute: ActivatedRoute,
@@ -101,7 +100,15 @@ export class SaldosBancoComponent {
 
   visible: boolean = false;
 
-    showDialog() {
-        this.visible = true;
-    }
+  showDialog() {
+    this.visible = true;
+  }
+
+  mostrarSaldo() {
+    this.router.navigate(['/saldos']);
+  }
+
+  mostrarDetalle(idCuenta: number, bitacora: number, idBanco: number) {
+    this.router.navigate(['/movimientos',idCuenta,bitacora,idBanco,'-','-','T',5,0]);
+  }
 }

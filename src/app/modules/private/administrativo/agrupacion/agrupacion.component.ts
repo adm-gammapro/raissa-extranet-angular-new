@@ -5,11 +5,11 @@ import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-impo
 import { PaginatorComponent } from '../../commons/paginator/paginator.component';
 import { HeaderComponent } from '../../layout/header/header.component';
 import { AgrupacionService } from '../../../../service/modules/private/operativo/agrupacion.service';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Agrupacion } from '../../../../apis/model/module/private/agrupacion';
 import { Estado } from '../../../../apis/model/commons/estado';
 import { Paginator } from '../../../../apis/model/commons/paginator';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MessagesService } from '../../../../service/commons/messages.service';
 import { environment } from '../../../../../environments/environment';
 import { Util } from '../../../../utils/util/util.util';
@@ -27,7 +27,8 @@ import { EstadoRegistroEnum } from '../../../../apis/model/enums/estado-registro
     ...PRIME_NG_MODULES,
     PaginatorComponent, 
     HeaderComponent,
-    EstadoRegistroLabelPipe],
+    EstadoRegistroLabelPipe,
+    RouterLink],
 providers: [ConfirmationService, MessageService, AgrupacionService],
 schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './agrupacion.component.html',
@@ -37,7 +38,6 @@ export class AgrupacionComponent implements OnInit {
   public agrupaciones: AgrupacionResponse[] = [];
   nombreSearch:string | undefined;
   estadoSearch:string | undefined;
-  messages: Message[] = [];
   public agrupacionSearchForm: FormGroup;
   estados: Estado[] = Estado.estados;
   idEmpresa: string = "";
@@ -104,10 +104,7 @@ export class AgrupacionComponent implements OnInit {
 
             this.agrupacionService.eliminar(agrupacion).subscribe(
               response => {
-                const messages: Message[] = [
-                  { severity: 'success', summary: 'Confirmación', detail: 'Registro dado de baja', life: 5000 }
-                ];
-                this.messagesService.setMessages(messages);
+                this.messagesService.setMessages('Registro dado de baja.');
                 this.reloadPage();
               }
             )
@@ -171,8 +168,6 @@ export class AgrupacionComponent implements OnInit {
         });
       });
     });
-
-    this.messages = this.messagesService.getMessages();
   }
 
   busqueda() {

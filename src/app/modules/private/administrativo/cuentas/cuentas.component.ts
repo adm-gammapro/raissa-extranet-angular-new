@@ -4,13 +4,13 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angul
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { PaginatorComponent } from '../../commons/paginator/paginator.component';
 import { HeaderComponent } from '../../layout/header/header.component';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { CuentasService } from '../../../../service/modules/private/operativo/cuentas.service';
 import { Cuentas } from '../../../../apis/model/module/private/cuentas';
 import { AgrupacionService } from '../../../../service/modules/private/operativo/agrupacion.service';
 import { Estado } from '../../../../apis/model/commons/estado';
 import { Paginator } from '../../../../apis/model/commons/paginator';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MessagesService } from '../../../../service/commons/messages.service';
 import { environment } from '../../../../../environments/environment';
 import { Util } from '../../../../utils/util/util.util';
@@ -33,7 +33,8 @@ import { InstitucionFinancieraResponse } from '../../../../apis/model/module/pri
     ...PRIME_NG_MODULES,
     PaginatorComponent, 
     HeaderComponent,
-    EstadoRegistroLabelPipe],
+    EstadoRegistroLabelPipe,
+    RouterLink],
 providers: [ConfirmationService, MessageService],
 schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './cuentas.component.html',
@@ -45,7 +46,6 @@ export class CuentasComponent implements OnInit {
   agrupacionSearch:number | null = null;
   bancoSearch:string | undefined;
   estadoSearch:string | undefined;
-  messages: Message[] = [];
   cuentasSearchForm: FormGroup;
   credencialForm: FormGroup;
   estados: Estado[] = Estado.estados;
@@ -141,10 +141,7 @@ export class CuentasComponent implements OnInit {
       accept: () => {
         this.cuentasService.eliminar(cuentasParam.codigo, Number(this.idEmpresa)).subscribe({
           next: () => {
-            const messages: Message[] = [
-              { severity: 'success', summary: 'Confirmación', detail: 'Registro dado de baja', life: 5000 }
-            ];
-            this.messagesService.setMessages(messages);
+            this.messagesService.setMessages('Registro dado de baja.');
             this.reloadPage();
           },
           error: (err) => {
@@ -209,8 +206,6 @@ export class CuentasComponent implements OnInit {
       });
     });
 
-    this.messages = this.messagesService.getMessages();
-
   }
 
   busqueda() {
@@ -218,18 +213,13 @@ export class CuentasComponent implements OnInit {
     this.estadoSearch = this.cuentasSearchForm.controls['estadoSearch'].value;
     this.bancoSearch = this.cuentasSearchForm.controls['bancoSearch'].value;
     this.agrupacionSearch = this.cuentasSearchForm.controls['agrupacionSearch'].value;
-    if (this.numeroCuentaSearch === undefined) {
-      this.numeroCuentaSearch = "";
-    }
+
+    this.numeroCuentaSearch ??= '';
     if (this.estadoSearch === null) {
       this.estadoSearch = "T";
     }
-    if (this.bancoSearch === undefined) {
-      this.bancoSearch = "";
-    }
-    if (this.agrupacionSearch === undefined || this.agrupacionSearch === null) {
-      this.agrupacionSearch = 0;
-    }
+    this.bancoSearch ??= '';
+    this.agrupacionSearch ??= 0;
     this.router.navigate(['/cuentas',this.paginator.numeroPagina,this.estadoSearch,this.numeroCuentaSearch,this.paginator.cantidadRegistros,this.bancoSearch, this.agrupacionSearch]);
   }
 
@@ -246,10 +236,7 @@ export class CuentasComponent implements OnInit {
 
     this.cuentasService.registrarVinculoCuentaCredencial(this.cuentaCredencialRequest).subscribe({
       next: () => {
-        const messages: Message[] = [
-          { severity: 'success', summary: 'Confirmación', detail: 'Se guardó correctamente', life: 5000 }
-        ];
-        this.messagesService.setMessages(messages);
+        this.messagesService.setMessages('Se guardó registro existosamente.');
         this.reloadPage();
       },
       error: (err) => {

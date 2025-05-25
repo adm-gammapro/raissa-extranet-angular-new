@@ -3,11 +3,11 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderComponent } from '../../../layout/header/header.component';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { PerfilService } from '../../../../../service/modules/private/administrativo/perfil.service';
 import { Perfil } from '../../../../../apis/model/module/private/perfil';
 import { Aplicacion } from '../../../../../apis/model/module/private/aplicacion';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MessagesService } from '../../../../../service/commons/messages.service';
 import { environment } from '../../../../../../environments/environment';
 import { Util } from '../../../../../utils/util/util.util';
@@ -19,6 +19,7 @@ import { Util } from '../../../../../utils/util/util.util';
     ReactiveFormsModule,
     CommonModule,
     HeaderComponent,
+    RouterLink,
     ...PRIME_NG_MODULES],
     providers: [ConfirmationService, MessageService, PerfilService],
   templateUrl: './form-perfil.component.html',
@@ -30,13 +31,13 @@ export class FormPerfilComponent {
   public aplicaciones: Aplicacion[] = [];
   public idUsuarioSession: string = "";
 
-  constructor(private router: Router, 
-              private confirmationService: ConfirmationService, 
-              private formBuilder: FormBuilder,
-              private messageService: MessageService, 
-              private perfilService: PerfilService, 
-              private activatedRoute: ActivatedRoute,
-              private messagesService: MessagesService) {
+  constructor(private readonly router: Router, 
+              private readonly confirmationService: ConfirmationService, 
+              private readonly formBuilder: FormBuilder,
+              private readonly messageService: MessageService, 
+              private readonly perfilService: PerfilService, 
+              private readonly activatedRoute: ActivatedRoute,
+              private readonly messagesService: MessagesService) {
 
     this.perfilForm = this.formBuilder.group({
       codigo: new FormControl(this.perfil.codigo),
@@ -54,7 +55,7 @@ export class FormPerfilComponent {
 
   public cargarAplicaciones(): void {
     this.perfilService.getAplicaciones().subscribe(response => {
-      this.aplicaciones = response as Aplicacion[];
+      this.aplicaciones = response;
     });
     
   }
@@ -76,10 +77,7 @@ export class FormPerfilComponent {
               
               this.perfilService.create(this.perfil).subscribe({
                 next:(response) => {
-                  const messages: Message[] = [
-                    { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro existosamente`, life: 5000 }
-                  ];
-                  this.messagesService.setMessages(messages);
+                  this.messagesService.setMessages('Se guardó registro existosamente.');
                 },
                 error: (err) => {
                   this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message, life: 5000 });
@@ -115,7 +113,7 @@ export class FormPerfilComponent {
       if(id!=null && id > 0){
         this.perfilService.getPerfil(id).subscribe(response => {
 
-          this.perfil = response as Perfil;
+          this.perfil = response;
 
           this.perfilForm.patchValue({
             codigo: this.perfil.codigo,

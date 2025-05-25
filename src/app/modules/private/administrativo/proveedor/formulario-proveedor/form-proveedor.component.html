@@ -56,7 +56,7 @@
                         <label for="codigoInstitucionFinanciera" class="pl-1">Institución financiera
                             <span *ngIf="isFieldRequired('codigoInstitucionFinanciera')" style="color: red;">*</span>
                         </label>
-                        <p-dropdown
+                        <p-select
                             id="codigoInstitucionFinanciera" 
                             [options]="bancos" 
                             formControlName="codigoInstitucionFinanciera"
@@ -73,7 +73,7 @@
                             [filter]="true"
                             filterBy="nombre" 
                             placeholder="Selecciona institución financiera">
-                        </p-dropdown>
+                        </p-select>
 
                         <div *ngIf="proveedorForm.get('codigoInstitucionFinanciera')?.errors?.['required'] && proveedorForm.get('codigoInstitucionFinanciera')?.touched" class="p-error">
                             El campo es requerido

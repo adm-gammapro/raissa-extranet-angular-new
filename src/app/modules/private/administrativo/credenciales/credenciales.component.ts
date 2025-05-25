@@ -1,10 +1,10 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { Credenciales } from '../../../../apis/model/module/private/credenciales';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Estado } from '../../../../apis/model/commons/estado';
 import { Paginator } from '../../../../apis/model/commons/paginator';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MessagesService } from '../../../../service/commons/messages.service';
 import { CredencialesService } from '../../../../service/modules/private/operativo/credenciales.service';
 import { environment } from '../../../../../environments/environment';
@@ -28,7 +28,8 @@ import { EstadoRegistroEnum } from '../../../../apis/model/enums/estado-registro
     ...PRIME_NG_MODULES,
     PaginatorComponent, 
     HeaderComponent,
-    EstadoRegistroLabelPipe],
+    EstadoRegistroLabelPipe,
+    RouterLink],
 providers: [ConfirmationService, MessageService],
 schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './credenciales.component.html',
@@ -39,7 +40,6 @@ export class CredencialesComponent implements OnInit {
   nombreSearch:string | undefined;
   proveedorSearch!:string;
   estadoSearch:string | undefined;
-  messages: Message[] = [];
   public credencialesSearchForm: FormGroup;
   estados: Estado[] = Estado.estados;
   idEmpresa: string = "";
@@ -101,10 +101,7 @@ export class CredencialesComponent implements OnInit {
       accept: () => {
             this.credencialesService.eliminar(credencialesParam.codigo, Number(this.idEmpresa)).subscribe(
               response => {
-                const messages: Message[] = [
-                  { severity: 'success', summary: 'Confirmación', detail: 'Registro dado de baja', life: 5000 }
-                ];
-                this.messagesService.setMessages(messages);
+                this.messagesService.setMessages('Registro dado de baja.');
                 this.reloadPage();
               }
             )
@@ -151,8 +148,6 @@ export class CredencialesComponent implements OnInit {
         });
       });
     });
-
-    this.messages = this.messagesService.getMessages();
   }
 
   busqueda() {
@@ -165,9 +160,7 @@ export class CredencialesComponent implements OnInit {
     if (this.estadoSearch === null) {
       this.estadoSearch = "T";
     }
-    if (this.proveedorSearch === null) {
-      this.proveedorSearch = "";
-    }
+    this.proveedorSearch ??= '';
 
     this.router.navigate(['/credenciales',this.paginator.numeroPagina,this.estadoSearch,this.nombreSearch,this.proveedorSearch,this.paginator.cantidadRegistros]);
   }

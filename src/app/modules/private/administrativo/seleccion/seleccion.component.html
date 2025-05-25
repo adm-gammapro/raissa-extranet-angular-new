@@ -2,7 +2,7 @@
 <div class="card">
     <p-toolbar>
         <div class="p-toolbar-group-start">
-            <img src="assets/images/Raissa-logo-fondo-transparente-pequenio.png" width="150"/>
+            <img src="assets/images/Raissa-logo-fondo-transparente-pequenio.png" width="150" alt=""/>
         </div>
         <div class="p-toolbar-group-center">
 
@@ -17,14 +17,17 @@
 </div>
 <div class="card flex justify-content-center pt-5">
     <form [formGroup]="selectionForm">
-        <p-card header="Selección" subheader="Empresas" [style]="{ width: '360px' }">
-            <ng-template pTemplate="header">
-                <img alt="Card" src="assets/images/Raissa-logo-fondo-transparente-mediano.png" />
+        <p-card [style]="{ width: '360px' }">
+            <ng-template #header>
+                <img alt="Card" class="w-full" src="assets/images/Raissa-logo-fondo-transparente-mediano.png" />
             </ng-template>
+
+            <ng-template #title> Selección de empresas </ng-template>
+
             <ng-template pTemplate="body">
-                <div class="card flex justify-content-center">
+                <div class="card flex justify-content-center mt-4">
                     <p-floatLabel class="w-full">
-                        <p-dropdown [options]="consolidado.empresas" 
+                        <p-select [options]="consolidado.empresas" 
                                     optionLabel="razonSocial"
                                     optionValue="codigo"
                                     inputId="seleccion" 
@@ -35,7 +38,7 @@
                     </p-floatLabel>
                 </div>
             </ng-template>
-            <ng-template pTemplate="footer">
+            <ng-template #footer>
                 <div class="card flex justify-content-center">
                     <p-button label="Seleccionar" 
                               [raised]="true" 

@@ -3,11 +3,11 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderComponent } from '../../../layout/header/header.component';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { CredencialesService } from '../../../../../service/modules/private/operativo/credenciales.service';
 import { ProveedorService } from '../../../../../service/modules/private/operativo/proveedor.service';
 import { CuentasService } from '../../../../../service/modules/private/operativo/cuentas.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MessagesService } from '../../../../../service/commons/messages.service';
 import { environment } from '../../../../../../environments/environment';
 import { Util } from '../../../../../utils/util/util.util';
@@ -23,6 +23,7 @@ import { CredencialesRequest } from '../../../../../apis/model/module/private/op
     ReactiveFormsModule,
     CommonModule,
     HeaderComponent,
+    RouterLink,
     ...PRIME_NG_MODULES],
     providers: [ConfirmationService, MessageService],
   templateUrl: './form-credenciales.component.html',
@@ -103,10 +104,7 @@ export class FormCredencialesComponent {
             if (this.credencialesRequest.codigo) {
               this.credencialesService.update(this.credencialesRequest).subscribe({
                 next: () => {
-                  const messages: Message[] = [
-                    { severity: 'success', summary: 'Confirmación', detail: `Se Actualizó registro existosamente`, life: 5000 }
-                  ];
-                  this.messagesService.setMessages(messages);
+                  this.messagesService.setMessages('Se Actualizó registro existosamente.');
                 },
                 error: (err) => {
                   this.messageService.add({ severity: 'error', summary: 'Error', detail: Util.validaMensajeError(err), life: 5000 });
@@ -118,10 +116,7 @@ export class FormCredencialesComponent {
             } else {
               this.credencialesService.create(this.credencialesRequest).subscribe({
                 next: () => {
-                  const messages: Message[] = [
-                    { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro existosamente`, life: 5000 }
-                  ];
-                  this.messagesService.setMessages(messages);
+                  this.messagesService.setMessages('Se guardó registro existosamente.');
                 },
                 error: (err) => {
                   this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message, life: 5000 });

@@ -2,11 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PRIME_NG_MODULES } from '../../../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { MessagesService } from '../../../../../../service/commons/messages.service';
 import { UsuarioService } from '../../../../../../service/modules/private/administrativo/usuario.service';
 import { UsuarioCliente } from '../../../../../../apis/model/module/private/usuario-cliente';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { environment } from '../../../../../../../environments/environment';
 import { HeaderComponent } from '../../../../layout/header/header.component';
 import { EmpresaService } from '../../../../../../service/modules/private/administrativo/empresa.service';
@@ -22,7 +22,8 @@ import { Util } from '../../../../../../utils/util/util.util';
     ReactiveFormsModule,
     CommonModule,
     ...PRIME_NG_MODULES, 
-    HeaderComponent],
+    HeaderComponent,
+    RouterLink],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [ConfirmationService, MessageService, MessagesService, UsuarioService, PerfilService, EmpresaService],
   templateUrl: './form-usuario-cliente.component.html',
@@ -31,7 +32,6 @@ import { Util } from '../../../../../../utils/util/util.util';
 export class FormUsuarioClienteComponent implements OnInit {
   public empresas: Empresa[] = [];
   public perfiles: Perfil[] = [];
-  messages: Message[] = [];
   public usuarioClienteForm: FormGroup;
   idUsuarioSession: string = "";
   idUsuario!: number;
@@ -108,10 +108,7 @@ export class FormUsuarioClienteComponent implements OnInit {
 
         this.usuarioService.vincularEmpresaPerfil(this.usuarioCliente).subscribe({
           next:(response) => {
-            const messages: Message[] = [
-              { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro existosamente`, life: 5000 }
-            ];
-            this.messagesService.setMessages(messages);
+            this.messagesService.setMessages('Se guardó registro existosamente.');
           },
           error: (err) => {
             this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message, life: 5000 });

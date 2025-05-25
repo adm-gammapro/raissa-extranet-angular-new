@@ -3,9 +3,9 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../../layout/header/header.component';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ProveedorService } from '../../../../../service/modules/private/operativo/proveedor.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MessagesService } from '../../../../../service/commons/messages.service';
 import { environment } from '../../../../../../environments/environment';
 import { Util } from '../../../../../utils/util/util.util';
@@ -22,6 +22,7 @@ import { InstitucionFinancieraResponse } from '../../../../../apis/model/module/
     ReactiveFormsModule,
     CommonModule,
     HeaderComponent,
+    RouterLink,
     ...PRIME_NG_MODULES],
     providers: [ConfirmationService, MessageService],
   templateUrl: './form-proveedor.component.html',
@@ -78,10 +79,7 @@ export class FormProveedorComponent {
               
               this.proveedorService.create(this.proveedorRequest).subscribe({
                 next:(response) => {
-                  const messages: Message[] = [
-                    { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro existosamente`, life: 5000 }
-                  ];
-                  this.messagesService.setMessages(messages);
+                  this.messagesService.setMessages('Se guardó registro existosamente.');
                 },
                 error: (err) => {
                   this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message, life: 5000 });

@@ -1,6 +1,6 @@
 <app-header></app-header>
 <p-confirmDialog />
-<p-messages [value]="messages"></p-messages>
+<p-toast />
 <p-panel header="Posición general de bancos">
     <div class="flex border-round bg-gray-100 m-1 border-1 border-300">
         <div class="w-12 flex align-items-center justify-content-center">
@@ -67,7 +67,7 @@
                                 pRipple
                                 severity="secondary"
                                 pTooltip="Saldos por banco"
-                                [routerLink]="['/saldos-banco',saldo.idBanco]"
+                                (onClick)="mostrarSaldoBanco(saldo.idBanco)"
                                 tooltipPosition="top" />
                     </td>
                 </tr>
@@ -117,7 +117,7 @@
 
             <div class="field col-12 md:col-3">
                 <label for="fechas">Rango de fechas</label>
-                <p-calendar 
+                <p-datepicker 
                         inputId="fechas"
                         formControlName="rangeDates"
                         selectionMode="range" 
@@ -130,7 +130,7 @@
 
             <div class="field col-12 md:col-4">
                 <label for="banco">Intitución financiera</label>
-                <p-dropdown
+                <p-select
                     id="banco" 
                     [options]="bancos" 
                     formControlName="banco"
@@ -142,7 +142,7 @@
                     filterBy="nombre" 
                     placeholder="Selecciona institución financiera"
                     appendTo="body">
-                </p-dropdown>
+                </p-select>
             </div>
             <div class="field col-12 md:col-1"></div>
         </div>
@@ -150,7 +150,7 @@
             <div class="field col-12 md:col-1"></div>
             <div class="field col-12 md:col-3">
                 <label for="monedaCuenta">Moneda</label>
-                <p-dropdown
+                <p-select
                     id="monedaCuenta" 
                     [options]="monedas" 
                     formControlName="monedaCuenta"
@@ -160,11 +160,11 @@
                     optionValue="valor"
                     placeholder="Selecciona Moneda"
                     appendTo="body">
-                </p-dropdown>
+                </p-select>
             </div>
             <div class="field col-12 md:col-3">
                 <label for="tipoSeleccionado">Tipo movimiento</label>
-                <p-dropdown 
+                <p-select 
                     inputId = "tipoSeleccionado"
                     [options]="tiposMovimiento" 
                     [showClear]="true" 

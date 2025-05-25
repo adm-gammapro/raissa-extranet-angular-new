@@ -77,7 +77,7 @@
                         <label for="fechaCaducidad" class="pl-1">Fecha de caducidad
                             <span *ngIf="isFieldRequired('fechaCaducidad')" style="color: red;">*</span>
                         </label>
-                        <p-calendar id="fechaCaducidad"
+                        <p-datepicker id="fechaCaducidad"
                                     [readonlyInput]="true"
                                     formControlName="fechaCaducidad"
                                     styleClass="w-full"
@@ -88,7 +88,7 @@
                         <label for="codigoAplicacion" class="pl-1">Aplicación
                             <span *ngIf="isFieldRequired('codigoAplicacion')" style="color: red;">*</span>
                         </label>
-                        <p-dropdown
+                        <p-select
                             id="codigoAplicacion" 
                             [options]="aplicaciones" 
                             formControlName="codigoAplicacion"
@@ -103,7 +103,7 @@
                             optionLabel="descripcion" 
                             optionValue="codigo"
                             placeholder="Selecciona aplicación">
-                        </p-dropdown>
+                        </p-select>
 
                         <div *ngIf="perfilForm.get('codigoAplicacion')?.errors?.['required'] && perfilForm.get('codigoAplicacion')?.touched" class="p-error">
                             El campo es requerido

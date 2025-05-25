@@ -3,10 +3,10 @@ import { HeaderComponent } from "../../layout/header/header.component";
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { UsuarioService } from '../../../../service/modules/private/administrativo/usuario.service';
 import { Usuario } from '../../../../apis/model/module/private/usuario';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MessagesService } from '../../../../service/commons/messages.service';
 import { Paginator } from '../../../../apis/model/commons/paginator';
 import { Util } from '../../../../utils/util/util.util';
@@ -24,7 +24,8 @@ import { FormUsuarioPerfilComponent } from './usuario-perfil/form-usuario-perfil
             ...PRIME_NG_MODULES,
             PaginatorComponent, 
             HeaderComponent,
-            FormUsuarioPerfilComponent],
+            FormUsuarioPerfilComponent,
+            RouterLink],
 providers: [ConfirmationService, MessageService, UsuarioService],
 schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './usuario.component.html',
@@ -35,7 +36,6 @@ export class UsuarioComponent {
   usuarios!: Usuario[];
   nombreSearch:string | undefined;
   estadoSearch:string | undefined;
-  messages: Message[] = [];
   mostrarHijo = false;
   public usuarioSearchForm: FormGroup;
   estados: Estado[] = Estado.estados;
@@ -90,10 +90,7 @@ export class UsuarioComponent {
       accept: () => {
             this.usuarioService.eliminar(usuarioParam.id).subscribe(
               response => {
-                const messages: Message[] = [
-                  { severity: 'success', summary: 'Confirmación', detail: 'Registro dado de baja', life: 5000 }
-                ];
-                this.messagesService.setMessages(messages);
+                this.messagesService.setMessages('Registro dado de baja.');
                 this.reloadPage();
               }
             )
@@ -169,8 +166,6 @@ export class UsuarioComponent {
         });
       });
     });
-
-    this.messages = this.messagesService.getMessages();
   }
 
   busqueda() {
@@ -199,7 +194,6 @@ export class UsuarioComponent {
 
   cerrarModal(): void {
     this.mostrarHijo = false; // Cerrar el componente hijo
-    this.messages = this.messagesService.getMessages();
   }
 
   showDialog(idUsuario: number) {
@@ -210,11 +204,7 @@ export class UsuarioComponent {
   async resetPassword () {
     if (this.passwordReset) {
       this.usuarioService.cambiarPassword(this.idUsuarioReset,this.passwordReset).subscribe(response => {;
-
-        const messages: Message[] = [
-          { severity: 'success', summary: 'Confirmación', detail: 'Password actualizado', life: 5000 }
-        ];
-        this.messagesService.setMessages(messages);
+        this.messagesService.setMessages('Password actualizado');
         this.reloadPage();
       }
     )}

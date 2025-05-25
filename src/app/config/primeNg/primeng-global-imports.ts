@@ -17,21 +17,21 @@ import { DividerModule } from "primeng/divider";
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { SplitButtonModule } from 'primeng/splitbutton';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { PaginatorModule } from 'primeng/paginator';
 import { TableModule } from 'primeng/table';
 import { InputMaskModule } from 'primeng/inputmask';
-import { CalendarModule } from 'primeng/calendar';
 import { DialogModule } from 'primeng/dialog';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { DropdownModule } from 'primeng/dropdown';
+import { DatePickerModule } from 'primeng/datepicker';
 import { MessagesModule } from 'primeng/messages';
 import { PickListModule } from 'primeng/picklist';
 import { AvatarModule } from 'primeng/avatar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { MeterGroupModule } from 'primeng/metergroup';
+import { SelectModule } from 'primeng/select';
 
 export const PRIME_NG_MODULES = [
     ButtonModule,
@@ -53,20 +53,20 @@ export const PRIME_NG_MODULES = [
     InputGroupModule,
     InputGroupAddonModule,
     SplitButtonModule,
-    SidebarModule,
+    DrawerModule,
     PaginatorModule,
     TableModule,
     InputMaskModule,
-    CalendarModule,
+    DatePickerModule,
     DialogModule,
     ConfirmPopupModule,
     ConfirmDialogModule,
-    DropdownModule,
     MessagesModule,
     PickListModule,
     AvatarModule,
     ProgressSpinnerModule,
     ProgressBarModule,
-    MeterGroupModule
+    MeterGroupModule,
+    SelectModule
     // Agrega más módulos aquí
   ];

@@ -1,13 +1,13 @@
 <app-header></app-header>
 <p-confirmDialog />
-<p-messages [value]="messages"></p-messages>
+<p-toast />
 <p-panel header="Monitor de procesos">
   <div class="flex border-round bg-gray-100 m-1 border-1 border-300">
     <div class="w-12 flex align-items-center justify-content-center">
       <div class="formgrid grid w-12 flex  pt-5">
         <div class="field col-12 md:col-3">
           <p-floatLabel>
-            <p-calendar inputId="fechas" 
+            <p-datepicker inputId="fechas" 
                         [(ngModel)]="rangeDates" 
                         selectionMode="range" 
                         [readonlyInput]="true"

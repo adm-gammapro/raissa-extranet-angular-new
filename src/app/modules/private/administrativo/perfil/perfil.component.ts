@@ -1,17 +1,16 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, ViewChild } from '@angular/core';
 import { Perfil } from '../../../../apis/model/module/private/perfil';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Estado } from '../../../../apis/model/commons/estado';
 import { CommonModule } from '@angular/common';
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { PaginatorComponent } from '../../commons/paginator/paginator.component';
 import { HeaderComponent } from '../../layout/header/header.component';
-import { MenuComponent } from '../../layout/menu/menu.component';
 import { FormPerfilModuloComponent } from './perfil-modulo/form-perfil-modulo.component';
 import { UsuarioService } from '../../../../service/modules/private/administrativo/usuario.service';
 import { Paginator } from '../../../../apis/model/commons/paginator';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MessagesService } from '../../../../service/commons/messages.service';
 import { PerfilService } from '../../../../service/modules/private/administrativo/perfil.service';
 import { environment } from '../../../../../environments/environment';
@@ -26,8 +25,8 @@ import { Util } from '../../../../utils/util/util.util';
     ...PRIME_NG_MODULES,
     PaginatorComponent, 
     HeaderComponent,
-    MenuComponent,
-    FormPerfilModuloComponent],
+    FormPerfilModuloComponent,
+    RouterLink],
 providers: [ConfirmationService, MessageService, UsuarioService],
 schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './perfil.component.html',
@@ -38,7 +37,6 @@ export class PerfilComponent implements OnInit {
   public perfiles: Perfil[] = [];
   nombreSearch:string | undefined;
   estadoSearch:string | undefined;
-  messages: Message[] = [];
   mostrarHijo = false;
   public perfilSearchForm: FormGroup;
   estados: Estado[] = Estado.estados;
@@ -49,13 +47,13 @@ export class PerfilComponent implements OnInit {
 
   paginator: Paginator = new Paginator();//esta variable se debe declarar para usar el paginador de los apis, no de primeng
 
-  constructor(private confirmationService: ConfirmationService, 
-    private activatedRoute: ActivatedRoute,
-    private router: Router, 
-    private formBuilder: FormBuilder,
-    private messageService: MessageService,
-    private messagesService: MessagesService,
-    private perfilService: PerfilService) {
+  constructor(private readonly confirmationService: ConfirmationService, 
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router, 
+    private readonly formBuilder: FormBuilder,
+    private readonly messageService: MessageService,
+    private readonly messagesService: MessagesService,
+    private readonly perfilService: PerfilService) {
 
       this.perfilSearchForm = this.formBuilder.group({
         nombreSearch: new FormControl(this.nombreSearch, [Validators.maxLength(50)]),
@@ -105,10 +103,7 @@ export class PerfilComponent implements OnInit {
       accept: () => {
             this.perfilService.eliminar(perfilParam.codigo).subscribe(
               response => {
-                const messages: Message[] = [
-                  { severity: 'success', summary: 'Confirmación', detail: 'Registro dado de baja', life: 5000 }
-                ];
-                this.messagesService.setMessages(messages);
+                this.messagesService.setMessages('Registro dado de baja.');
                 this.reloadPage();
               }
             )
@@ -172,8 +167,6 @@ export class PerfilComponent implements OnInit {
         });
       });
     });
-
-    this.messages = this.messagesService.getMessages();
   }
 
   busqueda() {
@@ -202,6 +195,5 @@ export class PerfilComponent implements OnInit {
 
   cerrarModal(): void {
     this.mostrarHijo = false; // Cerrar el componente hijo
-    this.messages = this.messagesService.getMessages();
   }
 }

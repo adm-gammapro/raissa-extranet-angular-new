@@ -3,11 +3,11 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderComponent } from '../../../layout/header/header.component';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { CuentasService } from '../../../../../service/modules/private/operativo/cuentas.service';
 import { SaldosService } from '../../../../../service/modules/private/operativo/saldos.service';
 import { AgrupacionService } from '../../../../../service/modules/private/operativo/agrupacion.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MessagesService } from '../../../../../service/commons/messages.service';
 import { environment } from '../../../../../../environments/environment';
 import { Moneda } from '../../../../../apis/model/commons/moneda';
@@ -27,6 +27,7 @@ import { InstitucionFinancieraResponse } from '../../../../../apis/model/module/
     ReactiveFormsModule,
     CommonModule,
     HeaderComponent,
+    RouterLink,
     ...PRIME_NG_MODULES],
     providers: [ConfirmationService, MessageService, CuentasService, SaldosService, AgrupacionService],
   templateUrl: './form-cuentas.component.html',
@@ -124,10 +125,7 @@ export class FormCuentasComponent {
             if (this.cuentaRequest.codigo) {
               this.cuentasService.update(this.cuentaRequest).subscribe({
                 next: () => {
-                  const messages: Message[] = [
-                    { severity: 'success', summary: 'Confirmación', detail: `Se Actualizó registro existosamente`, life: 5000 }
-                  ];
-                  this.messagesService.setMessages(messages);
+                  this.messagesService.setMessages('Se Actualizó registro existosamente.');
                 },
                 error: (err) => {
                   this.messageService.add({ severity: 'error', summary: 'Error', detail: Util.validaMensajeError(err), life: 5000 });
@@ -139,10 +137,7 @@ export class FormCuentasComponent {
             } else {
               this.cuentasService.create(this.cuentaRequest).subscribe({
                 next: () => {
-                  const messages: Message[] = [
-                    { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro existosamente`, life: 5000 }
-                  ];
-                  this.messagesService.setMessages(messages);
+                  this.messagesService.setMessages('Se guardó registro existosamente.');
                 },
                 error: (err) => {
                   this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message, life: 5000 });

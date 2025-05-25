@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { HeaderComponent } from '../../layout/header/header.component';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { SaldosService } from '../../../../service/modules/private/operativo/saldos.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../../../environments/environment';
@@ -36,7 +36,6 @@ export class SaldosComponent {
   resumenSaldos: boolean = false;
   resumen: Resumen = new Resumen();
   idEmpresa: string = "";
-  messages: Message[] = [];
   descarga: boolean = false;
   public bancos: InstitucionFinancieraResponse[]=[];
   monedas: Moneda[] = Moneda.monedas;
@@ -130,7 +129,7 @@ export class SaldosComponent {
 
     this.saldosCuentaRequest = this.descargaForm.value;
 
-    let rangeDates: any[] = this.descargaForm.get('rangeDates')?.value || [];
+    let rangeDates: any[] = this.descargaForm.get('rangeDates')?.value ?? [];
 
     if (rangeDates.length>0) {
       lastWeek = rangeDates[0];
@@ -176,5 +175,9 @@ export class SaldosComponent {
         value: TipoMovimientoEnum[enumKey]
       };
     });
+  }
+
+  mostrarSaldoBanco(codigoBanco: number) {
+    this.router.navigate(['/saldos-banco', codigoBanco]);
   }
 }

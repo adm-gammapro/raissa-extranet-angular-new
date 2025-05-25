@@ -17,7 +17,7 @@
                         <label for="codigoCliente" class="pl-1">Empresa
                             <span *ngIf="isFieldRequired('codigoCliente')" style="color: red;">*</span>
                         </label>
-                        <p-dropdown
+                        <p-select
                             id="codigoCliente" 
                             [options]="empresas" 
                             formControlName="codigoCliente"
@@ -33,7 +33,7 @@
                             optionValue="codigo"
                             (onChange)="onPerfilesChange($event)"
                             placeholder="Selecciona empresa">
-                        </p-dropdown>
+                        </p-select>
 
                         <div *ngIf="usuarioClienteForm.get('codigoCliente')?.errors?.['required'] && usuarioClienteForm.get('codigoCliente')?.touched" class="p-error">
                             El campo es requerido
@@ -43,7 +43,7 @@
                         <label for="codigoPerfil" class="pl-1">Perfil
                             <span *ngIf="isFieldRequired('codigoPerfil')" style="color: red;">*</span>
                         </label>
-                        <p-dropdown
+                        <p-select
                             id="codigoPerfil" 
                             [options]="perfiles" 
                             formControlName="codigoPerfil"
@@ -58,7 +58,7 @@
                             optionLabel="descripcion" 
                             optionValue="codigo"
                             placeholder="Selecciona Perfil">
-                        </p-dropdown>
+                        </p-select>
 
                         <div *ngIf="usuarioClienteForm.get('codigoPerfil')?.errors?.['required'] && usuarioClienteForm.get('codigoPerfil')?.touched" class="p-error">
                             El campo es requerido

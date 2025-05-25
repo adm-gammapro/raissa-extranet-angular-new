@@ -1,38 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { PrimeNGConfig } from 'primeng/api';
+import { PrimeNG } from 'primeng/config';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
-  title = 'raissa-angular-extranet';
+export class AppComponent {
+  title = 'raissa-extranet-angular';
 
-  constructor(/*private authService: AuthService,*/
-    private primengConfig: PrimeNGConfig
+  constructor(private readonly primeng: PrimeNG
   ) {
 
   }
 
   ngOnInit(): void {
-    this.primengConfig.ripple = true;
+    this.primeng.ripple.set(true);
 
-    this.primengConfig.zIndex = {
+    this.primeng.zIndex = {
       modal: 1100,    // dialog, sidebar
       overlay: 1000,  // dropdown, overlaypanel
       menu: 1000,     // overlay menus
       tooltip: 1100   // tooltip
     };
 
-    /*if (this.authService.isAuthenticated()) {
-      this.authService.autoRefreshToken()
-    }*/
-
-    this.primengConfig.setTranslation({
+    this.primeng.setTranslation({
       accept: 'Aceptar',
       reject: 'Cancelar',
       dayNames: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],

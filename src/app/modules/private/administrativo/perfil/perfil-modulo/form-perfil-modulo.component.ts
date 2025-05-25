@@ -1,11 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { UsuarioService } from '../../../../../service/modules/private/administrativo/usuario.service';
-import { Perfil } from '../../../../../apis/model/module/private/perfil';
-import { Modulo } from '../../../../../apis/model/module/private/modulo';
 import { ModuloRequest } from '../../../../../apis/model/module/private/request/modulo-request';
 import { MessagesService } from '../../../../../service/commons/messages.service';
 import { PerfilService } from '../../../../../service/modules/private/administrativo/perfil.service';
@@ -23,7 +21,7 @@ import { Menu } from '../../../../../apis/model/module/private/menu';
   templateUrl: './form-perfil-modulo.component.html',
   styleUrl: './form-perfil-modulo.component.scss'
 })
-export class FormPerfilModuloComponent implements OnInit {
+export class FormPerfilModuloComponent {
   modulosAsignados: Menu[] = [];
   modulosNoAsignados: Menu[] = [];
   modulosAsignadosActual: Menu[] = [];
@@ -34,12 +32,9 @@ export class FormPerfilModuloComponent implements OnInit {
   @Output() cerrarModal = new EventEmitter<void>();
   public idEmpresa: string = "";
 
-  constructor(private cdr: ChangeDetectorRef,
-    private perfilService: PerfilService,
-    private messagesService: MessagesService) { }
-
-  ngOnInit() {
-  }
+  constructor(private readonly cdr: ChangeDetectorRef,
+    private readonly perfilService: PerfilService,
+    private readonly messagesService: MessagesService) { }
 
   cargarModelo(idPerfil: number) {
     this.idPerfilEnviado = idPerfil;
@@ -83,11 +78,7 @@ export class FormPerfilModuloComponent implements OnInit {
       }
     });
 
-    const messages: Message[] = [
-      { severity: 'success', summary: 'Confirmación', detail: `Se guardó existosamente`, life: 5000 }
-    ];
-
-    this.messagesService.setMessages(messages);
+    this.messagesService.setMessages('Se guardó existosamente.');
 
     this.cerrar();
   }

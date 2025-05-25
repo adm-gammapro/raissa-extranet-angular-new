@@ -2,11 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PRIME_NG_MODULES } from '../../../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { MessagesService } from '../../../../../../service/commons/messages.service';
 import { UsuarioService } from '../../../../../../service/modules/private/administrativo/usuario.service';
 import { UsuarioCliente } from '../../../../../../apis/model/module/private/usuario-cliente';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { environment } from '../../../../../../../environments/environment';
 import { HeaderComponent } from '../../../../layout/header/header.component';
 
@@ -17,14 +17,14 @@ import { HeaderComponent } from '../../../../layout/header/header.component';
     ReactiveFormsModule,
     CommonModule,
     ...PRIME_NG_MODULES, 
-    HeaderComponent],
+    HeaderComponent,
+    RouterLink],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [ConfirmationService, MessageService, MessagesService, UsuarioService],
   templateUrl: './table-usuario-cliente.component.html',
   styleUrl: './table-usuario-cliente.component.scss'
 })
 export class TableUsuarioClienteComponent implements OnInit {
-  messages: Message[] = [];
   empresasVinculadas: UsuarioCliente[] = [];
   idUsuarioSession!: string;
   idUsuario!: number;
@@ -62,10 +62,7 @@ export class TableUsuarioClienteComponent implements OnInit {
       accept: () => {
               this.usuarioService.desVincularEmpresa(usuarioCliente.codigo).subscribe(
                 response => {
-                  const messages: Message[] = [
-                    { severity: 'success', summary: 'Confirmación', detail: 'Registro dado de baja', life: 5000 }
-                  ];
-                  this.messagesService.setMessages(messages);
+                  this.messagesService.setMessages('Registro dado de baja.');
                   this.reloadPage();
                 }
               )

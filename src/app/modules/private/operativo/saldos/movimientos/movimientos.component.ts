@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
 import { PaginatorComponent } from '../../../commons/paginator/paginator.component';
 import { HeaderComponent } from '../../../layout/header/header.component';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { SaldosService } from '../../../../../service/modules/private/operativo/saldos.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DetalleSaldos } from '../../../../../apis/model/module/private/detalle-saldos';
@@ -37,7 +37,6 @@ export class MovimientosComponent {
   public numeroCuenta = "";
   public monedacuenta = "";
   idEmpresa: string = "";
-  messages: Message[] = [];
 
   tiposMovimiento: any[] = [];
 
@@ -177,5 +176,9 @@ export class MovimientosComponent {
         this.paginator.primerRegistroVisualizado = response.movimientos.pageable.offset;
       });
     })
+  }
+
+  mostrarSaldoBanco(idBanco: string | null) {
+    this.router.navigate(['/saldos-banco', idBanco]);
   }
 }

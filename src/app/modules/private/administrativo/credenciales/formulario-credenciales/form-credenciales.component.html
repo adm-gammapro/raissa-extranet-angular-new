@@ -95,7 +95,7 @@
                         <label for="codigoFrecuenciaActualizacion" class="pl-1">Frecuencia
                             <span *ngIf="isFieldRequired('codigoFrecuenciaActualizacion')" style="color: red;">*</span>
                         </label>
-                        <p-dropdown
+                        <p-select
                             id="codigoFrecuenciaActualizacion" 
                             [options]="frecuencias" 
                             formControlName="codigoFrecuenciaActualizacion"
@@ -110,7 +110,7 @@
                             optionLabel="descripcionFrecuencia" 
                             optionValue="codigo"
                             placeholder="Selecciona frecuencia">
-                        </p-dropdown>
+                        </p-select>
 
                         <div *ngIf="credencialForm.get('codigoFrecuenciaActualizacion')?.errors?.['required'] && credencialForm.get('codigoFrecuenciaActualizacion')?.touched" class="p-error">
                             El campo es requerido
@@ -120,7 +120,7 @@
                         <label for="codigoProveedor" class="pl-1">Proveedores
                             <span *ngIf="isFieldRequired('codigoProveedor')" style="color: red;">*</span>
                         </label>
-                        <p-dropdown
+                        <p-select
                             id="codigoProveedor" 
                             [options]="proveedores" 
                             formControlName="codigoProveedor"
@@ -136,7 +136,7 @@
                             optionValue="codigo"
                             (onChange)="onChangeProveedor($event);"
                             placeholder="Selecciona Proveedor">
-                        </p-dropdown>
+                        </p-select>
 
                         <div *ngIf="credencialForm.get('codigoProveedor')?.errors?.['required'] && credencialForm.get('codigoProveedor')?.touched" class="p-error">
                             El campo es requerido

@@ -34,7 +34,7 @@
                         <label for="codigoInstitucionFinanciera" class="pl-1">Intitución financiera
                             <span *ngIf="isFieldRequired('codigoInstitucionFinanciera')" style="color: red;">*</span>
                         </label>
-                        <p-dropdown
+                        <p-select
                             id="codigoInstitucionFinanciera" 
                             [options]="bancos" 
                             formControlName="codigoInstitucionFinanciera"
@@ -51,7 +51,7 @@
                             [filter]="true"
                             filterBy="nombre" 
                             placeholder="Selecciona institución financiera">
-                        </p-dropdown>
+                        </p-select>
 
                         <div *ngIf="cuentaForm.get('codigoInstitucionFinanciera')?.errors?.['required'] && cuentaForm.get('codigoInstitucionFinanciera')?.touched" class="p-error">
                             El campo es requerido
@@ -61,7 +61,7 @@
                         <label for="monedaCuenta" class="pl-1">Moneda
                             <span *ngIf="isFieldRequired('monedaCuenta')" style="color: red;">*</span>
                         </label>
-                        <p-dropdown
+                        <p-select
                             id="monedaCuenta" 
                             [options]="monedas" 
                             formControlName="monedaCuenta"
@@ -76,7 +76,7 @@
                             optionLabel="descripcion" 
                             optionValue="valor"
                             placeholder="Selecciona Moneda">
-                        </p-dropdown>
+                        </p-select>
 
                         <div *ngIf="cuentaForm.get('monedaCuenta')?.errors?.['required'] && cuentaForm.get('monedaCuenta')?.touched" class="p-error">
                             El campo es requerido
@@ -86,7 +86,7 @@
                         <label for="codigoAgrupacion" class="pl-1">Agrupación
                             <span *ngIf="isFieldRequired('codigoAgrupacion')" style="color: red;">*</span>
                         </label>
-                        <p-dropdown
+                        <p-select
                             id="codigoAgrupacion" 
                             [options]="agrupaciones" 
                             formControlName="codigoAgrupacion"
@@ -101,7 +101,7 @@
                             optionLabel="nombreAgrupacionCliente" 
                             optionValue="codigo"
                             placeholder="Selecciona Agrupacion">
-                        </p-dropdown>
+                        </p-select>
 
                         <div *ngIf="cuentaForm.get('codigoAgrupacion')?.errors?.['required'] && cuentaForm.get('codigoAgrupacion')?.touched" class="p-error">
                             El campo es requerido
@@ -111,7 +111,7 @@
                         <label for="frecuencia" class="pl-1">Frecuencia
                             <span *ngIf="isFieldRequired('frecuencia')" style="color: red;">*</span>
                         </label>
-                        <p-dropdown
+                        <p-select
                             id="frecuencia" 
                             [options]="frecuencias" 
                             formControlName="codigoFrecuenciaActualizacion"
@@ -126,7 +126,7 @@
                             optionLabel="descripcionFrecuencia" 
                             optionValue="codigo"
                             placeholder="Selecciona frecuencia">
-                        </p-dropdown>
+                        </p-select>
 
                         <div *ngIf="cuentaForm.get('frecuencia')?.errors?.['required'] && cuentaForm.get('frecuencia')?.touched" class="p-error">
                             El campo es requerido
@@ -136,7 +136,7 @@
                         <label for="tipoCuenta" class="pl-1">Tipo cuenta
                             <span *ngIf="isFieldRequired('tipoCuenta')" style="color: red;">*</span>
                         </label>
-                        <p-dropdown
+                        <p-select
                             id="tipoCuenta" 
                             [options]="tipoCuentas" 
                             formControlName="tipoCuenta"
@@ -151,7 +151,7 @@
                             optionLabel="descripcion" 
                             optionValue="valor"
                             placeholder="Selecciona tipo cuenta">
-                        </p-dropdown>
+                        </p-select>
 
                         <div *ngIf="cuentaForm.get('tipoCuenta')?.errors?.['required'] && cuentaForm.get('tipoCuenta')?.touched" class="p-error">
                             El campo es requerido

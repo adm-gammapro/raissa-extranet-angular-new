@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { MenuService } from '../../../../service/modules/private/administrativo/menu.service';
@@ -13,7 +13,9 @@ import { Menu } from '../../../../apis/model/module/private/menu';
   selector: 'app-menu',
   standalone: true,
   imports: [CommonModule,
-    ...PRIME_NG_MODULES],
+    RouterModule,
+    ...PRIME_NG_MODULES,
+    RouterLink],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [MenuService],
   templateUrl: './menu.component.html',
@@ -21,17 +23,13 @@ import { Menu } from '../../../../apis/model/module/private/menu';
 })
 export class MenuComponent implements OnInit {
   items: MenuItem[] = []; 
-  //menuUsuario : MenuUsuario = new MenuUsuario();
-  //public codMod?: string;
-  //public codFij?: string;
   public nombreEmpresa?: string;
   listaModulos: Modulo[]= [];
   listaPadres: Menu[] = []
   listaOpciones: Menu[] = [];
 
-  constructor(private menuService: MenuService, 
-              private activatedRoute: ActivatedRoute, 
-              private router: Router) {
+  constructor(private readonly menuService: MenuService, 
+              private readonly activatedRoute: ActivatedRoute) {
     if (sessionStorage.getItem(environment.session.NOMBRE_EMPRESA) != undefined) {
       this.nombreEmpresa = sessionStorage.getItem(environment.session.NOMBRE_EMPRESA)!;
     } else {
@@ -41,8 +39,8 @@ export class MenuComponent implements OnInit {
 
   ngOnInit() { 
     this.activatedRoute.paramMap.subscribe (params => {
-      let user: string | null = sessionStorage.getItem(environment.session.USERNAME)!;
-      let idEmpresa: string | null = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
+      let user: string | null = sessionStorage.getItem(environment.session.USERNAME);
+      let idEmpresa: string | null = sessionStorage.getItem(environment.session.ID_EMPRESA);
 
       if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined') {
         if (sessionStorage.getItem(environment.session.MENU_ITEMS)) {

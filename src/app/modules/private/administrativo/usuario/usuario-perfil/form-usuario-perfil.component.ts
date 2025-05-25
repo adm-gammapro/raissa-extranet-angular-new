@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { UsuarioService } from '../../../../../service/modules/private/administrativo/usuario.service';
 import { Perfil } from '../../../../../apis/model/module/private/perfil';
 import { MessagesService } from '../../../../../service/commons/messages.service';
@@ -20,7 +20,7 @@ import { PerfilRequest } from '../../../../../apis/model/module/private/request/
   templateUrl: './form-usuario-perfil.component.html',
   styleUrl: './form-usuario-perfil.component.scss'
 })
-export class FormUsuarioPerfilComponent implements OnInit {
+export class FormUsuarioPerfilComponent {
   perfilesAsignados: Perfil[] = [];
   perfilesNoAsignados: Perfil[] = [];
   perfilesAsignadosActual: Perfil[] = [];
@@ -31,12 +31,9 @@ export class FormUsuarioPerfilComponent implements OnInit {
   @Output() cerrarModal = new EventEmitter<void>();
   public idEmpresa: string = "";
 
-  constructor(private cdr: ChangeDetectorRef,
-    private usuarioService: UsuarioService,
-    private messagesService: MessagesService) { }
-
-  ngOnInit() {
-  }
+  constructor(private readonly cdr: ChangeDetectorRef,
+    private readonly usuarioService: UsuarioService,
+    private readonly messagesService: MessagesService) { }
 
   cargarModelo(idUsuario: number, idEmpresa: string) {
     this.idUsuarioEnviado = idUsuario;
@@ -80,11 +77,7 @@ export class FormUsuarioPerfilComponent implements OnInit {
       }
     });
 
-    const messages: Message[] = [
-      { severity: 'success', summary: 'Confirmación', detail: `Se guardó existosamente`, life: 5000 }
-    ];
-
-    this.messagesService.setMessages(messages);
+    this.messagesService.setMessages('Se guardó existosamente.');
 
     this.cerrar();
   }

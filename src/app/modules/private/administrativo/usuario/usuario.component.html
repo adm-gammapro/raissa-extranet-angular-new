@@ -1,6 +1,6 @@
 <app-header></app-header>
 <p-confirmDialog />
-    <p-messages [value]="messages"></p-messages>
+<p-toast />
     <form [formGroup]="usuarioSearchForm">
         <p-panel header="Usuario">
             <div class="flex border-round bg-gray-100 m-1 border-1 border-300">
@@ -21,7 +21,7 @@
                         </div>
                         <div class="field col-12 md:col-2">
                             <p-floatLabel>
-                                <p-dropdown 
+                                <p-select 
                                     formControlName="estadoSearch"
                                     [options]="estados"
                                     optionLabel="descripcion"

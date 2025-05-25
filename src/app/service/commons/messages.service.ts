@@ -1,12 +1,23 @@
 import { Injectable } from '@angular/core';
-import { Message } from 'primeng/api';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MessagesService {
 
-  private messages: Message[] = [];
+  private _message: string | null = null;
+
+  setMessages(message: string): void {
+    this._message = message;
+  }
+
+  getMessages(): string | null {
+    const message = this._message;
+    this._message = null; // Limpia el mensaje después de obtenerlo
+    return message;
+  }
+
+  /*private messages: Message[] = [];
 
   setMessages(messages: Message[]) {
     this.messages = messages;
@@ -20,5 +31,5 @@ export class MessagesService {
 
   clearMessages() {
     this.messages = [];
-  }
+  }*/
 }

@@ -3,13 +3,12 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { HeaderComponent } from '../../layout/header/header.component';
-import { MenuComponent } from '../../layout/menu/menu.component';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfiguracionService } from '../../../../service/modules/private/operativo/configuracion.service';
 import { AplicacionEntorno } from '../../../../apis/model/module/private/aplicacion-entorno';
 import { ServicioCliente } from '../../../../apis/model/module/private/servicio-cliente';
 import { JobCliente } from '../../../../apis/model/module/private/job-cliente';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../../../environments/environment';
 import { MessagesService } from '../../../../service/commons/messages.service';
 
@@ -21,7 +20,7 @@ import { MessagesService } from '../../../../service/commons/messages.service';
     CommonModule,
     ...PRIME_NG_MODULES, 
     HeaderComponent,
-    MenuComponent],
+    RouterLink],
 providers: [ConfirmationService, MessageService, ConfiguracionService],
 schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './configuracion.component.html',
@@ -33,14 +32,12 @@ export class ConfiguracionComponent {
   private servicioCliente!: ServicioCliente;
   public listarJobCliente: JobCliente[] = [];
   public codigoServicioCliente: number = 0;
-  messages: Message[] = [];
 
-  constructor(private activatedRoute: ActivatedRoute,
-              private router: Router,
-              private configuracionService: ConfiguracionService,
-              private messageService: MessageService,
-              private messagesService: MessagesService,
-              private confirmationService: ConfirmationService) {
+  constructor(private readonly router: Router,
+              private readonly configuracionService: ConfiguracionService,
+              private readonly messageService: MessageService,
+              private readonly messagesService: MessagesService,
+              private readonly confirmationService: ConfirmationService) {
     if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
       this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
     }
@@ -58,10 +55,7 @@ export class ConfiguracionComponent {
         accept: () => {
           this.configuracionService.delete(jobCliente.codigoJobCliente).subscribe(
                 response => {
-                  const messages: Message[] = [
-                    { severity: 'success', summary: 'Confirmación', detail: 'Registro dado de baja', life: 5000 }
-                  ];
-                  this.messagesService.setMessages(messages);
+                  this.messagesService.setMessages('Registro dado de baja.');
                   this.reloadPage();
                 }
               )
@@ -78,18 +72,17 @@ export class ConfiguracionComponent {
 
   ngOnInit() {
     this.configuracionService.getAplicacionEntorno(this.idEmpresa).subscribe(response => {
-      this.aplicacionEntorno = response as AplicacionEntorno;
+      this.aplicacionEntorno = response;
 
       this.configuracionService.getServicioCliente(Number(this.idEmpresa), this.aplicacionEntorno.codigoAplicacionEntorno).subscribe(response => {
-        this.servicioCliente = response as ServicioCliente;
+        this.servicioCliente = response;
 
         this.codigoServicioCliente = this.servicioCliente.codigoServicioCliente;
         this.configuracionService.getJobs(this.codigoServicioCliente).subscribe(response => {
-          this.listarJobCliente = response as JobCliente[];
+          this.listarJobCliente = response;
         });
       });
     });
-    this.messages = this.messagesService.getMessages();
   }
 
   reloadPage() {

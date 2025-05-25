@@ -27,10 +27,6 @@ import { MonitorComponent } from './modules/private/operativo/monitor/monitor.co
 import { DetalleMonitorComponent } from './modules/private/operativo/monitor/detalle-monitor/detalle-monitor.component';
 
 export const routes: Routes = [
-    /*{
-        path: '**',
-        redirectTo: 'content-web'
-    },*/
     { path: '', redirectTo: 'content', pathMatch: 'full' },
     { path: 'content-web', component: ContentWebComponent },
     { path: 'content', component: ContentComponent },

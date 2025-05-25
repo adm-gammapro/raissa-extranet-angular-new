@@ -3,10 +3,10 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderComponent } from '../../../layout/header/header.component';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { UsuarioService } from '../../../../../service/modules/private/administrativo/usuario.service';
 import { Usuario } from '../../../../../apis/model/module/private/usuario';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MessagesService } from '../../../../../service/commons/messages.service';
 import { Util } from '../../../../../utils/util/util.util';
 import { TipoDocService } from '../../../../../service/commons/tipo-doc.service';
@@ -25,6 +25,7 @@ interface Expiracion {
     ReactiveFormsModule,
     CommonModule,
     HeaderComponent,
+    RouterLink,
     ...PRIME_NG_MODULES],
     providers: [ConfirmationService, MessageService, UsuarioService,TipoDocService],
   templateUrl: './form-usuario.component.html',
@@ -39,14 +40,14 @@ export class FormUsuarioComponent {
   private idEmpresa: string = "";
   expiracion: Expiracion[] | undefined;
 
-  constructor(private router: Router, 
-              private confirmationService: ConfirmationService, 
-              private formBuilder: FormBuilder,
-              private messageService: MessageService, 
-              private usuarioService: UsuarioService, 
-              private activatedRoute: ActivatedRoute,
-              private messagesService: MessagesService,
-              private tipoDocService: TipoDocService) {
+  constructor(private readonly router: Router, 
+              private readonly confirmationService: ConfirmationService, 
+              private readonly formBuilder: FormBuilder,
+              private readonly messageService: MessageService, 
+              private readonly usuarioService: UsuarioService, 
+              private readonly activatedRoute: ActivatedRoute,
+              private readonly messagesService: MessagesService,
+              private readonly tipoDocService: TipoDocService) {
 
     this.usuarioForm = this.formBuilder.group({
       id: new FormControl(this.usuario.id),
@@ -85,10 +86,7 @@ export class FormUsuarioComponent {
               
               this.usuarioService.create(this.usuario, this.idEmpresa).subscribe({
                 next:(response) => {
-                  const messages: Message[] = [
-                    { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro ${response.numeroDocumento} existosamente`, life: 5000 }
-                  ];
-                  this.messagesService.setMessages(messages);
+                  this.messagesService.setMessages(`Se guardó registro ${response.numeroDocumento} existosamente.`);
                 },
                 error: (err) => {
                   this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message, life: 5000 });
@@ -125,7 +123,7 @@ export class FormUsuarioComponent {
       if(id!=null && id > 0){
         this.usuarioService.getUsuario(id).subscribe(response => {
 
-          this.usuario = response as Usuario;
+          this.usuario = response;
 
           this.usuarioForm.patchValue({
             id: this.usuario.id,

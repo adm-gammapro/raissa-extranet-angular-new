@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { Configuracion } from '../../../../../apis/model/module/private/configuracion';
 import { JobClienteProgramacion } from '../../../../../apis/model/module/private/Job-cliente-programacion';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../../layout/header/header.component';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfiguracionService } from '../../../../../service/modules/private/operativo/configuracion.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessagesService } from '../../../../../service/commons/messages.service';
@@ -33,13 +33,13 @@ export class FormConfiguracionComponent {
   public configuracionFormulario: ConfiguracionForm = new ConfiguracionForm();
   public datos;
 
-  constructor(private router: Router, 
-    private confirmationService: ConfirmationService, 
-    private formBuilder: FormBuilder,
-    private messageService: MessageService, 
-    private configuracionService: ConfiguracionService, 
-    private activatedRoute: ActivatedRoute,
-    private messagesService: MessagesService) {
+  constructor(private readonly router: Router, 
+    private readonly confirmationService: ConfirmationService, 
+    private readonly formBuilder: FormBuilder,
+    private readonly messageService: MessageService, 
+    private readonly configuracionService: ConfiguracionService, 
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly messagesService: MessagesService) {
 
     this.configuracionForm = this.formBuilder.group({
         codigoJobCliente: [''],
@@ -191,13 +191,9 @@ export class FormConfiguracionComponent {
             rejectIcon:"No",
             rejectButtonStyleClass:"p-button-text",
             accept: () => {
-              //if (this.configuracion.codigoJobCliente == null || this.configuracion.codigoJobCliente == 0) {
                 this.configuracionService.create(this.configuracion).subscribe({
                   next:(response) => {
-                    const messages: Message[] = [
-                      { severity: 'success', summary: 'Confirmación', detail: `Se guardó registro existosamente`, life: 5000 }
-                    ];
-                    this.messagesService.setMessages(messages);
+                    this.messagesService.setMessages('Registro actualizado satisfactoriamente.');
                   },
                   error: (err) => {
                     this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Hubo un error al registrar configuración', life: 5000 });
@@ -302,5 +298,9 @@ export class FormConfiguracionComponent {
         this.configuracionFormulario.codigoGroupDomingo = detalle.codigoJobClienteProgramacion;
       }
     });
+  }
+
+  mostrarConfiguracion() {
+    this.router.navigate(['/configuracion']);
   }
 }

@@ -3,7 +3,6 @@ import { HeaderComponent } from "../header/header.component";
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
-import { MenuComponent } from '../menu/menu.component';
 
 @Component({
   selector: 'app-content',
@@ -12,8 +11,7 @@ import { MenuComponent } from '../menu/menu.component';
             ReactiveFormsModule,
             CommonModule,
             ...PRIME_NG_MODULES,
-            HeaderComponent,
-            MenuComponent],
+            HeaderComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './content.component.html',
   styleUrl: './content.component.scss'

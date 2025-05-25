@@ -23,8 +23,7 @@
 
 
 <div class="card flex justify-content-center">
-    <p-sidebar [(visible)]="sidebarVisible"  styleClass="w-22rem">
-        <h3>Menu</h3>
+    <p-drawer header="Menu" [(visible)]="sidebarVisible" position="left">
         <app-menu></app-menu>
-    </p-sidebar>
+    </p-drawer>
 </div>

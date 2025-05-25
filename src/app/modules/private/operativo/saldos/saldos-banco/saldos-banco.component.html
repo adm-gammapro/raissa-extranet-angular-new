@@ -1,6 +1,6 @@
 <app-header></app-header>
 <p-confirmDialog />
-<p-messages [value]="messages"></p-messages>
+<p-toast />
 <p-panel header="Saldos">
     <div class="flex border-round bg-gray-100 m-1 border-1 border-300">
         <div class="w-12 flex align-items-center justify-content-center">
@@ -27,7 +27,7 @@
                     <p-button label="Volver" 
                             pTooltip="Volver" 
                             [text]="true" [raised]="true" severity="secondary" 
-                            [routerLink]="['/saldos']"
+                            (onClick)="mostrarSaldo()"
                             styleClass="w-full"/>
                 </div>
 
@@ -73,7 +73,8 @@
                                     pRipple
                                     severity="secondary"
                                     pTooltip="Movimientos" 
-                                    [routerLink]="['/movimientos',saldo.idCuenta,saldo.bitacora,saldo.idBanco,'-','-','T',5,0]"
+                                    mostrarDetalle
+                                    (onClick)="mostrarDetalle(saldo.idCuenta,saldo.bitacora,saldo.idBanco)"
                                     tooltipPosition="top" />
                             <p-button icon="pi pi-refresh" 
                                     [rounded]="true" 

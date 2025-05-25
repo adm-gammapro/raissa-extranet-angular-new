@@ -3,10 +3,10 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit } from '@angular/c
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { HeaderComponent } from '../../layout/header/header.component';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Paginator } from '../../../../apis/model/commons/paginator';
 import { ServicioEjecucionResponse } from '../../../../apis/model/module/private/operativo/servicio/response/servicio-ejecucion-response';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ProcesoService } from '../../../../service/modules/private/operativo/proceso.service';
 import { interval, Subscription, switchMap } from 'rxjs';
 import { PaginatorComponent } from '../../commons/paginator/paginator.component';
@@ -23,7 +23,8 @@ import { EstadoRegistroEnum } from '../../../../apis/model/enums/estado-registro
       CommonModule,
       ...PRIME_NG_MODULES,
       PaginatorComponent,
-      HeaderComponent],
+      HeaderComponent,
+      RouterLink],
   providers: [ConfirmationService, MessageService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './monitor.component.html',
@@ -31,7 +32,6 @@ import { EstadoRegistroEnum } from '../../../../apis/model/enums/estado-registro
 })
 export class MonitorComponent implements OnInit, OnDestroy {
     value: number = 0;
-    messages: Message[] = [];
     interval: any;
     procesos!: ServicioEjecucionResponse[];
     rangeDates!: Date[] | [];
