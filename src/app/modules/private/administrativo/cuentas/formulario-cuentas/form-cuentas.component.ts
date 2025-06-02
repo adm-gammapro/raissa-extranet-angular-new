@@ -93,16 +93,17 @@ export class FormCuentasComponent {
       if(id){
         this.cuentasService.getCuenta(id, Number(this.idEmpresa)).subscribe(response=> {
           this.cuentaResponse = response;
-
-          this.cuentaForm.patchValue({
-            codigo: this.cuentaResponse.codigo,
-            numeroCuenta: this.cuentaResponse.numeroCuenta,
-            codigoInstitucionFinanciera: this.cuentaResponse.codigoInstitucionFinanciera,
-            monedaCuenta: this.cuentaResponse.monedaCuenta,
-            codigoAgrupacion: this.cuentaResponse.agrupacion.codigo,
-            codigoFrecuenciaActualizacion: this.cuentaResponse.frecuenciaActualizacion.codigo,
-            tipoCuenta: this.cuentaResponse.tipoCuenta
-          });
+          if (this.cuentaResponse.codigo != null) {
+            this.cuentaForm.patchValue({
+              codigo: this.cuentaResponse.codigo,
+              numeroCuenta: this.cuentaResponse.numeroCuenta,
+              codigoInstitucionFinanciera: this.cuentaResponse.codigoInstitucionFinanciera,
+              monedaCuenta: this.cuentaResponse.monedaCuenta,
+              codigoAgrupacion: this.cuentaResponse.agrupacion.codigo,
+              codigoFrecuenciaActualizacion: this.cuentaResponse.frecuenciaActualizacion.codigo,
+              tipoCuenta: this.cuentaResponse.tipoCuenta
+            });
+          }
         });
       }
     })
