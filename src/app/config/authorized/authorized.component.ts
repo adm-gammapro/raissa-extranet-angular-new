@@ -38,7 +38,7 @@ export class AuthorizedComponent implements OnInit {
       next: value => {
         this.tokenService.setTokens(value.access_token, value.refresh_token);
         this.authService.guardarUsuario(value.access_token);
-        this.router.navigate(['/seleccion-empresa']);
+        this.router.navigate(['/saldos']);
       },
       error: () => {
         this.tokenService.clear();

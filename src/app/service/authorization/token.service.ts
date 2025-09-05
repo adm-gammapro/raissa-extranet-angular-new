@@ -75,7 +75,6 @@ export class TokenService {
 
   setVerifier(code_verifier: string): void {
     if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){
-    //if(sessionStorage.getItem(environment.session.CODE_VERIFIER)) {
       this.deleteVerifier();
     }
     const encrypted = CryptoJS.AES.encrypt(code_verifier, environment.security.secret_pkce);

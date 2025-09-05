@@ -1,0 +1,76 @@
+/* Layout base */
+.kicker { font-size: .75rem; letter-spacing: .12em; color: var(--raissa-700); text-transform: uppercase; }
+.section-title, .section-heading { color: var(--raissa-900); font-family: var(--font-display); font-weight: 700; }
+.section-title { font-size: 1.25rem; }
+.section-heading { font-size: 1.4rem; }
+
+.section-blue {
+  background: #D7ECF9;            /* color fijo */
+  padding: 3rem 1rem;             /* opcional */
+}
+.section-blue, .section-blue .p-button { color: #000000; }
+
+.hero { margin-top: clamp(24px, 4vw, 56px); }
+.hero-title { font-family: var(--font-display); font-weight: 700; color: var(--raissa-900); font-size: clamp(1.6rem, 2.2vw + .6rem, 2.2rem); }
+
+/* Features */
+.features-grid .feature-box {
+  padding: 1.25rem;
+  border: 1px solid var(--raissa-100);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff 0%, var(--raissa-50) 100%);
+  height: 100%;
+}
+.feature-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 10px;
+  background: var(--raissa-100); color: var(--raissa-700); font-size: 1.2rem;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 1px 2px rgba(15,35,95,.06);
+}
+.feature-title { margin: .75rem 0 .25rem; color: var(--raissa-800); font-weight: 700; }
+.feature-text { color: #2E3742; font-size: .92rem; }
+
+/* Cards de sección media */
+.card-elev.p-card { border-radius: 14px; border: 1px solid var(--raissa-200); box-shadow: 0 6px 24px rgba(15,35,95,.06); }
+.card-elev.p-card:hover { border-color: var(--raissa-300); box-shadow: 0 8px 28px rgba(15,35,95,.10); }
+.card-img { width: 100%; height: 300px; object-fit: cover; border-top-left-radius: 12px; border-top-right-radius: 12px; }
+.card-title { color: var(--raissa-800); margin-top: .75rem; font-weight: 700; }
+.card-text { color: #516072; }
+
+/* CTA banner */
+.cta-wrap { padding: 2.5rem 0; background: linear-gradient(180deg, var(--raissa-50), #fff); }
+.cta-card {
+  max-width: 920px; margin: 0 auto; border: 1px solid var(--raissa-200); border-radius: 14px;
+  background: linear-gradient(180deg, #fff 0%, var(--raissa-50) 100%);
+  padding: 1.25rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.cta-title { margin: 0 0 .25rem; color: var(--raissa-900); font-weight: 700; }
+
+/* Contacto */
+.contact-box { padding: 1rem; border: 1px dashed var(--raissa-200); border-radius: 12px; background: #fff; }
+.contact-icon {
+  width: 40px; height: 40px; border-radius: 10px; background: var(--raissa-100);
+  color: var(--raissa-700); display: inline-flex; align-items: center; justify-content: center;
+}
+.contact-title { margin: .75rem 0 .25rem; color: var(--raissa-800); font-weight: 700; }
+
+/* Footer oscuro */
+.footer-dark {
+  margin-top: 2.5rem; padding: 2.5rem clamp(16px, 3vw, 40px);
+  background: #5DB6E9; color: #000000;
+}
+.footer-dark .link { color: #000000; text-decoration: none; }
+.footer-dark .link:hover { color: #000000; text-decoration: underline; }
+.footer-nav { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; grid-auto-flow: row; gap: .5rem; }
+.footer-brand { color: #000000; font-family: var(--font-display); font-weight: 700; }
+.footer-note { font-size: .85rem; color: #000000; }
+
+/* Botones (usa tu paleta ya definida) */
+.p-button.p-button-primary { background: var(--raissa-600); border-color: var(--raissa-600); color: #fff; }
+.p-button.p-button-primary:hover { background: var(--raissa-700); border-color: var(--raissa-700); }
+.p-button.p-button-outlined { border-color: var(--raissa-300); color: var(--raissa-700); }
+.p-button.p-button-outlined:hover { border-color: var(--raissa-400); color: var(--raissa-800); }
+
+/* Contenedor de página (si usas <main class="page">) */
+:root { --page-x: clamp(16px, 3vw, 40px); --page-top: clamp(24px, 4vw, 56px); --page-max: 1200px; }
+.page { max-width: var(--page-max); margin: var(--page-top) auto 0; padding-inline: var(--page-x); }

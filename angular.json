@@ -34,13 +34,13 @@
             ],
             "styles": [
               "src/styles.scss",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeflex/primeflex.css"
+              "node_modules/primeicons/primeicons.css"
             ],
             "scripts": []
           },
           "configurations": {
             "production": {
+              "baseHref": "/extranet/",
               "budgets": [
                 {
                   "type": "initial",
@@ -60,6 +60,7 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true,
+              "baseHref": "/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",

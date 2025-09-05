@@ -1,24 +1,26 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Usuario } from '../../apis/model/module/private/usuario';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { TokenService } from './token.service';
 import { Router } from '@angular/router';
 import { catchError, map, Observable, throwError } from 'rxjs';
+import { Cliente } from '../../apis/model/module/private/cliente';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   public _token?: string | null;
-  private token_url = environment.security.token_url;
+  private readonly token_url = environment.security.token_url;
   private _usuario: Usuario = new Usuario();
+  private _empresa: Cliente = new Cliente();
 
-  private httpHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
+  private readonly httpHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-  constructor(private httpClient: HttpClient, 
-              private tokenService: TokenService,
-              private router: Router) { }
+  constructor(private readonly httpClient: HttpClient, 
+              private readonly tokenService: TokenService,
+              private readonly router: Router) { }
 
   public getToken(code: string, code_verifier: string): Observable<any> {
     let body = new URLSearchParams();
@@ -88,11 +90,20 @@ export class AuthService {
   guardarUsuario(accessToken: string): void {
     let payload = this.obtenerDatosToken(accessToken);
     let usuario = JSON.stringify(payload.username).replace(/['"]+/g, '');
+    let idEmpresa = JSON.stringify(payload.empresaId).replace(/['"]+/g, '');
 
     sessionStorage.setItem(environment.session.USERNAME, usuario);
+    if(idEmpresa != "0") {
+      sessionStorage.setItem(environment.session.ID_EMPRESA, idEmpresa);
+
+      this.getEmpresa(idEmpresa).subscribe(response => {
+        this._empresa = response;
+        sessionStorage.setItem(environment.session.NOMBRE_EMPRESA, this._empresa.razonSocial);
+      });
+    }
 
     this.getUsuario(payload.username).subscribe(response => {
-      this._usuario = response as Usuario;
+      this._usuario = response;
       sessionStorage.setItem(environment.session.ID_USUARIO_SESSION, this._usuario.id.toString());
       sessionStorage.setItem(environment.session.NOMBRES_USUARIO, this._usuario.nombres);
     });
@@ -107,6 +118,27 @@ export class AuthService {
       
     });
     const url = `${environment.url.base}/seguridad/obtenerUsuarioByUsername?${params}`;
+
+    return this.httpClient.get(url, { headers: headers }).pipe(
+      map((response: any) => {
+        return response.body;
+      }),
+      catchError((e) => {
+          this.isNoAutorizado(e);
+          return throwError(() => e);
+      })
+    );
+  }
+
+  public getEmpresa(idEmpresa: string):  Observable<Cliente> {
+    const params = [
+      `idEmpresa=${idEmpresa}`,
+    ].filter(Boolean).join('&');
+
+    const headers = new HttpHeaders({
+      
+    });
+    const url = `${environment.url.base}/plataforma/cliente/obtenerCliente?${params}`;
 
     return this.httpClient.get(url, { headers: headers }).pipe(
       map((response: any) => {

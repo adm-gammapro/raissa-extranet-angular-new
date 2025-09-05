@@ -32,6 +32,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { MeterGroupModule } from 'primeng/metergroup';
 import { SelectModule } from 'primeng/select';
+import { MenubarModule } from 'primeng/menubar';
+import { ScrollPanelModule } from 'primeng/scrollpanel';
 
 export const PRIME_NG_MODULES = [
     ButtonModule,
@@ -67,6 +69,8 @@ export const PRIME_NG_MODULES = [
     ProgressSpinnerModule,
     ProgressBarModule,
     MeterGroupModule,
-    SelectModule
+    SelectModule,
+    MenubarModule,
+    ScrollPanelModule
     // Agrega más módulos aquí
   ];

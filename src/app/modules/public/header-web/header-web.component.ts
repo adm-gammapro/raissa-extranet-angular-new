@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { TokenService } from '../../../service/authorization/token.service';
 import { HttpParams } from '@angular/common/http';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { CommonModule } from '@angular/common';
 import { PRIME_NG_MODULES } from '../../../config/primeNg/primeng-global-imports';
 
@@ -31,7 +31,7 @@ export class HeaderWebComponent implements OnInit {
     code_challenge_method: environment.security.code_challenge_method
   }
 
-  constructor(private tokenService: TokenService) { }
+  constructor(private readonly tokenService: TokenService) { }
 
   onLogin(): void {
     const code_verifier = this.tokenService.generateCodeVerifier();

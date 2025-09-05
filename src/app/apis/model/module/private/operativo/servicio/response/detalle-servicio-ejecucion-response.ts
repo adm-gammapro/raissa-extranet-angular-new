@@ -6,6 +6,7 @@ export class DetalleServicioEjecucionResponse {
     nombreEntidadFinanciera!: string;
     descripcionMoneda!: string;
     estadoProceso!: string;
+    detalleError!: string;
 
     estadoRegistro!: EstadoRegistroEnum;
     audiFechIns!: string;

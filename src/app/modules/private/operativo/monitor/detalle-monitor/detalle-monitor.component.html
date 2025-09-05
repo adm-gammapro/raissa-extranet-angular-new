@@ -42,7 +42,7 @@
                 {{ getEstadoProceso(detalleServicios.estadoProceso) }}
               </td>
               <td style="text-align: left">
-                {{ detalleServicios.estadoProceso === 'O' ? 'Error en el logueo BBVA' : '' }}
+                {{ detalleServicios.estadoProceso === 'O' ? detalleServicios.detalleError : '' }}
               </td>
           </tr>
         </ng-template>

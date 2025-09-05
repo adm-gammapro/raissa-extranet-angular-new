@@ -109,16 +109,15 @@ export class SaldosService {
   }
 
   actualizarSaldosMovimientosGeneral(codigoCliente: number) {
-    let ejecucion: Ejecucion = new Ejecucion();
-    ejecucion.codigoCliente = codigoCliente;
-    ejecucion.usuarioEjecucionProceso = sessionStorage.getItem(environment.session.USERNAME)!;
+    let ejecucionRequest: EjecucionRequest = new EjecucionRequest();
+    ejecucionRequest.codigoCliente = codigoCliente;
 
     const headers = new HttpHeaders({
     });
 
     const url = `${this.urlEjecucion}/ejecutarConsultaPosicionGeneralOnline`;
 
-    return this.http.post<any>(url, ejecucion, { headers: headers }).pipe(
+    return this.http.post<any>(url, ejecucionRequest, { headers: headers }).pipe(
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);
@@ -128,16 +127,16 @@ export class SaldosService {
 
   actualizarSaldosMovimientosPorBanco(codigoCliente: number,
     codigoIfi: string) {
-    let ejecucion: Ejecucion = new Ejecucion();
-    ejecucion.codigoCliente = codigoCliente;
-    ejecucion.codigoIfi = codigoIfi;
+      let ejecucionRequest: EjecucionRequest = new EjecucionRequest();
+    ejecucionRequest.codigoCliente = codigoCliente;
+    ejecucionRequest.codigoIfi = codigoIfi;
 
     const headers = new HttpHeaders({
     });
 
     const url = `${this.urlEjecucion}/ejecutarConsultaPosicionGeneralOnline`;
 
-    return this.http.post<any>(url, ejecucion, { headers: headers }).pipe(
+    return this.http.post<any>(url, ejecucionRequest, { headers: headers }).pipe(
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);

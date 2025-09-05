@@ -1,24 +1,24 @@
 <p-toolbar>
     <div class="p-toolbar-group-start">
-        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
-            <img src="assets/images/Raissa-logo-fondo-transparente-pequenio.png" width="200" height="60" alt="Descripción de la imagen">
-        </a>
+        
     </div>
     <div class="p-toolbar-group-center">
-        
+        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
+            <img src="assets/images/Raissa-logo-fondo-transparente-mediano.png" width="350" height="120" alt="Descripción">
+        </a>
     </div>
     <div class="p-toolbar-group-end">
         <p-button label="Iniciar sesión" 
                   icon="pi pi-sign-in"
                   [outlined]="true" 
                   severity="secondary" 
-                  (click)="onLogin()"
+                  (onClick)="onLogin()"
                   *ngIf="!isLogged"/>
         <p-button label="Cerrar sessión" 
                   icon="pi pi-sign-out" 
                   [outlined]="true" 
                   severity="secondary" 
-                  (click)="onLogout()"
+                  (onClick)="onLogout()"
                   *ngIf="isLogged"/>
     </div>
 </p-toolbar>

@@ -6,10 +6,10 @@ export class Usuario {
     public apeMaterno: string;
     public password: string;
     public fechaCambioClave: string;
-    public indicadorExpiracion: String;
+    public indicadorExpiracion: string;
     public fechaExpiracionClave: string;
-    public correo: String;
-    public telefono: String;
+    public correo: string;
+    public telefono: string;
     public estadoRegistro: string;
     public codigoTipoDocumento: string;
     public descripcionTipoDocumento: string;

@@ -34,6 +34,8 @@ export class SeleccionComponent implements OnInit {
     this.selectionForm = this.formBuilder.group({
       seleccion: ['', Validators.required]
     });
+
+    console.log(sessionStorage.getItem(environment.session.ID_EMPRESA));
   }
 
   public seleccionarEmpresa(): void {
@@ -56,7 +58,7 @@ export class SeleccionComponent implements OnInit {
   ngOnInit() {
     this.activatedRoute.paramMap.subscribe (params => {
 
-      let user: string | null = sessionStorage.getItem(environment.session.USERNAME)!;
+      let user = sessionStorage.getItem(environment.session.USERNAME)!;
 
       this.empresaService.getempresas(user)
         .subscribe(response => {
