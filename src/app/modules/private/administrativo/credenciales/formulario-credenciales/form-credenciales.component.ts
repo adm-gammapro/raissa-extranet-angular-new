@@ -170,7 +170,7 @@ export class FormCredencialesComponent {
   }
 
   filterAlphanumeric(event: Event): void {
-    Util.filterAlphanumeric(event, this.credencialForm);
+    Util.filterSpecialCharacters(event, this.credencialForm);
   }
 
   isFieldRequired(controlName: string): boolean {

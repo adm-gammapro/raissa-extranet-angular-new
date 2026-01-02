@@ -3,9 +3,11 @@
         <div class="p-toolbar-group-start">
             
             <p-button icon="pi pi-bars" class="mr-2" (onClick)="sidebarVisible = true"  severity="secondary"/>
-            <img alt="" src="assets/images/Raissa-logo-fondo-transparente-pequenio.png" width="150"/>
+            <a [routerLink]="['/content']">
+                <img alt="" src="assets/images/Raissa-logo-fondo-transparente-pequenio.png" width="150"/>
+            </a>
         </div>
-        <div class="p-toolbar-group-center font-bold text-lg">
+        <div class="p-toolbar-group-center font-bold text-2xl">
             {{nombreEmpresa}}
         </div>
         <div class="p-toolbar-group-end">

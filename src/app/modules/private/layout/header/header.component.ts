@@ -6,6 +6,7 @@ import { TokenService } from '../../../../service/authorization/token.service';
 import { environment } from '../../../../../environments/environment';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MenuComponent } from '../menu/menu.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -14,7 +15,8 @@ import { MenuComponent } from '../menu/menu.component';
             ReactiveFormsModule,
             CommonModule,
             ...PRIME_NG_MODULES, 
-            MenuComponent],
+            MenuComponent,
+            RouterLink],
   providers: [ConfirmationService, MessageService, TokenService],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'

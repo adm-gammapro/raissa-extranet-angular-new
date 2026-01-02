@@ -34,6 +34,9 @@ import { MeterGroupModule } from 'primeng/metergroup';
 import { SelectModule } from 'primeng/select';
 import { MenubarModule } from 'primeng/menubar';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
+import { TagModule } from 'primeng/tag';
+import { RatingModule } from 'primeng/rating';
+import { ChartModule } from 'primeng/chart';
 
 export const PRIME_NG_MODULES = [
     ButtonModule,
@@ -71,6 +74,9 @@ export const PRIME_NG_MODULES = [
     MeterGroupModule,
     SelectModule,
     MenubarModule,
-    ScrollPanelModule
+    ScrollPanelModule,
+    TagModule, 
+    RatingModule,
+    ChartModule
     // Agrega más módulos aquí
   ];

@@ -75,7 +75,7 @@ export class DetalleMonitorComponent implements OnInit {
   }
 
   busqueda() {
-    this.router.navigate(['/detalle-monitor',this.paginator.numeroPagina,this.paginator.cantidadRegistros,this.codigoBitacoraEjecucion]);
+    this.router.navigate(['/detalle-monitor', this.paginator.cantidadRegistros, this.paginator.numeroPagina, this.codigoBitacoraEjecucion]);
   }
 
   getEstadoProceso(estado: string): string {

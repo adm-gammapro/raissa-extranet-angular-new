@@ -48,7 +48,7 @@ export class SeleccionComponent implements OnInit {
       if (this.seleccionado?.codigo && this.seleccionado?.razonSocial){
         sessionStorage.setItem(environment.session.ID_EMPRESA, this.seleccionado.codigo.toString());
         sessionStorage.setItem(environment.session.NOMBRE_EMPRESA, this.seleccionado?.razonSocial);
-        this.router.navigate(['/saldos']);
+        this.router.navigate(['/content']);
       }
     } else {
       this.messageService.add({ severity: 'error', summary: 'Error!', detail: 'No se seleccionó empresa', life: 5000 });

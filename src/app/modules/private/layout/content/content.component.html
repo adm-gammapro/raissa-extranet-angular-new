@@ -1,1 +1,133 @@
-<app-header>
+<app-header></app-header>
+
+<div class="card">
+    <p-splitter [style]="{ height: '760px' }" [minSizes]="[10, 0]" styleClass="mb-8">
+
+        <ng-template #panel>
+            <p-splitter layout="horizontal" [panelSizes]="[50, 50]">
+                <ng-template #panel>
+                    <div class="h-full flex flex-column">
+                        <div class="flex-grow-1 p-3" style="overflow-y: auto;">
+                            <p-table [value]="resumen.saldosBanco" stripedRows showGridlines
+                                [tableStyle]="{ 'min-width': '50rem', 'width': '100%' }" styleClass="w-full">
+                                <ng-template #caption>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xl font-bold">Entidades financieras</span>
+                                    </div>
+                                </ng-template>
+                                <ng-template #header>
+                                    <tr>
+                                        <th id="imagen" style="width:5%"></th>
+                                        <th id="nombre" style="width:25%">Nombre banco</th>
+                                        <th id="ccsoles" style="width:15%; text-align: right;">Cant. ctas Soles</th>
+                                        <th id="totalsoles" style="width:20%; text-align: right;">Total Soles</th>
+                                        <th id="ccdolares" style="width:15%; text-align: right;">Cant. ctas Dólares</th>
+                                        <th id="totaldolares" style="width:20%; text-align: right;">Total Dólares</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template #body let-banco>
+                                    <tr>
+                                        <td style="text-align: center;">
+                                            <img [src]="'assets/images/' + banco.imagen"
+                                                [alt]="banco.abreviatura" width="60" class="shadow-lg rounded" />
+                                        </td>
+                                        <td>{{ banco.banco }}</td>
+                                        <td style="text-align: right;">{{ banco.cantidadCuentasSoles }}</td>
+                                        <td style="text-align: right;">{{ banco.saldoDisponibleformatoSoles }}</td>
+                                        <td style="text-align: right;">{{ banco.cantidadCuentasDolares }}</td>
+                                        <td style="text-align: right;">{{ banco.saldoDisponibleformatoDolares }}</td>
+
+                                    </tr>
+                                </ng-template>
+                                <ng-template #footer>
+                                    <tr>
+                                        <td colspan="6">Hay en total {{ resumen.saldosGeneral ? resumen.saldosGeneral.length : 0 }}
+                                            entidades.
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template #panel>
+                    <p-splitter layout="vertical" [panelSizes]="[50, 50]">
+                        <ng-template #panel>
+                            <p-splitter [panelSizes]="[50, 50]">
+                                <ng-template #panel>
+                                    <div class="h-full flex flex-column">
+                                        <div class="flex justify-content-center align-items-center p-1">
+                                            <h3 class="text-blue-500 font-bold m-1">Consolidado en Soles</h3>
+                                        </div>
+
+                                        <div class="flex-grow-1 flex align-items-center justify-content-center p-1">
+                                            <div class="text-center w-full">
+                                                <p-chart type="doughnut" [data]="dataSoles" [options]="optionsSoles" height="300" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template #panel>
+                                    <div class="h-full flex flex-column">
+                                        <div class="flex justify-content-center align-items-center p-2">
+                                            <h3 class="text-blue-500 font-bold m-2">Consolidado en Dólares</h3>
+                                        </div>
+
+                                        <div class="flex-grow-1 flex align-items-center justify-content-center p-3">
+                                            <div class="text-center w-full">
+                                                <p-chart type="doughnut" [data]="dataDolares" [options]="optionsDolares"  height="300" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </p-splitter>
+                        </ng-template>
+                        <ng-template #panel>
+                            <div class="h-full p-3">
+                              <div class="flex flex-column h-full justify-content-center align-items-center">
+                                <div class="grid w-full" style="max-width: 600px;">
+                                  <div class="col-12 mb-2">
+                                    <div class="card surface-card border-round p-2 shadow-2 text-center">
+                                      <button
+                                        pButton
+                                        type="button"
+                                        severity="info"
+                                        class="w-full p-button-rounded p-button-outlined justify-content-center"
+                                        [routerLink]="['/saldos']">
+                                        <span class="flex align-items-center gap-2">
+                                          <i class="pi pi-arrow-right font-medium text-blue-500"></i>
+                                          <span class="font-medium text-blue-500 text-sm">Ir a posición bancaria</span>
+                                        </span>
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <div class="col-12 mb-2">
+                                    <div class="card surface-card border-round p-2 shadow-2 text-center">
+                                      <div class="flex flex-column align-items-center">
+                                        <i class="pi pi-wallet text-blue-500 text-xl mb-2"></i>
+                                        <span class="text-color-secondary text-sm font-medium mb-1">Total Soles</span>
+                                        <div class="text-4xl font-bold text-blue-500">S/. {{ resumen.saldoDisponibleSoles }}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div class="col-12">
+                                    <div class="card surface-card border-round p-2 shadow-2 text-center">
+                                      <div class="flex flex-column align-items-center">
+                                        <i class="pi pi-dollar text-blue-500 text-xl mb-2"></i>
+                                        <span class="text-color-secondary text-sm font-medium mb-1">Total Dólares</span>
+                                        <div class="text-4xl font-bold text-blue-500">$ {{ resumen.saldoDisponibleDolares }}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                        </ng-template>
+                    </p-splitter>
+                </ng-template>
+            </p-splitter>
+        </ng-template>
+    </p-splitter>
+</div>

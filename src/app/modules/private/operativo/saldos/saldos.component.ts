@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { HeaderComponent } from '../../layout/header/header.component';
@@ -30,7 +30,7 @@ import { TipoMovimientoEnum, TipoMovimientoLabels } from '../../../../apis/model
   templateUrl: './saldos.component.html',
   styleUrl: './saldos.component.scss'
 })
-export class SaldosComponent {
+export class SaldosComponent implements OnInit {
   descargaForm: FormGroup;
   loading: boolean = false;
   resumenSaldos: boolean = false;

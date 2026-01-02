@@ -1,4 +1,4 @@
-const URL_BASE = 'http://www.raissaob.com/api/extranet/'
+const URL_BASE = 'https://www.raissaob.com/api/extranet'
 
 export const environment = {
     production: false,
@@ -20,17 +20,17 @@ export const environment = {
         MENU_ITEMS: 'menuItems'
     },
     security: {
-        authorize_uri: 'http://www.raissaob.com/api/autorizador/oauth2/authorize?',
+        authorize_uri: 'https://www.raissaob.com/api/autorizador/oauth2/authorize?',
         client_id: 'extranet',
-        redirect_uri: 'http://www.raissaob.com/extranet/authorized',
+        redirect_uri: 'https://www.raissaob.com/extranet/authorized',
         scope: 'openid',
         response_type: 'code',
         response_mode: 'form_post',
         code_challenge_method: 'S256',
-        token_url: "http://www.raissaob.com/api/autorizador/oauth2/token",
+        token_url: "https://www.raissaob.com/api/autorizador/oauth2/token",
         grant_type: "authorization_code",
-        resource_url: 'http://www.raissaob.com/extranet/resource/',//esta es la ruta del servicio del server resource
-        logout_url: 'http://www.raissaob.com/api/autorizador/logout',
+        resource_url: 'https://www.raissaob.com/api/extranet/resource/',//esta es la ruta del servicio del server resource
+        logout_url: 'https://www.raissaob.com/api/autorizador/logout',
         secret_pkce: 'extranet',
     }
 };

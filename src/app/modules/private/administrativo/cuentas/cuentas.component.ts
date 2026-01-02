@@ -31,7 +31,7 @@ import { InstitucionFinancieraResponse } from '../../../../apis/model/module/pri
     ReactiveFormsModule,
     CommonModule,
     ...PRIME_NG_MODULES,
-    PaginatorComponent, 
+    PaginatorComponent,
     HeaderComponent,
     EstadoRegistroLabelPipe,
     RouterLink],
@@ -56,13 +56,14 @@ export class CuentasComponent implements OnInit {
   idCuentaVincular!: number;
   credenciales!: CredencialesResponse[];
   cuentaCredencialRequest!: CuentaCredencialRequest;
-  idBancoVincular!: string;
+  visibleCuentas = new Set<number>();
+  mostrarTodas = false;
 
   paginator: Paginator = new Paginator();//esta variable se debe declarar para usar el paginador de los apis, no de primeng
 
-  constructor(private readonly confirmationService: ConfirmationService, 
+  constructor(private readonly confirmationService: ConfirmationService,
     private readonly activatedRoute: ActivatedRoute,
-    private readonly router: Router, 
+    private readonly router: Router,
     private readonly formBuilder: FormBuilder,
     private readonly messageService: MessageService,
     private readonly messagesService: MessagesService,
@@ -82,7 +83,7 @@ export class CuentasComponent implements OnInit {
         codigo: [null],
         codigoCuenta: [null],
         codigoCredencial: [null]
-      }); 
+      });
 
       if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
         this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
@@ -186,9 +187,9 @@ export class CuentasComponent implements OnInit {
       this.cuentasService.getCuentas(pagina,
                                     this.estadoSearch,
                                     numeroCuenta,
-                                    cantReg, 
-                                    Number(this.idEmpresa), 
-                                    idBanco, 
+                                    cantReg,
+                                    Number(this.idEmpresa),
+                                    idBanco,
                                     idAgrupacion).subscribe(response => {
         this.cuentas = response.content;
         //estos valores se usan para actualizar los valores del paginador
@@ -228,7 +229,7 @@ export class CuentasComponent implements OnInit {
       this.router.navigate(['/cuentas']);
     });
   }
-   
+
   async vincularCredenciales() {
     this.cuentaCredencialRequest = this.credencialForm.value;
     this.cuentaCredencialRequest.codigoCuenta = this.idCuentaVincular;
@@ -261,5 +262,34 @@ export class CuentasComponent implements OnInit {
         codigoCredencial: cuentaCredencial.codigoCredencial
       });
     });
+  }
+
+  esVisible(cuenta: any): boolean {
+    return this.mostrarTodas || this.visibleCuentas.has(cuenta.codigo);
+  }
+
+  ocultarValor(valor: string): string {
+    if (!valor) return '';
+    if (valor.length <= 4) return valor;
+    const visibles = valor.slice(-4);
+    const ocultos = '*'.repeat(valor.length - 4);
+    return ocultos + visibles;
+  }
+
+  toggleVisibilidad(cuenta: any): void {
+    if (this.visibleCuentas.has(cuenta.codigo)) {
+      this.visibleCuentas.delete(cuenta.codigo);
+    } else {
+      this.visibleCuentas.add(cuenta.codigo);
+    }
+  }
+
+  toggleTodasVisibles(): void {
+    this.mostrarTodas = !this.mostrarTodas;
+    if (this.mostrarTodas) {
+      this.visibleCuentas = new Set(this.cuentas.map(c => c.codigo)); // o cuentas de la página
+    } else {
+      this.visibleCuentas.clear();
+    }
   }
 }
