@@ -25,6 +25,7 @@ import { TableUsuarioClienteComponent } from './modules/private/administrativo/u
 import { FormUsuarioClienteComponent } from './modules/private/administrativo/usuario/usuario-empresa/form/form-usuario-cliente.component';
 import { MonitorComponent } from './modules/private/operativo/monitor/monitor.component';
 import { DetalleMonitorComponent } from './modules/private/operativo/monitor/detalle-monitor/detalle-monitor.component';
+import {UsuarioCuentaComponent} from './modules/private/administrativo/usuario/usuario-cuenta/usuario-cuenta.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'content', pathMatch: 'full' },
@@ -33,13 +34,14 @@ export const routes: Routes = [
     { path: 'authorized', component: AuthorizedComponent },
     { path: 'logout', component: LogoutComponent},
     { path: 'seleccion-empresa', component: SeleccionComponent},
-    
+
     { path: 'usuario', component: UsuarioComponent },
     { path: 'form-usuario/:id', component: FormUsuarioComponent},
     { path: 'usuario/:pagina/:cantReg/:nombreSearch/:estadoSearch', component: UsuarioComponent },
     { path: 'usuario-empresa/:id', component: TableUsuarioClienteComponent },
     { path: 'form-usuario-cliente/:id', component: FormUsuarioClienteComponent },
-    
+    { path: 'usuario-cuenta/:idUsuario', component: UsuarioCuentaComponent },
+
     { path: 'perfil', component: PerfilComponent },
     { path: 'perfil/:pagina/:cantReg/:nombreSearch/:estadoSearch', component: PerfilComponent },
     { path: 'form-perfil/:id', component: FormPerfilComponent },
@@ -51,15 +53,15 @@ export const routes: Routes = [
     { path: 'proveedor', component: ProveedorComponent},
     { path: 'proveedor/:pagina/:estadoSearch/:nombreSearch/:cantReg', component: ProveedorComponent},
     { path: 'form-proveedor/:id', component: FormProveedorComponent},
-    
+
     { path: 'credenciales', component: CredencialesComponent},
     { path: 'credenciales/:pagina/:estadoSearch/:nombreSearch/:proveedorSearch/:cantReg', component: CredencialesComponent},
     { path: 'form-credenciales/:id', component: FormCredencialesComponent},
-    
+
     { path: 'cuentas', component: CuentasComponent},
     { path: 'cuentas/:pagina/:estadoRegistro/:numeroCuenta/:cantReg/:idBanco/:idAgrupacion', component: CuentasComponent},
     { path: 'form-cuentas/:id', component: FormCuentasComponent},
-    
+
     { path: 'configuracion', component: ConfiguracionComponent},
     { path: 'form-configuracion/:id/:codigoServicioCliente', component: FormConfiguracionComponent},
 

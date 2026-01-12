@@ -1,21 +1,25 @@
-import { CommonModule, DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
-import { HeaderComponent } from '../../layout/header/header.component';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { SaldosService } from '../../../../service/modules/private/operativo/saldos.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { environment } from '../../../../../environments/environment';
-import { Resumen } from '../../../../apis/model/module/private/resumen';
-import { ResumenGeneralModalComponent } from "./resumen-general/resumen-general-modal.component";
-import { Util } from '../../../../utils/util/util.util';
-import { InstitucionFinancieraService } from '../../../../service/commons/institucion-financiera.service';
-import { InstitucionFinancieraResponse } from '../../../../apis/model/module/private/commons/institucion-financiera-response';
-import { Moneda } from '../../../../apis/model/commons/moneda';
-import { SaldosCuentaSearch } from '../../../../apis/model/module/private/operativo/reportes/request/saldos-cuenta-search';
-import { ReportesService } from '../../../../service/modules/private/operativo/reportes.service';
-import { TipoMovimientoEnum, TipoMovimientoLabels } from '../../../../apis/model/enums/tipo-movimiento.enum';
+import {CommonModule, DatePipe} from '@angular/common';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {PRIME_NG_MODULES} from '../../../../config/primeNg/primeng-global-imports';
+import {HeaderComponent} from '../../layout/header/header.component';
+import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
+import {SaldosService} from '../../../../service/modules/private/operativo/saldos.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {environment} from '../../../../../environments/environment';
+import {Resumen} from '../../../../apis/model/module/private/resumen';
+import {ResumenGeneralModalComponent} from "./resumen-general/resumen-general-modal.component";
+import {Util} from '../../../../utils/util/util.util';
+import {InstitucionFinancieraService} from '../../../../service/commons/institucion-financiera.service';
+import {
+  InstitucionFinancieraResponse
+} from '../../../../apis/model/module/private/commons/institucion-financiera-response';
+import {Moneda} from '../../../../apis/model/commons/moneda';
+import {
+  SaldosCuentaSearch
+} from '../../../../apis/model/module/private/operativo/reportes/request/saldos-cuenta-search';
+import {ReportesService} from '../../../../service/modules/private/operativo/reportes.service';
+import {TipoMovimientoEnum, TipoMovimientoLabels} from '../../../../apis/model/enums/tipo-movimiento.enum';
 
 @Component({
   selector: 'app-saldos',
@@ -24,7 +28,7 @@ import { TipoMovimientoEnum, TipoMovimientoLabels } from '../../../../apis/model
     ReactiveFormsModule,
     CommonModule,
     ...PRIME_NG_MODULES,
-    HeaderComponent, 
+    HeaderComponent,
     ResumenGeneralModalComponent],
   providers: [ConfirmationService, MessageService, SaldosService],
   templateUrl: './saldos.component.html',
@@ -37,24 +41,36 @@ export class SaldosComponent implements OnInit {
   resumen: Resumen = new Resumen();
   idEmpresa: string = "";
   descarga: boolean = false;
-  public bancos: InstitucionFinancieraResponse[]=[];
+  public bancos: InstitucionFinancieraResponse[] = [];
   monedas: Moneda[] = Moneda.monedas;
   saldosCuentaRequest!: SaldosCuentaSearch;
   saldosCuentaEnviarRequest!: SaldosCuentaSearch;
   tiposMovimiento: any[] = [];
+  protected codigoUsuarioSesion: string = "";
+  protected claseUsuarioSesion: string = "";
+  protected items: MenuItem[] | undefined;
+  protected home: MenuItem | undefined;
 
   constructor(private readonly activatedRoute: ActivatedRoute,
               private readonly formBuilder: FormBuilder,
-              private readonly router: Router, 
+              private readonly router: Router,
               private readonly saldosService: SaldosService,
               private readonly institucionFinancieraService: InstitucionFinancieraService,
               private readonly reportesService: ReportesService) {
-      if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
-        this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
-      }
+    if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
+      this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
+    }
+
+    if (sessionStorage.getItem(environment.session.ID_USUARIO_SESSION) != undefined) {
+      this.codigoUsuarioSesion = sessionStorage.getItem(environment.session.ID_USUARIO_SESSION)!;
+    }
+
+    if (sessionStorage.getItem(environment.session.CLASE_USUARIO_SESSION) != undefined) {
+      this.claseUsuarioSesion = sessionStorage.getItem(environment.session.CLASE_USUARIO_SESSION)!;
+    }
 
     this.descargaForm = this.formBuilder.group({
-      rangeDates:[[]],
+      rangeDates: [[]],
       numeroCuenta: [''],
       banco: [''],
       monedaCuenta: [''],
@@ -78,7 +94,7 @@ export class SaldosComponent implements OnInit {
   }
 
   reloadPage() {
-    this.router.navigateByUrl('/content-web', { skipLocationChange: true }).then(() => {
+    this.router.navigateByUrl('/content-web', {skipLocationChange: true}).then(() => {
       this.router.navigate(['/saldos']);
     });
   }
@@ -92,14 +108,16 @@ export class SaldosComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.activatedRoute.paramMap.subscribe (params => {        
-      this.saldosService.getSaldos(Number(this.idEmpresa)).subscribe(response => {
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.saldosService.getSaldos(Number(this.idEmpresa), Number(this.codigoUsuarioSesion)).subscribe(response => {
         this.resumen = response;
-        
+
         this.cargarBanco();
         this.cargarTiposMovimiento();
       });
     })
+
+    this.initializeBreadcrumbs();
   }
 
   transform(value: string, formato: string) {
@@ -112,7 +130,7 @@ export class SaldosComponent implements OnInit {
   }
 
   filterNumeric(event: Event): void {
-      Util.filterNumeric(event, this.descargaForm);
+    Util.filterNumeric(event, this.descargaForm);
   }
 
   public cargarBanco(): void {
@@ -131,7 +149,7 @@ export class SaldosComponent implements OnInit {
 
     let rangeDates: any[] = this.descargaForm.get('rangeDates')?.value ?? [];
 
-    if (rangeDates.length>0) {
+    if (rangeDates.length > 0) {
       lastWeek = rangeDates[0];
       fechaInicial = lastWeek.toISOString().split('T')[0];
 
@@ -156,15 +174,16 @@ export class SaldosComponent implements OnInit {
     this.saldosCuentaEnviarRequest.moneda = this.saldosCuentaRequest.moneda;
     this.saldosCuentaEnviarRequest.numeroCuenta = this.saldosCuentaRequest.numeroCuenta
     this.saldosCuentaEnviarRequest.tipoMovimiento = this.saldosCuentaRequest.tipoMovimiento;
+    this.saldosCuentaEnviarRequest.codigoUsuario = Number(this.codigoUsuarioSesion);
 
     this.reportesService.descargarReporteSaldosMovimientos(this.saldosCuentaEnviarRequest).subscribe(response => {
-      const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const blob = new Blob([response], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
       link.download = 'reporte.xlsx';
       link.click();
     });
-    
+
   }
 
   cargarTiposMovimiento() {
@@ -179,5 +198,10 @@ export class SaldosComponent implements OnInit {
 
   mostrarSaldoBanco(codigoBanco: number) {
     this.router.navigate(['/saldos-banco', codigoBanco]);
+  }
+
+  private initializeBreadcrumbs(): void {
+    this.items = [{label: 'Posición general'}];
+    this.home = {icon: 'pi pi-home', routerLink: '/content'};
   }
 }

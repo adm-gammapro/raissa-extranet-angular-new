@@ -1,94 +1,111 @@
 <app-header></app-header>
-<p-confirmDialog />
-<p-toast />
-<p-panel header="Entidad Financiera: {{nombreBanco}} ------- Nro cuenta: {{numeroCuenta}} ------- Moneda: {{monedacuenta}}" >
-    <div class="flex border-round bg-gray-100 m-1 border-1 border-300">
-        <div class="w-12 flex align-items-center justify-content-center">
-            <div class="formgrid grid w-12 flex  pt-5">
-                
-                <div class="field col-12 md:col-2">
-                    <p-floatLabel>
-                        <p-datepicker 
-                            inputId="fechas"
-                            [(ngModel)]="rangeDates" 
-                            selectionMode="range"  
-                            dateFormat="dd/mm/yy"/>
-                        <label for="fechas">Rango de fechas</label>
-                    </p-floatLabel>
-                </div>
-                <div class="field col-12 md:col-2">
-                    <p-floatLabel>
-                        <p-select 
-                            inputId = "tipoSeleccionado"
-                            [options]="tiposMovimiento" 
-                            [(ngModel)] = "tipoSeleccionado" 
-                            optionLabel="label" 
-                            optionValue="value"
-                            placeholder="Seleccione tipo de movimiento" 
-                            styleClass="w-full"/>
-                        <label for="tipoSeleccionado">Tipo movimiento</label>
-                    </p-floatLabel>
-                </div>
-                <div class="field col-12 md:col-6">
-                </div>
-                <div class="field col-12 md:col-1 text-right">
-                    <p-button label="Buscar" 
-                            pTooltip="Buscar" 
-                            [outlined]="true" 
-                            severity="secondary" 
-                            (onClick)="busqueda();"
-                            styleClass="w-full"
-                            tooltipPosition="left"/>
-                </div>
-                <div class="field col-12 md:col-1">
-                    <p-button label="Volver" 
-                            pTooltip="Volver" 
-                            [outlined]="true"  severity="secondary" 
-                            (onClick)="mostrarSaldoBanco(idBanco)"
-                            styleClass="w-full"
-                            tooltipPosition="left"/>
-                </div>
+<p-confirmDialog/>
+<p-toast/>
+<p-panel>
 
+  <div class="card flex justify-center">
+    <p-breadcrumb class="max-w-full" [model]="items" [home]="home"/>
+  </div>
+  <div class="flex border-round bg-gray-100 m-1 border-1 border-300">
+    <div class="w-12 flex align-items-center justify-content-center">
+      <div class="formgrid grid w-12 flex  pt-5">
 
-            </div>
+        <div class="field col-12 md:col-2">
+          <p-tag severity="info" value="Entidad Financiera: {{nombreBanco}}"/>
         </div>
-        
-    </div>
-    <div class="flex border-round p-1 m-1 border-1 border-300">
-        <div class="w-12 p-1 flex align-items-center justify-content-center">
-
-            <p-table [value]="detalleSaldos" 
-                    selectionMode="single" 
-                    class="w-full"
-                    [styleClass]="'p-datatable-sm'">
-                <ng-template pTemplate="header">
-                    <tr class="custom-header">
-                        <th id="fechaProceso" style="width:10%; text-align: center">Fecha de proceso</th>
-                        <th id="concepto" style="width:50%">Concepto</th>
-                        <th id="referencia" style="width:20%">Referencia</th>
-                        <th id="cargo" style="width:10%; text-align: right;">Cargo</th>
-                        <th id="abono" style="width:10%; text-align: right;">Abono</th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-mov>
-                    <tr>
-                        <td style="text-align: center">{{mov.fechaOperacionFormato}}</td>
-                        <td>{{mov.concepto}}</td>
-                        <td>{{mov.referencia}}</td>
-                        <td style="text-align: right">
-                            <strong>
-                                <div *ngIf="mov.cargo>0.0">{{mov.cargoFormato}}</div>
-                            </strong></td>
-                        <td style="text-align: right">
-                            <strong>
-                                <div *ngIf="mov.abono>0.0">{{mov.abonoFormato}}</div>
-                            </strong>
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
-
+        <div class="field col-12 md:col-2">
+          <p-tag severity="info" value="Nro cuenta: {{numeroCuenta}}"/>
         </div>
+        <div class="field col-12 md:col-2">
+          <p-tag severity="info" value="Moneda: {{monedacuenta}}"/>
+        </div>
+
+        <div class="field col-12 md:col-2">
+          <p-floatLabel>
+            <p-datepicker
+              inputId="fechas"
+              [(ngModel)]="rangeDates"
+              selectionMode="range"
+              dateFormat="dd/mm/yy"
+              class="w-full">
+            </p-datepicker>
+            <label for="fechas">Rango de fechas</label>
+          </p-floatLabel>
+        </div>
+        <div class="field col-12 md:col-2">
+          <p-floatLabel>
+            <p-select
+              inputId="tipoSeleccionado"
+              [options]="tiposMovimiento"
+              [(ngModel)]="tipoSeleccionado"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Seleccione tipo de movimiento"
+              styleClass="w-full"/>
+            <label for="tipoSeleccionado">Tipo movimiento</label>
+          </p-floatLabel>
+        </div>
+
+        <div class="field col-12 md:col-1 text-right">
+          <p-button label="Buscar"
+                    pTooltip="Buscar"
+                    tooltipPosition="top"
+                    [raised]="true"
+                    severity="info"
+                    (onClick)="busqueda();"
+                    styleClass="w-full"/>
+        </div>
+        <div class="field col-12 md:col-1">
+          <p-button label="Volver"
+                    pTooltip="Volver"
+                    tooltipPosition="top"
+                    [raised]="true"
+                    severity="info"
+                    (onClick)="mostrarSaldoBanco(idBanco)"
+                    styleClass="w-full"/>
+        </div>
+
+
+      </div>
     </div>
-    <app-paginator *ngIf="paginator" [paginatorInput] = "paginator" (paginatorOutput)="cambioPagina($event)"></app-paginator>
+
+  </div>
+  <div class="flex border-round p-1 m-1 border-1 border-300">
+    <div class="w-12 p-1 flex align-items-center justify-content-center">
+
+      <p-table [value]="detalleSaldos"
+               selectionMode="single"
+               class="w-full"
+               [styleClass]="'p-datatable-sm'">
+        <ng-template pTemplate="header">
+          <tr class="custom-header">
+            <th id="fechaProceso" style="width:10%; text-align: center">Fecha de proceso</th>
+            <th id="concepto" style="width:50%">Concepto</th>
+            <th id="referencia" style="width:20%">Referencia</th>
+            <th id="cargo" style="width:10%; text-align: right;">Cargo</th>
+            <th id="abono" style="width:10%; text-align: right;">Abono</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-mov>
+          <tr>
+            <td style="text-align: center">{{ mov.fechaOperacionFormato }}</td>
+            <td>{{ mov.concepto }}</td>
+            <td>{{ mov.referencia }}</td>
+            <td style="text-align: right">
+              <strong>
+                <div *ngIf="mov.cargo>0.0">{{ mov.cargoFormato }}</div>
+              </strong></td>
+            <td style="text-align: right">
+              <strong>
+                <div *ngIf="mov.abono>0.0">{{ mov.abonoFormato }}</div>
+              </strong>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+    </div>
+  </div>
+  <app-paginator *ngIf="paginator" [paginatorInput]="paginator"
+                 (paginatorOutput)="cambioPagina($event)"></app-paginator>
 </p-panel>

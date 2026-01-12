@@ -1,58 +1,60 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, ViewChild } from '@angular/core';
-import { HeaderComponent } from "../../layout/header/header.component";
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { UsuarioService } from '../../../../service/modules/private/administrativo/usuario.service';
-import { Usuario } from '../../../../apis/model/module/private/usuario';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MessagesService } from '../../../../service/commons/messages.service';
-import { Paginator } from '../../../../apis/model/commons/paginator';
-import { Util } from '../../../../utils/util/util.util';
-import { Estado } from '../../../../apis/model/commons/estado';
-import { environment } from '../../../../../environments/environment';
-import { PaginatorComponent } from '../../commons/paginator/paginator.component';
-import { FormUsuarioPerfilComponent } from './usuario-perfil/form-usuario-perfil.component';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, ViewChild} from '@angular/core';
+import {HeaderComponent} from "../../layout/header/header.component";
+import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {PRIME_NG_MODULES} from '../../../../config/primeNg/primeng-global-imports';
+import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
+import {UsuarioService} from '../../../../service/modules/private/administrativo/usuario.service';
+import {Usuario} from '../../../../apis/model/module/private/usuario';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Paginator} from '../../../../apis/model/commons/paginator';
+import {Util} from '../../../../utils/util/util.util';
+import {Estado} from '../../../../apis/model/commons/estado';
+import {environment} from '../../../../../environments/environment';
+import {PaginatorComponent} from '../../commons/paginator/paginator.component';
+import {FormUsuarioPerfilComponent} from './usuario-perfil/form-usuario-perfil.component';
+import {UsuarioResponse} from '../../../../apis/model/module/private/administrativo/usuario/response/usuario-response';
+import {EstadoRegistroLabelPipe} from '../../../../apis/model/pipe/estado-registro-label.pipe';
 
 @Component({
   selector: 'app-usuario',
   standalone: true,
   imports: [FormsModule,
-            ReactiveFormsModule,
-            CommonModule,
-            ...PRIME_NG_MODULES,
-            PaginatorComponent, 
-            HeaderComponent,
-            FormUsuarioPerfilComponent,
-            RouterLink],
-providers: [ConfirmationService, MessageService, UsuarioService],
+    ReactiveFormsModule,
+    CommonModule,
+    ...PRIME_NG_MODULES,
+    PaginatorComponent,
+    HeaderComponent,
+    FormUsuarioPerfilComponent,
+    RouterLink, EstadoRegistroLabelPipe],
+providers: [ConfirmationService, MessageService],
 schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './usuario.component.html',
   styleUrl: './usuario.component.scss'
 })
-export class UsuarioComponent {
+export class UsuarioComponent implements OnInit {
   @ViewChild(FormUsuarioPerfilComponent) formUsuarioPerfilComponent!: FormUsuarioPerfilComponent;
-  usuarios!: Usuario[];
-  nombreSearch:string | undefined;
-  estadoSearch:string | undefined;
-  mostrarHijo = false;
+  protected items: MenuItem[] | undefined;
+  protected home: MenuItem | undefined;
+  protected usuarios!: UsuarioResponse[];
+  protected nombreSearch:string | undefined;
+  protected estadoSearch:string | undefined;
+  protected mostrarHijo = false;
   public usuarioSearchForm: FormGroup;
-  estados: Estado[] = Estado.estados;
-  idEmpresa: string = "";
-  visibleResetPassword: boolean = false;
+  protected estados: Estado[] = Estado.estados;
+  protected idEmpresa: string = "";
+  protected visibleResetPassword: boolean = false;
   public idUsuarioReset!: number;
   public passwordReset!: string;
 
   paginator: Paginator = new Paginator();//esta variable se debe declarar para usar el paginador de los apis, no de primeng
 
-  constructor(private readonly confirmationService: ConfirmationService, 
+  constructor(private readonly confirmationService: ConfirmationService,
     private readonly activatedRoute: ActivatedRoute,
-    private readonly router: Router, 
+    private readonly router: Router,
     private readonly formBuilder: FormBuilder,
-    private readonly messageService: MessageService, 
-    private readonly usuarioService: UsuarioService,
-    private readonly messagesService: MessagesService) {
+    private readonly messageService: MessageService,
+    private readonly usuarioService: UsuarioService) {
 
       this.usuarioSearchForm = this.formBuilder.group({
         nombreSearch: new FormControl(this.nombreSearch, [Validators.maxLength(50)]),
@@ -90,7 +92,7 @@ export class UsuarioComponent {
       accept: () => {
             this.usuarioService.eliminar(usuarioParam.id).subscribe(
               response => {
-                this.messagesService.setMessages('Registro dado de baja.');
+                this.messageService.add({ severity: 'success', summary: 'Confirmación', detail: 'Se dió de baja al registro', life: 5000 });
                 this.reloadPage();
               }
             )
@@ -105,66 +107,33 @@ export class UsuarioComponent {
     Util.filterAlphanumericoSinEspacio(event, this.usuarioSearchForm);
   }
 
-  filterAlphabetsGuiones(event: Event): void {
-    Util.filterAlphabetsGuiones(event, this.usuarioSearchForm);
-  }
-
   esBotonDeshabilitado(usuario: Usuario): boolean {
     return usuario.estadoRegistro === "INACTIVO";
   }
 
   ngOnInit() {
+    this.activatedRoute.paramMap.subscribe(params => {
+      const pagina = Util.parseOrDefault(params.get('pagina'), 0);
+      const cantReg = Util.parseOrDefault(params.get('cantReg'), 5);
+      const estado = Util.getEstado(params.get('estadoSearch'));
+      const username = params.get('usernameSearch') ?? "";
 
-    this.activatedRoute.paramMap.subscribe (params => {
-      let pagina: number;
-      let usuario: string;
-      let estado: string
-      let cantReg: number;
+      // Configuración del paginador
+      this.paginator.numeroPagina = pagina;
+      this.paginator.cantidadRegistros = cantReg;
+      this.estadoSearch = estado === "T" ? "" : estado;
+      this.nombreSearch = username;
 
-      pagina = Number(params.get('pagina'));
-      usuario = String(params.get('nombreSearch'));
-      estado = String(params.get('estadoSearch'));
-      cantReg = Number(params.get('cantReg'));
+      this.loadUsuarios();
 
-      if(!pagina){
-        this.paginator.numeroPagina = 0;
-      } else {
-        this.paginator.numeroPagina = pagina;
-      }
+      this.estadoSearch = this.estadoSearch ? this.estadoSearch : "T";
 
-      if(!usuario || usuario == "null") {
-        this.nombreSearch = "";
-      } else {
-        this.nombreSearch = usuario;
-      }
-
-      if(!estado || estado == "null"){
-        this.estadoSearch = "";
-      } else {
-        this.estadoSearch = estado;
-      }
-      
-      if(!cantReg){
-        this.paginator.cantidadRegistros = 5;
-      } else {
-        this.paginator.cantidadRegistros = cantReg;
-      }
-
-      this.usuarioService.getUsuarios(this.paginator.numeroPagina, this.estadoSearch, this.nombreSearch, this.paginator.cantidadRegistros, this.idEmpresa).subscribe(response => {
-        this.usuarios = response.content as Usuario[];
-        //estos valores se usan para catualizar los valores del paginador
-        this.paginator.totalRegistros = response.totalElements;
-        this.paginator.primerRegistroVisualizado = response.pageable.offset;
-
-        if(!estado || estado == "null" || estado == "T"){
-          this.estadoSearch = "T"
-        }
-
-        this.usuarioSearchForm.patchValue({
-          nombreSearch: this.nombreSearch,
-          estadoSearch: this.estadoSearch
-        });
+      this.usuarioSearchForm.patchValue({
+        usernameSearch: this.nombreSearch,
+        estadoSearch: this.estadoSearch
       });
+
+      this.initializeBreadcrumbs();
     });
   }
 
@@ -176,7 +145,7 @@ export class UsuarioComponent {
     }
     if (this.estadoSearch === null || this.estadoSearch === "T") {
       this.estadoSearch = "";
-    } 
+    }
 
     this.router.navigate(['/usuario',this.paginator.numeroPagina,this.paginator.cantidadRegistros,this.nombreSearch,this.estadoSearch]);
   }
@@ -201,12 +170,37 @@ export class UsuarioComponent {
     this.visibleResetPassword = true;
   }
 
+  onGuardado() {
+    this.mostrarHijo = false;
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Registro guardado satisfactoriamente.',
+      life: 4000
+    });
+  }
+
   async resetPassword () {
     if (this.passwordReset) {
-      this.usuarioService.cambiarPassword(this.idUsuarioReset,this.passwordReset).subscribe(response => {;
-        this.messagesService.setMessages('Password actualizado');
+      this.usuarioService.cambiarPassword(this.idUsuarioReset,this.passwordReset).subscribe(response => {
+        this.messageService.add({ severity: 'success', summary: 'Confirmación', detail: 'Password actualizado', life: 5000 });
         this.reloadPage();
       }
     )}
+  }
+
+  private loadUsuarios(): void {
+    this.usuarioService
+      .getUsuariosPage(this.paginator.numeroPagina, this.estadoSearch, this.nombreSearch, Number(this.idEmpresa), this.paginator.cantidadRegistros)
+      .subscribe(response => {
+        this.usuarios = response.content as UsuarioResponse[];
+        this.paginator.totalRegistros = response.totalElements;
+        this.paginator.primerRegistroVisualizado = response.pageable.offset;
+      });
+  }
+
+  private initializeBreadcrumbs(): void {
+    this.items = [{ label: 'Usuarios' }];
+    this.home = { icon: 'pi pi-home', routerLink: '/content' };
   }
 }

@@ -5,6 +5,7 @@ import { AuthService } from '../../service/authorization/auth.service';
 import { TokenService } from '../../service/authorization/token.service';
 import { PRIME_NG_MODULES } from '../primeNg/primeng-global-imports';
 import { MessagesService } from '../../service/commons/messages.service';
+import {mapTo, switchMap, tap} from 'rxjs';
 
 @Component({
   selector: 'app-authorized',
@@ -32,17 +33,20 @@ export class AuthorizedComponent implements OnInit {
       this.getToken(this.code_verifier, this.code);
     });
   }
-  
+
   getToken(code_verifier: string, code: string): void {
-    this.authService.getToken(code, code_verifier).subscribe({
-      next: value => {
+    this.authService.getToken(code, code_verifier).pipe(
+      tap(value => {
         this.tokenService.setTokens(value.access_token, value.refresh_token);
-        this.authService.guardarUsuario(value.access_token);
-        this.router.navigate(['/content']);
-      },
+      }),
+      switchMap(value =>
+        this.authService.guardarUsuario(value.access_token).pipe(mapTo(value))
+      )
+    ).subscribe({
+      next: () => this.router.navigate(['/content']),
       error: () => {
         this.tokenService.clear();
-        this.messagesService.setMessages('Se guardó registro existosamente.');
+        this.messagesService.setMessages('Error al obtener token.');
       }
     });
   }

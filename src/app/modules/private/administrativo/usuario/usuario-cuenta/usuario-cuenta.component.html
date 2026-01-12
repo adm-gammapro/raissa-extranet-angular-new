@@ -1,0 +1,176 @@
+<app-header></app-header>
+<p-confirmDialog />
+<p-toast />
+<form [formGroup]="usuarioSearchForm">
+  <p-panel>
+    <div class="card flex justify-center">
+      <p-breadcrumb class="max-w-full" [model]="items" [home]="home" />
+    </div>
+
+    <div class="flex border-round bg-gray-100 m-1 border-1 border-300">
+      <div class="w-12 flex align-items-center justify-content-center">
+        <div class="formgrid grid w-12 flex  pt-5">
+          <div class="field col-12 md:col-2">
+            <p-select
+              formControlName="bancoSearch"
+              [options]="bancos"
+              [showClear]="true"
+              optionLabel="nombre"
+              optionValue="codigo"
+              placeholder="Seleccione banco"
+              [filter]="true"
+              filterBy="nombre"
+              class="text-base text-color surface-overlay surface-border border-round outline-none focus:border-primary"
+              styleClass="w-full"/>
+          </div>
+          <div class="field col-12 md:col-2">
+            <p-select
+              formControlName="agrupacionSearch"
+              [options]="agrupaciones"
+              [showClear]="true"
+              optionLabel="nombreAgrupacionCliente"
+              optionValue="codigo"
+              placeholder="Seleccione agrupacion"
+              class="text-base text-color surface-overlay surface-border border-round outline-none focus:border-primary"
+              styleClass="w-full"/>
+          </div>
+          <div class="field col-12 md:col-2">
+            <p-select
+              [options]="monedas"
+              formControlName="monedaSearch"
+              [showClear]="true"
+              optionLabel="descripcion"
+              optionValue="valor"
+              placeholder="Selecciona Moneda"
+              class="text-base text-color surface-overlay surface-border border-round outline-none focus:border-primary"
+              styleClass="w-full">
+            </p-select>
+          </div>
+          <div class="field col-12 md:col-2">
+            <p-select
+              formControlName="estadoSearch"
+              [showClear]="true"
+              [options]="estados"
+              optionLabel="descripcion"
+              optionValue="valor"
+              placeholder="Selecciona estado"
+              class="text-base text-color surface-overlay surface-border border-round outline-none focus:border-primary"
+              styleClass="w-full"/>
+          </div>
+          <div class="field col-12 md:col-1 text-right">
+            <p-button label="Buscar"
+                      pTooltip="Buscar"
+                      tooltipPosition="top"
+                      variant="outlined"
+                      severity="info"
+                      (onClick)="busqueda();"
+                      styleClass="w-full"/>
+          </div>
+          <div class="field col-12 md:col-1 text-right">
+            <p-button label="Limpiar"
+                      pTooltip="Limpiar"
+                      tooltipPosition="top"
+                      variant="outlined"
+                      severity="info"
+                      (onClick)="reloadPage();"
+                      styleClass="w-full"/>
+          </div>
+          <div class="field col-12 md:col-1 text-right">
+            <p-button label="Agregar"
+                      pTooltip="Agregar"
+                      tooltipPosition="top"
+                      variant="outlined"
+                      severity="info"
+                      (onClick)="mostrarModal()"
+                      styleClass="w-full"/>
+          </div>
+          <div class="field col-12 md:col-1 text-right">
+            <p-button label="Volver"
+                      pTooltip="Volver"
+                      tooltipPosition="top"
+                      variant="outlined"
+                      severity="contrast"
+                      [routerLink]="['/usuario']"
+                      styleClass="w-full"/>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="flex border-round p-1 m-1 border-1 border-300">
+      <div class="w-12 p-1 flex align-items-center justify-content-center">
+        <p-table
+          [value]="usuarioCuentas"
+          selectionMode="single"
+          class="w-full"
+          [styleClass]="'p-datatable-sm'">
+          <ng-template pTemplate="header">
+            <tr>
+              <th id="usuario" style="width:10%">Usuario</th>
+              <th id="numeroCuenta" style="width:15%">
+                <p-button
+                  [icon]="mostrarTodas ? 'pi pi-eye-slash' : 'pi pi-eye'"
+                  [rounded]="true"
+                  [text]="true"
+                  size="small"
+                  [pTooltip]="mostrarTodas ? 'Ocultar todos' : 'Mostrar todos'"
+                  tooltipPosition="top"
+                  (onClick)="toggleTodasVisibles()">
+                </p-button>
+                Número de cuenta
+              </th>
+              <th id="banco" style="width:20%">Institución financiera</th>
+              <th id="moneda" style="width:10%">Moneda</th>
+              <th id="agrupacion" style="width:15%">Agrupación</th>
+
+              <th id="estado" style="width:10%">Estado</th>
+              <th id="acciones" style="width:15%; text-align: center;">Acciones</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-cuenta>
+            <tr>
+              <td>{{cuenta.nombreUsuario}}</td>
+              <td>
+                <p-button
+                  [icon]="esVisible(cuenta) ? 'pi pi-eye-slash' : 'pi pi-eye'"
+                  [rounded]="true"
+                  [text]="true"
+                  size="small"
+                  [pTooltip]="esVisible(cuenta) ? 'Ocultar' : 'Mostrar'"
+                  tooltipPosition="top"
+                  (onClick)="toggleVisibilidad(cuenta)">
+                </p-button>
+                <span class="mr-2">
+                                        {{ esVisible(cuenta) ? cuenta.numeroCuenta : ocultarValor(cuenta.numeroCuenta) }}
+                                      </span>
+              </td>
+              <td>{{cuenta.nombreEntidadFinanciera}}</td>
+              <td>{{cuenta.monedaCuenta}}</td>
+              <td>{{cuenta.nombreAgrupacion}}</td>
+
+              <td>{{cuenta.estadoRegistro | estadoRegistroLabel}}</td>
+              <td style="text-align: center;">
+                <p-button icon="pi pi-trash"
+                          [rounded]="true"
+                          [text]="true"
+                          type="button"
+                          severity="secondary"
+                          pTooltip="Dar de baja"
+                          tooltipPosition="left"
+                          [disabled]="esBotonDeshabilitado(cuenta)"
+                          (onClick)="eliminarFila($event, cuenta)"/>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+    <app-paginator *ngIf="paginator" [paginatorInput] = "paginator" (paginatorOutput)="cambioPagina($event)"></app-paginator>
+  </p-panel>
+</form>
+
+<p-dialog [modal]="true" [(visible)]="mostrarHijo" [style]="{ width: '80rem'}">
+  <app-add-usuario-cuenta (guardado)="onGuardado()" (cerrarModal)="cerrarModal()"></app-add-usuario-cuenta>
+  <div class="flex justify-content-end gap-2">
+  </div>
+</p-dialog>

@@ -1,57 +1,60 @@
-import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, inject, OnInit, PLATFORM_ID } from '@angular/core';
-import { HeaderComponent } from "../header/header.component";
-import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { SaldosService } from '../../../../service/modules/private/operativo/saldos.service';
-import { Resumen } from '../../../../apis/model/module/private/resumen';
-import { environment } from '../../../../../environments/environment';
+import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, inject, OnInit, PLATFORM_ID} from '@angular/core';
+import {HeaderComponent} from "../header/header.component";
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {CommonModule, isPlatformBrowser} from '@angular/common';
+import {PRIME_NG_MODULES} from '../../../../config/primeNg/primeng-global-imports';
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import {SaldosService} from '../../../../service/modules/private/operativo/saldos.service';
+import {Resumen} from '../../../../apis/model/module/private/resumen';
+import {environment} from '../../../../../environments/environment';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-content',
   standalone: true,
   imports: [FormsModule,
-            ReactiveFormsModule,
-            CommonModule,
-            ...PRIME_NG_MODULES,
-            HeaderComponent,
-            RouterLink],
+    ReactiveFormsModule,
+    CommonModule,
+    ...PRIME_NG_MODULES,
+    HeaderComponent,
+    RouterLink],
+  providers: [MessageService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './content.component.html',
   styleUrl: './content.component.scss'
 })
 export class ContentComponent implements OnInit {
-  dataSoles: any;
-  optionsSoles: any;
-  dataDolares: any;
-  optionsDolares: any;
-  resumen: Resumen = new Resumen();
-  idEmpresa: string = "";
-  descarga: boolean = false;
+  protected dataSoles: any;
+  protected optionsSoles: any;
+  protected dataDolares: any;
+  protected optionsDolares: any;
+  protected resumen: Resumen = new Resumen();
+  protected idEmpresa: string = "";
+  protected codigoUsuarioSesion: string = "";
 
-  platformId = inject(PLATFORM_ID);
+  protected platformId = inject(PLATFORM_ID);
 
   constructor(private readonly activatedRoute: ActivatedRoute,
-    private readonly formBuilder: FormBuilder,
-    private readonly router: Router,
-    private readonly saldosService: SaldosService,
-    private readonly cd: ChangeDetectorRef) {
+              private readonly saldosService: SaldosService,
+              private readonly cd: ChangeDetectorRef) {
 
     if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
       this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
     }
 
+    if (sessionStorage.getItem(environment.session.ID_USUARIO_SESSION) != undefined) {
+      this.codigoUsuarioSesion = sessionStorage.getItem(environment.session.ID_USUARIO_SESSION)!;
+    }
   }
 
   ngOnInit() {
     this.activatedRoute.paramMap.subscribe(params => {
-      this.saldosService.getSaldos(Number(this.idEmpresa)).subscribe(response => {
+      this.saldosService.getSaldos(Number(this.idEmpresa), Number(this.codigoUsuarioSesion)).subscribe(response => {
         this.resumen = response;
 
         this.initChart();
       });
-    })
+    });
   }
 
   initChart() {
@@ -67,7 +70,7 @@ export class ContentComponent implements OnInit {
 
   private initDoughnutCharts(documentStyle: CSSStyleDeclaration, textColor: string) {
     const toNumber = (value: number | null | undefined) =>
-    typeof value === 'number' ? value : 0;
+      typeof value === 'number' ? value : 0;
 
     const bancosSoles = this.resumen.saldosBanco.filter(b => toNumber(b.saldoDisponibleSoles) > 0);
     const totalSoles = bancosSoles.reduce((sum, b) => sum + toNumber(b.saldoDisponibleSoles), 0);
@@ -140,7 +143,7 @@ export class ContentComponent implements OnInit {
             usePointStyle: true,
             color: textColor,
             padding: 20,
-            font: { size: 14 },
+            font: {size: 14},
           },
         },
         tooltip: {
@@ -168,7 +171,7 @@ export class ContentComponent implements OnInit {
             usePointStyle: true,
             color: textColor,
             padding: 20,
-            font: { size: 14 },
+            font: {size: 14},
           },
         },
         tooltip: {

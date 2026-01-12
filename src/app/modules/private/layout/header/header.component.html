@@ -1,7 +1,7 @@
 <div class="card">
     <p-toolbar>
         <div class="p-toolbar-group-start">
-            
+
             <p-button icon="pi pi-bars" class="mr-2" (onClick)="sidebarVisible = true"  severity="secondary"/>
             <a [routerLink]="['/content']">
                 <img alt="" src="assets/images/Raissa-logo-fondo-transparente-pequenio.png" width="150"/>
@@ -14,10 +14,10 @@
             <div class="flex align-items-center gap-1">
                 <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
 
-                <p-splitButton label={{usuario}} 
-                                [model]="items" text 
-                                severity="secondary"/>
-                
+                <p-splitButton label={{nombreUsuarioSesion}}
+                                [model]="items" text
+                                severity="secondary"></p-splitButton>
+
             </div>
         </div>
     </p-toolbar>
@@ -29,3 +29,175 @@
         <app-menu></app-menu>
     </p-drawer>
 </div>
+
+<p-dialog header="Perfil" [modal]="true" [(visible)]="visible" [style]="{ width: '60rem', maxWidth: '95vw' }">
+  <p-toast></p-toast>
+
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2">
+      <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
+      <span class="font-bold whitespace-nowrap">{{ nombreUsuarioSesion }}</span>
+    </div>
+  </ng-template>
+
+
+
+  <div class="card">
+    <div class="flex flex-column md:flex-row gap-3 align-items-stretch">
+      <form class="w-full md:w-6" [formGroup]="perfilForm">
+        <p-panel styleClass="h-full">
+          <h4 class="mb-4 ml-2">Datos personales</h4>
+          <div class="w-12 p-2 flex align-items-center justify-content-center">
+            <div class="formgrid grid w-full">
+
+
+              <div class="field col-12 md:col-12">
+                <p-iftalabel>
+                  <label for="nombres">Nombres
+                    <span *ngIf="isFieldRequired('nombres')" style="color: red;">*</span>
+                  </label>
+                  <input pInputText
+                         id="nombres"
+                         type="text"
+                         formControlName="nombres"
+                         class="w-full"
+                         [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('nombres') }"/>
+                </p-iftalabel>
+              </div>
+              <div class="field col-12 md:col-12">
+                <p-iftalabel>
+                  <label for="apellidoPaterno">Apellido paterno
+                    <span *ngIf="isFieldRequired('nombres')" style="color: red;">*</span>
+                  </label>
+                  <input pInputText
+                         id="apellidoPaterno"
+                         type="text"
+                         formControlName="apellidoPaterno"
+                         class="w-full"
+                         [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('apellidoPaterno') }"/>
+                </p-iftalabel>
+              </div>
+              <div class="field col-12 md:col-12">
+                <p-iftalabel>
+                  <label for="apellidoMaterno">Apellido materno
+                    <span *ngIf="isFieldRequired('apellidoMaterno')" style="color: red;">*</span>
+                  </label>
+                  <input pInputText
+                         id="apellidoMaterno"
+                         type="text"
+                         formControlName="apellidoMaterno"
+                         class="w-full"
+                         [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('apellidoMaterno') }"/>
+                </p-iftalabel>
+              </div>
+              <div class="field col-12 md:col-12">
+                <p-iftalabel>
+                  <label for="correo">Correo
+                    <span *ngIf="isFieldRequired('correo')" style="color: red;">*</span>
+                  </label>
+                  <input pInputText
+                         id="correo"
+                         type="email"
+                         formControlName="correo"
+                         class="w-full"
+                         [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('correo') }"/>
+                </p-iftalabel>
+              </div>
+              <div class="field col-12 md:col-12">
+                <p-iftalabel>
+                  <label for="telefono">Teléfono
+                    <span *ngIf="isFieldRequired('telefono')" style="color: red;">*</span>
+                  </label>
+                  <input pInputText
+                         id="telefono"
+                         type="text"
+                         formControlName="telefono"
+                         class="w-full"
+                         [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('telefono') }"/>
+                </p-iftalabel>
+              </div>
+
+              <div class="field col-12 md:col-12">
+                <p-button
+                  label="Guardar datos"
+                  icon="pi pi-save"
+                  severity="info"
+                  [outlined]="true"
+                  class="w-full"
+                  (onClick)="guardarDatos()">
+                </p-button>
+              </div>
+            </div>
+          </div>
+        </p-panel>
+      </form>
+
+
+      <p-divider layout="vertical"
+                 class="!hidden md:!flex"
+                 [style]="{ height: '100%' }"></p-divider>
+
+      <form class="w-full md:w-6" [formGroup]="passwordForm">
+        <p-panel styleClass="h-full">
+          <h4 class="mb-4 ml-2">Actualizar Contraseña</h4>
+          <div class="w-12 p-2 flex align-items-center justify-content-center">
+            <div class="formgrid grid w-full">
+
+
+              <div class="field col-12 md:col-12">
+                <p-iftalabel>
+                  <label for="passwordNueva">Nueva contraseña
+                    <span *ngIf="isFieldRequiredPassword('passwordNueva')" style="color: red;">*</span>
+                  </label>
+                  <input pInputText
+                         id="passwordNueva"
+                         type="password"
+                         formControlName="passwordNueva"
+                         class="w-full"
+                         [ngClass]="{ 'ng-invalid ng-dirty': isInvalidPassword('passwordNueva') }"/>
+                </p-iftalabel>
+              </div>
+
+              <div class="field col-12 md:col-12">
+                <p-iftalabel>
+                  <label for="passwordConfirmar">Confirmar contraseña
+                    <span *ngIf="isFieldRequiredPassword('passwordConfirmar')" style="color: red;">*</span>
+                  </label>
+                  <input pInputText
+                         id="passwordConfirmar"
+                         type="password"
+                         formControlName="passwordConfirmar"
+                         class="w-full"
+                         [ngClass]="{ 'ng-invalid ng-dirty': isInvalidPassword('passwordConfirmar') }"/>
+                </p-iftalabel>
+              </div>
+
+              <div class="card mt-2 ml-2 mb-4">
+                <p-metergroup [value]="passwordMeters"></p-metergroup>
+                <div class="text-sm text-color-secondary mt-2">
+                  Fortaleza: {{ passwordProgress | number:'1.0-0' }}%
+                </div>
+              </div>
+
+              <div class="field col-12 md:col-12">
+                <p-button
+                  label="Actualizar contraseña"
+                  icon="pi pi-lock"
+                  severity="info"
+                  [outlined]="true"
+                  class="w-full"
+                  (onClick)="cambiarPassword()">
+                </p-button>
+              </div>
+            </div>
+          </div>
+        </p-panel>
+      </form>
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Cerrar" [outlined]="true"
+              severity="contrast" (onClick)="visible = false" />
+  </ng-template>
+</p-dialog>

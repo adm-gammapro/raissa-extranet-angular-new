@@ -1,11 +1,12 @@
-import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
-import { Usuario } from '../../apis/model/module/private/usuario';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { TokenService } from './token.service';
-import { Router } from '@angular/router';
-import { catchError, map, Observable, throwError } from 'rxjs';
-import { Cliente } from '../../apis/model/module/private/cliente';
+import {Injectable} from '@angular/core';
+import {environment} from '../../../environments/environment';
+import {Usuario} from '../../apis/model/module/private/usuario';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {TokenService} from './token.service';
+import {Router} from '@angular/router';
+import {catchError, forkJoin, map, mapTo, Observable, of, tap, throwError} from 'rxjs';
+import {Cliente} from '../../apis/model/module/private/cliente';
+import {UsuarioResponse} from '../../apis/model/module/private/administrativo/usuario/response/usuario-response';
 
 @Injectable({
   providedIn: 'root'
@@ -13,12 +14,12 @@ import { Cliente } from '../../apis/model/module/private/cliente';
 export class AuthService {
   public _token?: string | null;
   private readonly token_url = environment.security.token_url;
-  private _usuario: Usuario = new Usuario();
+  private _usuario: Usuario = new UsuarioResponse();
   private _empresa: Cliente = new Cliente();
 
   private readonly httpHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-  constructor(private readonly httpClient: HttpClient, 
+  constructor(private readonly httpClient: HttpClient,
               private readonly tokenService: TokenService,
               private readonly router: Router) { }
 
@@ -87,35 +88,56 @@ export class AuthService {
     return false;
   }
 
-  guardarUsuario(accessToken: string): void {
-    let payload = this.obtenerDatosToken(accessToken);
-    let usuario = JSON.stringify(payload.username).replace(/['"]+/g, '');
-    let idEmpresa = JSON.stringify(payload.empresaId).replace(/['"]+/g, '');
+  guardarUsuario(accessToken: string): Observable<void> {
+    const payload = this.obtenerDatosToken(accessToken);
+    const usuario = String(payload.username ?? '').replace(/['"]+/g, '');
+    const idEmpresa = String(payload.empresaId ?? '').replace(/['"]+/g, '');
 
     sessionStorage.setItem(environment.session.USERNAME, usuario);
-    if(idEmpresa != "0") {
-      sessionStorage.setItem(environment.session.ID_EMPRESA, idEmpresa);
 
-      this.getEmpresa(idEmpresa).subscribe(response => {
-        this._empresa = response;
-        sessionStorage.setItem(environment.session.NOMBRE_EMPRESA, this._empresa.razonSocial);
-      });
+    const ops: Observable<any>[] = [];
+    ops.push(
+      this.getUsuario(usuario).pipe(
+        tap(u => {
+          this._usuario = u;
+          sessionStorage.setItem(environment.session.ID_USUARIO_SESSION, u.id?.toString() ?? '');
+          sessionStorage.setItem(environment.session.NOMBRES_USUARIO, u.nombres ?? '');
+          sessionStorage.setItem(environment.session.CLASE_USUARIO_SESSION, u.claseUsuario ?? '');
+
+          sessionStorage.setItem(environment.session.APELLIDO_PATERNO_USUARIO_SESSION, u.apePaterno ?? '');
+          sessionStorage.setItem(environment.session.APELLIDO_MATERNO_USUARIO_SESSION, u.apeMaterno ?? '');
+          sessionStorage.setItem(environment.session.CORREO_USUARIO_SESSION, u.correo ?? '');
+          sessionStorage.setItem(environment.session.TELEFONO_USUARIO_SESSION, u.telefono ?? '');
+        })
+      )
+    );
+
+    if (idEmpresa && idEmpresa !== '0') {
+      sessionStorage.setItem(environment.session.ID_EMPRESA, idEmpresa);
+      ops.push(
+        this.getEmpresa(idEmpresa).pipe(
+          tap(emp => {
+            this._empresa = emp;
+            sessionStorage.setItem(environment.session.NOMBRE_EMPRESA, emp.razonSocial ?? '');
+          })
+        )
+      );
     }
 
-    this.getUsuario(payload.username).subscribe(response => {
-      this._usuario = response;
-      sessionStorage.setItem(environment.session.ID_USUARIO_SESSION, this._usuario.id.toString());
-      sessionStorage.setItem(environment.session.NOMBRES_USUARIO, this._usuario.nombres);
-    });
+    if (ops.length === 0) {
+      return of(void 0);
+    }
+
+    return forkJoin(ops).pipe(mapTo(void 0));
   }
 
-  public getUsuario(username: string):  Observable<Usuario> {
+  public getUsuario(username: string):  Observable<UsuarioResponse> {
     const params = [
       `username=${username}`,
     ].filter(Boolean).join('&');
 
     const headers = new HttpHeaders({
-      
+
     });
     const url = `${environment.url.base}/seguridad/obtenerUsuarioByUsername?${params}`;
 
@@ -136,7 +158,7 @@ export class AuthService {
     ].filter(Boolean).join('&');
 
     const headers = new HttpHeaders({
-      
+
     });
     const url = `${environment.url.base}/plataforma/cliente/obtenerCliente?${params}`;
 
@@ -159,7 +181,7 @@ export class AuthService {
   }
 
   public getusuario(): string | null {
-    
+
     if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){
       let username = sessionStorage.getItem(environment.session.USERNAME);
       if (username != null) {

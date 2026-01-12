@@ -1,16 +1,16 @@
-import { Component } from '@angular/core';
-import { environment } from '../../../../../../environments/environment';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
-import { PaginatorComponent } from '../../../commons/paginator/paginator.component';
-import { HeaderComponent } from '../../../layout/header/header.component';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { SaldosService } from '../../../../../service/modules/private/operativo/saldos.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { DetalleSaldos } from '../../../../../apis/model/module/private/detalle-saldos';
-import { TipoMovimientoEnum, TipoMovimientoLabels } from '../../../../../apis/model/enums/tipo-movimiento.enum';
-import { Paginator } from '../../../../../apis/model/commons/paginator';
+import {Component, OnInit} from '@angular/core';
+import {environment} from '../../../../../../environments/environment';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {PRIME_NG_MODULES} from '../../../../../config/primeNg/primeng-global-imports';
+import {PaginatorComponent} from '../../../commons/paginator/paginator.component';
+import {HeaderComponent} from '../../../layout/header/header.component';
+import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
+import {SaldosService} from '../../../../../service/modules/private/operativo/saldos.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {DetalleSaldos} from '../../../../../apis/model/module/private/detalle-saldos';
+import {TipoMovimientoEnum, TipoMovimientoLabels} from '../../../../../apis/model/enums/tipo-movimiento.enum';
+import {Paginator} from '../../../../../apis/model/commons/paginator';
 
 @Component({
   selector: 'app-movimientos',
@@ -25,7 +25,7 @@ import { Paginator } from '../../../../../apis/model/commons/paginator';
   templateUrl: './movimientos.component.html',
   styleUrl: './movimientos.component.scss'
 })
-export class MovimientosComponent {
+export class MovimientosComponent implements OnInit {
   public detalleSaldos: DetalleSaldos[] = [];
   public idBanco: string | null = "";
   public paginador: any;
@@ -40,30 +40,38 @@ export class MovimientosComponent {
 
   tiposMovimiento: any[] = [];
 
-  public tipoSeleccionado: any; 
+  public tipoSeleccionado: any;
   rangeDates!: Date[] | [];
+
+  protected claseUsuarioSesion: string = "";
+  protected items: MenuItem[] | undefined;
+  protected home: MenuItem | undefined;
 
   paginator: Paginator = new Paginator();//esta variable se debe declarar para usar el paginador de los apis, no de primeng
 
   constructor(private readonly activatedRoute: ActivatedRoute,
-              private readonly router: Router, 
+              private readonly router: Router,
               private readonly saldosService: SaldosService) {
-      if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
-        this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
-      }
-      this.cargarTiposMovimiento();
+    if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
+      this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
+    }
 
-      this.tipoSeleccionado = TipoMovimientoEnum.TODOS;
+    if (sessionStorage.getItem(environment.session.CLASE_USUARIO_SESSION) != undefined) {
+      this.claseUsuarioSesion = sessionStorage.getItem(environment.session.CLASE_USUARIO_SESSION)!;
+    }
+    this.cargarTiposMovimiento();
+
+    this.tipoSeleccionado = TipoMovimientoEnum.TODOS;
   }
 
   cambioPagina(event: any) {//este metodo se debe replicar en todas las tablas donde se quiera usar paginador
-    if (event.primerRegistroVisualizado!=undefined) {
+    if (event.primerRegistroVisualizado != undefined) {
       this.paginator.primerRegistroVisualizado = event.primerRegistroVisualizado;
     }
-    if (event.cantidadRegistros!=undefined) {
+    if (event.cantidadRegistros != undefined) {
       this.paginator.cantidadRegistros = event.cantidadRegistros;
     }
-    if (event.numeroPagina!=undefined) {
+    if (event.numeroPagina != undefined) {
       this.paginator.numeroPagina = event.numeroPagina;
     }
 
@@ -72,10 +80,10 @@ export class MovimientosComponent {
 
   cargarTiposMovimiento() {
     this.tiposMovimiento = Object.keys(TipoMovimientoEnum).map(key => {
-      const enumKey = key as keyof typeof TipoMovimientoEnum; 
+      const enumKey = key as keyof typeof TipoMovimientoEnum;
       return {
-        label: TipoMovimientoLabels[TipoMovimientoEnum[enumKey]], 
-        value: TipoMovimientoEnum[enumKey]                        
+        label: TipoMovimientoLabels[TipoMovimientoEnum[enumKey]],
+        value: TipoMovimientoEnum[enumKey]
       };
     });
   }
@@ -88,9 +96,9 @@ export class MovimientosComponent {
 
     if (this.tipoSeleccionado === null || this.tipoSeleccionado === TipoMovimientoEnum.TODOS) {
       this.tipoSeleccionado = TipoMovimientoEnum.TODOS;
-    } 
+    }
 
-    if (this.rangeDates.length>0) {
+    if (this.rangeDates.length > 0) {
       lastWeek = this.rangeDates[0];
       fechaInicial = lastWeek.toISOString().split('T')[0];
 
@@ -100,9 +108,9 @@ export class MovimientosComponent {
       fechaInicial = "-";
       fechaFinal = "-";
     }
-    
 
-    this.router.navigate(['/movimientos', this.idCuenta,this.bitacora, this.idBanco, fechaInicial, fechaFinal, this.tipoSeleccionado, this.paginator.cantidadRegistros, this.paginator.numeroPagina]);
+
+    this.router.navigate(['/movimientos', this.idCuenta, this.bitacora, this.idBanco, fechaInicial, fechaFinal, this.tipoSeleccionado, this.paginator.cantidadRegistros, this.paginator.numeroPagina]);
   }
 
   ngOnInit() {
@@ -124,35 +132,35 @@ export class MovimientosComponent {
       fechaFinal = String(params.get('fechaFinal'));
       cantReg = Number(params.get('cantReg'));
       tipoMovimiento = String(params.get('tipoMovimiento'));
-                      
-      if(!pagina){
+
+      if (!pagina) {
         this.paginator.numeroPagina = 0;
       } else {
         this.paginator.numeroPagina = pagina;
       }
-      
-      if(!cantReg){
+
+      if (!cantReg) {
         this.paginator.cantidadRegistros = 5;
       } else {
         this.paginator.cantidadRegistros = cantReg;
       }
 
-      if(!fechaInicial || fechaInicial === "null" || fechaInicial === "" || fechaInicial === "-") {
+      if (!fechaInicial || fechaInicial === "null" || fechaInicial === "" || fechaInicial === "-") {
         lastWeek = new Date();
         lastWeek.setDate(lastWeek.getDate() - 14);
         fechaInicial = lastWeek.toISOString().split('T')[0];
       } else {
         const [year, month, day] = fechaInicial.split('-').map(Number);
-        lastWeek = new Date(year, month - 1, day); 
+        lastWeek = new Date(year, month - 1, day);
         fechaInicial = lastWeek.toISOString().split('T')[0];
       }
 
-      if(!fechaFinal || fechaFinal == "null" || fechaFinal == "" || fechaFinal == "-"){
+      if (!fechaFinal || fechaFinal == "null" || fechaFinal == "" || fechaFinal == "-") {
         today = new Date();
         fechaFinal = today.toISOString().split('T')[0];
       } else {
         const [year, month, day] = fechaFinal.split('-').map(Number);
-        today = new Date(year, month - 1, day); 
+        today = new Date(year, month - 1, day);
         fechaFinal = today.toISOString().split('T')[0];
       }
 
@@ -160,12 +168,13 @@ export class MovimientosComponent {
 
       if (!tipoMovimiento || tipoMovimiento == "null" || tipoMovimiento == "" || tipoMovimiento == undefined) {
         this.tipoSeleccionado = TipoMovimientoEnum.TODOS;
-        tipoMovimiento =  TipoMovimientoEnum.TODOS;;
+        tipoMovimiento = TipoMovimientoEnum.TODOS;
+        ;
       } else {
         this.tipoSeleccionado = tipoMovimiento;
       }
 
-      this.saldosService.getMovimientos(Number(this.idEmpresa),this.idCuenta, fechaInicial, fechaFinal, tipoMovimiento, this.paginator.cantidadRegistros, this.paginator.numeroPagina).subscribe(response => {
+      this.saldosService.getMovimientos(Number(this.idEmpresa), this.idCuenta, fechaInicial, fechaFinal, tipoMovimiento, this.paginator.cantidadRegistros, this.paginator.numeroPagina).subscribe(response => {
         this.detalleSaldos = response.movimientos.content as DetalleSaldos[];
         this.paginador = response.movimientos;
         this.nombreBanco = response.nombreBanco;
@@ -176,9 +185,20 @@ export class MovimientosComponent {
         this.paginator.primerRegistroVisualizado = response.movimientos.pageable.offset;
       });
     })
+
+    this.initializeBreadcrumbs();
   }
 
   mostrarSaldoBanco(idBanco: string | null) {
     this.router.navigate(['/saldos-banco', idBanco]);
+  }
+
+  private initializeBreadcrumbs(): void {
+    this.items = [
+      {label: 'Posición general', routerLink: '/saldos'},
+      {label: 'Posición por banco', routerLink: [ '/saldos-banco', this.idBanco ] },
+      {label: 'Movimientos'},
+    ];
+    this.home = {icon: 'pi pi-home', routerLink: '/content'};
   }
 }

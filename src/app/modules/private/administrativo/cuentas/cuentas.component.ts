@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angul
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { PaginatorComponent } from '../../commons/paginator/paginator.component';
 import { HeaderComponent } from '../../layout/header/header.component';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
 import { CuentasService } from '../../../../service/modules/private/operativo/cuentas.service';
 import { Cuentas } from '../../../../apis/model/module/private/cuentas';
 import { AgrupacionService } from '../../../../service/modules/private/operativo/agrupacion.service';
@@ -41,23 +41,26 @@ schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrl: './cuentas.component.scss'
 })
 export class CuentasComponent implements OnInit {
-  cuentas: CuentaResponse[] = [];
-  numeroCuentaSearch:string | undefined;
-  agrupacionSearch:number | null = null;
-  bancoSearch:string | undefined;
-  estadoSearch:string | undefined;
-  cuentasSearchForm: FormGroup;
-  credencialForm: FormGroup;
-  estados: Estado[] = Estado.estados;
-  idEmpresa: string = "";
-  agrupaciones: AgrupacionResponse[] = [];
-  bancos: InstitucionFinancieraResponse[] = [];
-  visibleVinculoCredenciales: boolean = false;
-  idCuentaVincular!: number;
-  credenciales!: CredencialesResponse[];
-  cuentaCredencialRequest!: CuentaCredencialRequest;
-  visibleCuentas = new Set<number>();
-  mostrarTodas = false;
+  protected cuentas: CuentaResponse[] = [];
+  protected numeroCuentaSearch:string | undefined;
+  protected agrupacionSearch:number | null = null;
+  protected bancoSearch:string | undefined;
+  protected estadoSearch:string | undefined;
+  protected cuentasSearchForm: FormGroup;
+  protected credencialForm: FormGroup;
+  protected estados: Estado[] = Estado.estados;
+  protected idEmpresa: string = "";
+  protected idUsuarioSesion: string = "";
+  protected agrupaciones: AgrupacionResponse[] = [];
+  protected bancos: InstitucionFinancieraResponse[] = [];
+  protected visibleVinculoCredenciales: boolean = false;
+  protected idCuentaVincular!: number;
+  protected credenciales!: CredencialesResponse[];
+  protected cuentaCredencialRequest!: CuentaCredencialRequest;
+  protected visibleCuentas = new Set<number>();
+  protected mostrarTodas = false;
+  protected items: MenuItem[] | undefined;
+  protected home: MenuItem | undefined;
 
   paginator: Paginator = new Paginator();//esta variable se debe declarar para usar el paginador de los apis, no de primeng
 
@@ -88,6 +91,9 @@ export class CuentasComponent implements OnInit {
       if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
         this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
       }
+    if (sessionStorage.getItem(environment.session.ID_USUARIO_SESSION) != undefined) {
+      this.idUsuarioSesion = sessionStorage.getItem(environment.session.ID_USUARIO_SESSION)!;
+    }
   }
 
   getAgrupaciones(): void {
@@ -186,11 +192,13 @@ export class CuentasComponent implements OnInit {
 
       this.cuentasService.getCuentas(pagina,
                                     this.estadoSearch,
-                                    numeroCuenta,
+                                    this.numeroCuentaSearch,
                                     cantReg,
                                     Number(this.idEmpresa),
-                                    idBanco,
-                                    idAgrupacion).subscribe(response => {
+                                    this.bancoSearch,
+                                    this.agrupacionSearch,
+                                    Number(this.idUsuarioSesion)).subscribe(response => {
+
         this.cuentas = response.content;
         //estos valores se usan para actualizar los valores del paginador
         this.paginator.totalRegistros = response.totalElements;
@@ -207,6 +215,7 @@ export class CuentasComponent implements OnInit {
       });
     });
 
+    this.initializeBreadcrumbs();
   }
 
   busqueda() {
@@ -291,5 +300,10 @@ export class CuentasComponent implements OnInit {
     } else {
       this.visibleCuentas.clear();
     }
+  }
+
+  private initializeBreadcrumbs(): void {
+    this.items = [{ label: 'Cuentas' }];
+    this.home = { icon: 'pi pi-home', routerLink: '/content' };
   }
 }

@@ -29,7 +29,8 @@ export class CuentasService {
             cantReg: number,
             codigoCliente: number,
             idBanco: string | undefined,
-            idAgrupacion: number | null): Observable<any> {
+            idAgrupacion: number | null,
+            idUsuario: number | null): Observable<any> {
 
     const params = [
       `page=${page}`,
@@ -39,6 +40,7 @@ export class CuentasService {
       `codigoCliente=${codigoCliente}`,
       `idBanco=${idBanco}`,
       idAgrupacion !== null && idAgrupacion !== undefined ? `idAgrupacion=${idAgrupacion}` : null,
+      idUsuario !== null && idUsuario !== undefined ? `idUsuario=${idUsuario}` : null,
     ].filter(param => param !== null).join('&');
 
     const url = `${this.urlCuenta}/list-page-cuenta?${params}`;

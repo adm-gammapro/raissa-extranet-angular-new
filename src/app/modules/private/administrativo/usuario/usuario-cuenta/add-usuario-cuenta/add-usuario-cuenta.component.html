@@ -1,0 +1,109 @@
+<p-toast />
+
+<p-table
+  [value]="grupos"
+  dataKey="grupoNombre"
+  [expandedRowKeys]="expandedRows"
+  [tableStyle]="{ 'min-width': '40rem' }"
+  [showGridlines]="true"
+  [responsiveLayout]="'scroll'">
+
+  <ng-template pTemplate="caption">
+    <div class="flex flex-wrap justify-end gap-2">
+      <p-button label="Expandir todo" icon="pi pi-plus" variant="text" severity="info" (onClick)="expandAll()"></p-button>
+      <p-button label="Colapsar todo" icon="pi pi-minus" variant="text" severity="info" (onClick)="collapseAll()"></p-button>
+      <p-button
+        [icon]="mostrarTodas ? 'pi pi-eye-slash' : 'pi pi-eye'"
+        label="{{ mostrarTodas ? 'Ocultar todos' : 'Mostrar todos' }}"
+        variant="text"
+        severity="info"
+        (onClick)="toggleTodasVisibles()">
+      </p-button>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="header" let-columns>
+    <tr style="background:#0f172a; color:#fff;">
+      <th id="casilla" style="width:3rem;"></th>
+      <th id="sel" style="width:3rem; text-align:center;">Sel.</th>
+      <th id="grupo" colspan="2">Agrupación</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-rowData let-expanded="expanded">
+    <tr>
+      <td style="text-align:center;">
+        <p-button type="button" [pRowToggler]="rowData" [text]="true" [rounded]="true"
+                  [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></p-button>
+      </td>
+      <td style="text-align:center;">
+        <p-checkbox
+          [binary]="true"
+          [indeterminate]="isGroupPartialSelected(rowData.grupoId)"
+          [ngModel]="isGroupAllSelected(rowData.grupoId)"
+          (onChange)="toggleGroupSelection(rowData.grupoId)">
+        </p-checkbox>
+      </td>
+      <td colspan="2" style="background:#e5e7eb; color:#0f172a; font-weight:600;">
+        {{ rowData.grupoNombre }}
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="expandedrow" let-rowData>
+    <tr>
+      <td colspan="4">
+        <p-table
+          [value]="rowData.items"
+          dataKey="id"
+          selectionMode="multiple"
+          [(selection)]="selection"
+          (selectionChange)="onSelectionChange($event)"
+          [showGridlines]="true">
+
+          <ng-template pTemplate="header" let-columns>
+            <tr style="background:#1e293b; color:#fff;">
+              <th id="checks" style="width:3rem; text-align:center;">
+              </th>
+              <th id="ids" *ngFor="let col of cols">
+                {{ col.header }}
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-row let-columns="columns">
+            <tr>
+              <td style="text-align:center;">
+                <p-tableCheckbox [value]="row"></p-tableCheckbox>
+              </td>
+              <td *ngFor="let col of cols">
+                <ng-container *ngIf="col.field === 'numeroCuenta'; else normalCell">
+                  <p-button
+                    [icon]="esVisible(row) ? 'pi pi-eye-slash' : 'pi pi-eye'"
+                    [rounded]="true"
+                    [text]="true"
+                    size="small"
+                    [pTooltip]="esVisible(row) ? 'Ocultar' : 'Mostrar'"
+                    tooltipPosition="top"
+                    (onClick)="toggleVisibilidad(row)">
+                  </p-button>
+                  <span class="mr-2">
+                    {{ esVisible(row) ? row.numeroCuenta : ocultarValor(row.numeroCuenta) }}
+                  </span>
+                </ng-container>
+                <ng-template #normalCell>
+                  {{ row[col.field] }}
+                </ng-template>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<div class="flex justify-center gap-3 mt-4">
+  <p-button label="Guardar selección" variant="outlined" severity="info" (onClick)="guardarListas()"></p-button>
+  <p-button label="Cerrar" variant="outlined" severity="contrast" (onClick)="cerrar()"></p-button>
+</div>

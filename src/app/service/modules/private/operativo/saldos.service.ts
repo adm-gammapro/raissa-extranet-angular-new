@@ -17,10 +17,12 @@ export class SaldosService {
   constructor(private readonly  http: HttpClient,
               private readonly  authService: AuthService) { }
 
-  getSaldos(idEmpresa: number): Observable<Resumen> {
+  getSaldos(idEmpresa: number,
+            codigoUsuario: number): Observable<Resumen> {
     const params = [
       `estadoRegistro=S`,
       `codigoCliente=${idEmpresa}`,
+      `codigoUsuario=${codigoUsuario}`,
     ].filter(Boolean).join('&');
 
     const headers = new HttpHeaders({
@@ -39,10 +41,13 @@ export class SaldosService {
     );
   }
 
-  getSaldosPorCuenta(idEmpresa: string, idBanco: string): Observable<Resumen> {
+  getSaldosPorCuenta(idEmpresa: string,
+                     idBanco: string,
+                     codigoUsuario: number): Observable<Resumen> {
     const params = [
       `codigoCliente=${idEmpresa}`,
       `idBanco=${idBanco}`,
+      `codigoUsuario=${codigoUsuario}`,
     ].filter(Boolean).join('&');
 
     const url = `${this.urlSaldos}/list-saldos-por-cuenta?${params}`;
@@ -58,11 +63,11 @@ export class SaldosService {
     );
   }
 
-  getMovimientos(codigoCliente: number, 
-                idCuenta: number, 
-                fechaInicial: string | null, 
-                fechaFinal: string | null, 
-                tipoMovimiento: string | null, 
+  getMovimientos(codigoCliente: number,
+                idCuenta: number,
+                fechaInicial: string | null,
+                fechaFinal: string | null,
+                tipoMovimiento: string | null,
                 cantReg: number, pagina: number): Observable<any> {
     const params = [
       `codigoCliente=${codigoCliente}`,

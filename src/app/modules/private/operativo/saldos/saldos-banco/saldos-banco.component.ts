@@ -1,14 +1,14 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
-import { HeaderComponent } from '../../../layout/header/header.component';
-import { ResumenGeneralModalComponent } from '../resumen-general/resumen-general-modal.component';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { SaldosService } from '../../../../../service/modules/private/operativo/saldos.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { environment } from '../../../../../../environments/environment';
-import { Resumen } from '../../../../../apis/model/module/private/resumen';
+import {CommonModule} from '@angular/common';
+import {Component, OnInit} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {PRIME_NG_MODULES} from '../../../../../config/primeNg/primeng-global-imports';
+import {HeaderComponent} from '../../../layout/header/header.component';
+import {ResumenGeneralModalComponent} from '../resumen-general/resumen-general-modal.component';
+import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
+import {SaldosService} from '../../../../../service/modules/private/operativo/saldos.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {environment} from '../../../../../../environments/environment';
+import {Resumen} from '../../../../../apis/model/module/private/resumen';
 
 @Component({
   selector: 'app-saldos-banco',
@@ -23,19 +23,30 @@ import { Resumen } from '../../../../../apis/model/module/private/resumen';
   templateUrl: './saldos-banco.component.html',
   styleUrl: './saldos-banco.component.scss'
 })
-export class SaldosBancoComponent {
+export class SaldosBancoComponent implements OnInit {
   loading: boolean = false;
   resumenSaldos: boolean = false;
   public resumen: Resumen = new Resumen();
   idEmpresa: string = "";
-  private idBanco: string ="";
+  private idBanco: string = "";
+  protected codigoUsuarioSesion: string = "";
+  protected claseUsuarioSesion: string = "";
+  protected items: MenuItem[] | undefined;
+  protected home: MenuItem | undefined;
 
   constructor(private readonly activatedRoute: ActivatedRoute,
-              private readonly router: Router, 
+              private readonly router: Router,
               private readonly saldosService: SaldosService) {
-      if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
-        this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
-      }
+    if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
+      this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
+    }
+    if (sessionStorage.getItem(environment.session.ID_USUARIO_SESSION) != undefined) {
+      this.codigoUsuarioSesion = sessionStorage.getItem(environment.session.ID_USUARIO_SESSION)!;
+    }
+
+    if (sessionStorage.getItem(environment.session.CLASE_USUARIO_SESSION) != undefined) {
+      this.claseUsuarioSesion = sessionStorage.getItem(environment.session.CLASE_USUARIO_SESSION)!;
+    }
   }
 
   actualizarSaldosMovimientos() {
@@ -43,14 +54,14 @@ export class SaldosBancoComponent {
 
     this.saldosService.actualizarSaldosMovimientosPorBanco(Number(this.idEmpresa),
       this.idBanco).subscribe({
-        next: () => {
-          this.loading = false;  // Ocultar el spinner
-          this.reloadPage();
-        },
-        error: () => {
-          this.loading = false;
-        }
-      });
+      next: () => {
+        this.loading = false;  // Ocultar el spinner
+        this.reloadPage();
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
   }
 
   actualizarSaldosMovimientosPorCuenta(codigoCuenta: number) {
@@ -58,14 +69,14 @@ export class SaldosBancoComponent {
 
     this.saldosService.actualizarSaldosMovimientos(Number(this.idEmpresa),
       codigoCuenta).subscribe({
-        next: () => {
-          this.loading = false;  // Ocultar el spinner
-          this.reloadPage();
-        },
-        error: (err) => {
-          this.loading = false;
-        }
-      });
+      next: () => {
+        this.loading = false;  // Ocultar el spinner
+        this.reloadPage();
+      },
+      error: (err) => {
+        this.loading = false;
+      }
+    });
   }
 
   mostrarResumen() {
@@ -80,16 +91,17 @@ export class SaldosBancoComponent {
       }
     })
 
+    this.initializeBreadcrumbs();
   }
 
   private cargarSaldos(): void {
-    this.saldosService.getSaldosPorCuenta(this.idEmpresa, this.idBanco).subscribe(response => {
+    this.saldosService.getSaldosPorCuenta(this.idEmpresa, this.idBanco, Number(this.codigoUsuarioSesion)).subscribe(response => {
       this.resumen = response;
     });
   }
 
   reloadPage() {
-    this.router.navigateByUrl('/content-web', { skipLocationChange: true }).then(() => {
+    this.router.navigateByUrl('/content-web', {skipLocationChange: true}).then(() => {
       this.router.navigate(['/saldos']);
     });
   }
@@ -109,6 +121,14 @@ export class SaldosBancoComponent {
   }
 
   mostrarDetalle(idCuenta: number, bitacora: number, idBanco: number) {
-    this.router.navigate(['/movimientos',idCuenta,bitacora,idBanco,'-','-','T',5,0]);
+    this.router.navigate(['/movimientos', idCuenta, bitacora, idBanco, '-', '-', 'T', 5, 0]);
+  }
+
+  private initializeBreadcrumbs(): void {
+    this.items = [
+      { label: 'Posición general', routerLink: '/saldos' },
+      { label: 'Posición por banco' },
+    ];
+    this.home = { icon: 'pi pi-home', routerLink: '/content' };
   }
 }

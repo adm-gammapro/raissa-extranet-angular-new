@@ -1,13 +1,13 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Output } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { UsuarioService } from '../../../../../service/modules/private/administrativo/usuario.service';
-import { ModuloRequest } from '../../../../../apis/model/module/private/request/modulo-request';
-import { MessagesService } from '../../../../../service/commons/messages.service';
-import { PerfilService } from '../../../../../service/modules/private/administrativo/perfil.service';
-import { Menu } from '../../../../../apis/model/module/private/menu';
+import {CommonModule} from '@angular/common';
+import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Output} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {PRIME_NG_MODULES} from '../../../../../config/primeNg/primeng-global-imports';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {UsuarioService} from '../../../../../service/modules/private/administrativo/usuario.service';
+import {PerfilService} from '../../../../../service/modules/private/administrativo/perfil.service';
+import {forkJoin, of} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
+import {OpcionResponse} from '../../../../../apis/model/module/private/administrativo/opcion/response/opcion-response';
 
 @Component({
   selector: 'app-form-perfil-modulo',
@@ -22,65 +22,71 @@ import { Menu } from '../../../../../apis/model/module/private/menu';
   styleUrl: './form-perfil-modulo.component.scss'
 })
 export class FormPerfilModuloComponent {
-  modulosAsignados: Menu[] = [];
-  modulosNoAsignados: Menu[] = [];
-  modulosAsignadosActual: Menu[] = [];
-  modulosNoAsignadosActual: Menu[] = [];
-  idPerfilEnviado: number = 0;
-  vincularmodulos: ModuloRequest = new ModuloRequest();
-  desvincularmodulos: ModuloRequest = new ModuloRequest();
   @Output() cerrarModal = new EventEmitter<void>();
-  public idEmpresa: string = "";
+  @Output() guardado = new EventEmitter<void>();
+
+  protected opcionesNoAsignados!: OpcionResponse[];
+  protected opcionesAsignados!: OpcionResponse[];
+  protected idPerfilEnviado: number = 0;
+  protected idEmpresa: string = "";
 
   constructor(private readonly cdr: ChangeDetectorRef,
-    private readonly perfilService: PerfilService,
-    private readonly messagesService: MessagesService) { }
+              private readonly perfilService: PerfilService) {
+  }
 
   cargarModelo(idPerfil: number) {
     this.idPerfilEnviado = idPerfil;
-    this.cargarPerfiles(idPerfil);
+    this.cargarOpciones(idPerfil);
     this.cdr.markForCheck();
   }
 
-  cargarPerfiles(idPerfil: number): void {
+  cargarOpciones(idPerfil: number): void {
     this.perfilService.getPerfilModulos(idPerfil).subscribe(response => {
-      this.modulosAsignados = response.modulosxperfil as Menu[];
-      this.modulosNoAsignados = response.modulos as Menu[];
+      this.opcionesAsignados = response.opcionesVinculados;
+      this.opcionesNoAsignados = response.opcionesNoVinculados;
     });
   }
 
   guardarListas() {
-    let diferentesA;
-    let diferentesB;
+    this.perfilService.getPerfilModulos(this.idPerfilEnviado).pipe(
+      switchMap(res => {
+        const antesAsignados = res.opcionesVinculados ?? [];
+        const antesNoAsignados = res.opcionesNoVinculados ?? [];
+        const ahoraAsignados = this.opcionesAsignados ?? [];
+        const ahoraNoAsignados = this.opcionesNoAsignados ?? [];
 
-    this.perfilService.getPerfilModulos(this.idPerfilEnviado).subscribe(response => {
-      this.modulosAsignadosActual = response.modulosxperfil as Menu[];
-      diferentesA = this.modulosAsignados.filter(itemA => !this.modulosAsignadosActual.some(itemB => itemB.codigo === itemA.codigo));
-      if (diferentesA.length > 0) {
-        const idsAsignados: number[] = diferentesA.map(modulo => modulo.codigo);
+        const aVincular = ahoraAsignados
+          .filter(a => !antesAsignados.some((b: { codigo: number; }) => b.codigo === a.codigo))
+          .map(o => o.codigo);
 
-        this.vincularmodulos.codigoPerfiles = [this.idPerfilEnviado];
-        this.vincularmodulos.codigoModulos = idsAsignados;
+        const aDesvincular = ahoraNoAsignados
+          .filter(a => !antesNoAsignados.some((b: { codigo: number; }) => b.codigo === a.codigo))
+          .map(o => o.codigo);
 
-        this.perfilService.vincularOpcion(this.vincularmodulos).subscribe();
-      }
-
-      this.modulosNoAsignadosActual = response.modulos as Menu[];
-      diferentesB = this.modulosNoAsignados.filter(itemA => !this.modulosNoAsignadosActual.some(itemB => itemB.codigo === itemA.codigo));
-      if (diferentesB.length > 0) {
-        const idsNoAsignados: number[] = diferentesB.map(modulo => modulo.codigo);
-
-        this.desvincularmodulos.codigoPerfiles = [this.idPerfilEnviado];
-
-        this.desvincularmodulos.codigoModulos = idsNoAsignados;
-
-        this.perfilService.desvincularOpcion(this.desvincularmodulos).subscribe();
+        const calls = [];
+        if (aVincular.length) {
+          calls.push(this.perfilService.vincularOpcion({
+            codigoPerfil: [this.idPerfilEnviado],
+            codigoOpcion: aVincular,
+          }));
+        }
+        if (aDesvincular.length) {
+          calls.push(this.perfilService.desvincularOpcion({
+            codigoPerfil: [this.idPerfilEnviado],
+            codigoOpcion: aDesvincular,
+          }));
+        }
+        return calls.length ? forkJoin(calls) : of(null);
+      })
+    ).subscribe({
+      next: () => {
+        this.guardado.emit();
+        this.cerrar();
+      },
+      error: err => {
+        console.log(err);
       }
     });
-
-    this.messagesService.setMessages('Se guardó existosamente.');
-
-    this.cerrar();
   }
 
   cerrar(): void {

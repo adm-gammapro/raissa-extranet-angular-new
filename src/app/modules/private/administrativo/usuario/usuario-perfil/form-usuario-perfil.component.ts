@@ -1,12 +1,15 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Output } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { UsuarioService } from '../../../../../service/modules/private/administrativo/usuario.service';
-import { Perfil } from '../../../../../apis/model/module/private/perfil';
-import { MessagesService } from '../../../../../service/commons/messages.service';
-import { PerfilRequest } from '../../../../../apis/model/module/private/request/perfil-request';
+import {CommonModule} from '@angular/common';
+import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Output} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {PRIME_NG_MODULES} from '../../../../../config/primeNg/primeng-global-imports';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {UsuarioService} from '../../../../../service/modules/private/administrativo/usuario.service';
+import {PerfilResponse} from '../../../../../apis/model/module/private/administrativo/perfil/response/perfil-response';
+import {forkJoin, of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
+import {
+  UsuarioPerfilRequest
+} from '../../../../../apis/model/module/private/administrativo/usuario/request/usuario-perfil-request';
 
 @Component({
   selector: 'app-form-usuario-perfil',
@@ -16,24 +19,20 @@ import { PerfilRequest } from '../../../../../apis/model/module/private/request/
     CommonModule,
     ...PRIME_NG_MODULES],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  providers: [ConfirmationService, MessageService, UsuarioService],
+  providers: [ConfirmationService, MessageService],
   templateUrl: './form-usuario-perfil.component.html',
   styleUrl: './form-usuario-perfil.component.scss'
 })
 export class FormUsuarioPerfilComponent {
-  perfilesAsignados: Perfil[] = [];
-  perfilesNoAsignados: Perfil[] = [];
-  perfilesAsignadosActual: Perfil[] = [];
-  perfilesNoAsignadosActual: Perfil[] = [];
-  idUsuarioEnviado: number = 0;
-  vincularPerfiles: PerfilRequest = new PerfilRequest();
-  desvincularPerfiles: PerfilRequest = new PerfilRequest();
+  protected perfilesAsignados: PerfilResponse[] = [];
+  protected perfilesNoAsignados: PerfilResponse[] = [];
+  protected idUsuarioEnviado: number = 0;
   @Output() cerrarModal = new EventEmitter<void>();
-  public idEmpresa: string = "";
+  @Output() guardado = new EventEmitter<void>();
+  protected idEmpresa: string = "";
 
   constructor(private readonly cdr: ChangeDetectorRef,
-    private readonly usuarioService: UsuarioService,
-    private readonly messagesService: MessagesService) { }
+    private readonly usuarioService: UsuarioService) { }
 
   cargarModelo(idUsuario: number, idEmpresa: string) {
     this.idUsuarioEnviado = idUsuario;
@@ -44,42 +43,42 @@ export class FormUsuarioPerfilComponent {
 
   cargarPerfiles(idUsuario: number, idEmpresa: string): void {
     this.usuarioService.getUsuarioPerfiles(idUsuario, idEmpresa).subscribe(response => {
-      this.perfilesAsignados = response.perfilesxusuario as Perfil[];
-      this.perfilesNoAsignados = response.perfiles as Perfil[];
+      this.perfilesAsignados = response.perfilesAsignados;
+      this.perfilesNoAsignados = response.perfilesNoAsignados;
     });
   }
 
   guardarListas() {
+    let usuarioPerfilVincular: UsuarioPerfilRequest = new UsuarioPerfilRequest();
+    let usuarioPerfilDesvincular: UsuarioPerfilRequest = new UsuarioPerfilRequest();
+
     let diferentesA;
     let diferentesB;
 
+    let perfilesNoAsignados!: PerfilResponse[];
+    let perfilesAsignados!: PerfilResponse[];
+
     this.usuarioService.getUsuarioPerfiles(this.idUsuarioEnviado, this.idEmpresa).subscribe(response => {
-      this.perfilesAsignadosActual = response.perfilesxusuario as Perfil[];
-      diferentesA = this.perfilesAsignados.filter(itemA => !this.perfilesAsignadosActual.some(itemB => itemB.codigo === itemA.codigo));
+      perfilesAsignados = response.perfilesAsignados;
+      diferentesA = this.perfilesAsignados.filter(itemA => !perfilesAsignados.some(itemB => itemB.codigo === itemA.codigo));
       if (diferentesA.length > 0) {
-        const idsAsignados: number[] = diferentesA.map(perfil => perfil.codigo);
+        usuarioPerfilVincular.codigoPerfil = diferentesA.map(perfil => perfil.codigo);
+        usuarioPerfilVincular.codigoUsuario = [this.idUsuarioEnviado];
 
-        this.vincularPerfiles.codigoPerfiles = idsAsignados;
-        this.vincularPerfiles.codigoUsuarios = [this.idUsuarioEnviado];
-
-        this.usuarioService.vincularPerfil(this.vincularPerfiles).subscribe();
+        this.usuarioService.vincularPerfil(usuarioPerfilVincular).subscribe();
       }
 
-      this.perfilesNoAsignadosActual = response.perfiles as Perfil[];
-      diferentesB = this.perfilesNoAsignados.filter(itemA => !this.perfilesNoAsignadosActual.some(itemB => itemB.codigo === itemA.codigo));
+      perfilesNoAsignados = response.perfilesNoAsignados;
+      diferentesB = this.perfilesNoAsignados.filter(itemA => !perfilesNoAsignados.some(itemB => itemB.codigo === itemA.codigo));
       if (diferentesB.length > 0) {
-        const idsNoAsignados: number[] = diferentesB.map(perfil => perfil.codigo);
+        usuarioPerfilDesvincular.codigoPerfil = diferentesB.map(perfil => perfil.codigo);
+        usuarioPerfilDesvincular.codigoUsuario = [this.idUsuarioEnviado];
 
-        this.desvincularPerfiles.codigoPerfiles = idsNoAsignados;
-        this.desvincularPerfiles.codigoUsuarios = [this.idUsuarioEnviado];
-
-        this.usuarioService.desVincularPerfil(this.desvincularPerfiles).subscribe();
+        this.usuarioService.desVincularPerfil(usuarioPerfilDesvincular).subscribe();
       }
     });
 
-    this.messagesService.setMessages('Se guardó existosamente.');
-
-    this.cerrar();
+    this.guardado.emit();
   }
 
   cerrar(): void {
