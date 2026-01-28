@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 export class ResourceService {
   resourceUrl = environment.security.resource_url;
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private readonly httpClient: HttpClient) { }
 
   public user(): Observable<any> {
     return this.httpClient.get<any>(this.resourceUrl + 'user');//api para rol de user

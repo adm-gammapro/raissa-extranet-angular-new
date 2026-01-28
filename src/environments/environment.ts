@@ -27,6 +27,7 @@ export const environment = {
   security: {
     authorize_uri: 'https://www.raissaob.com/api/autorizador/oauth2/authorize?',
     client_id: 'extranet',
+    secret_client: 'S3cr3t$$',
     redirect_uri: 'https://www.raissaob.com/extranet/authorized',
     scope: 'openid',
     response_type: 'code',
@@ -36,6 +37,6 @@ export const environment = {
     grant_type: "authorization_code",
     resource_url: 'https://www.raissaob.com/api/extranet/resource/',//esta es la ruta del servicio del server resource
     logout_url: 'https://www.raissaob.com/api/autorizador/logout',
-    secret_pkce: 'extranet',
+    secret_pkce: 'secret',
   }
 };

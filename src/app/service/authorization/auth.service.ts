@@ -1,8 +1,6 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../../environments/environment';
-import {Usuario} from '../../apis/model/module/private/usuario';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {TokenService} from './token.service';
 import {Router} from '@angular/router';
 import {catchError, forkJoin, map, mapTo, Observable, of, tap, throwError} from 'rxjs';
 import {Cliente} from '../../apis/model/module/private/cliente';
@@ -14,13 +12,8 @@ import {UsuarioResponse} from '../../apis/model/module/private/administrativo/us
 export class AuthService {
   public _token?: string | null;
   private readonly token_url = environment.security.token_url;
-  private _usuario: Usuario = new UsuarioResponse();
-  private _empresa: Cliente = new Cliente();
-
-  private readonly httpHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
 
   constructor(private readonly httpClient: HttpClient,
-              private readonly tokenService: TokenService,
               private readonly router: Router) { }
 
   public getToken(code: string, code_verifier: string): Observable<any> {
@@ -31,7 +24,7 @@ export class AuthService {
     body.set('scope',environment.security.scope);
     body.set('code_verifier',code_verifier);
     body.set('code',code);
-    const basic_auth = 'Basic ' + btoa(environment.security.client_id+':secret');
+    const basic_auth = 'Basic ' + btoa(environment.security.client_id+':'+environment.security.secret_client);
     const headers_object = new HttpHeaders({
       'Content-Type': 'application/x-www-form-urlencoded',
       'Accept': '*/*',
@@ -64,14 +57,6 @@ export class AuthService {
     }
   }
 
-  public agregarAuthorizationHeader() {
-    let token = this.tokenService.getAccessToken();
-    if (token != null) {
-      return this.httpHeaders.append('Authorization', 'Bearer ' + token);
-    }
-    return this.httpHeaders;
-  }
-
   public isNoAutorizado(e: any): boolean | any {
     if (e.status == 401) {
       if (this.getToken != null) {
@@ -90,8 +75,8 @@ export class AuthService {
 
   guardarUsuario(accessToken: string): Observable<void> {
     const payload = this.obtenerDatosToken(accessToken);
-    const usuario = String(payload.username ?? '').replace(/['"]+/g, '');
-    const idEmpresa = String(payload.empresaId ?? '').replace(/['"]+/g, '');
+    const usuario = String(payload.username ?? '').replaceAll(/['"]+/g, '');
+    const idEmpresa = String(payload.empresaId ?? '').replaceAll(/['"]+/g, '');
 
     sessionStorage.setItem(environment.session.USERNAME, usuario);
 
@@ -99,7 +84,6 @@ export class AuthService {
     ops.push(
       this.getUsuario(usuario).pipe(
         tap(u => {
-          this._usuario = u;
           sessionStorage.setItem(environment.session.ID_USUARIO_SESSION, u.id?.toString() ?? '');
           sessionStorage.setItem(environment.session.NOMBRES_USUARIO, u.nombres ?? '');
           sessionStorage.setItem(environment.session.CLASE_USUARIO_SESSION, u.claseUsuario ?? '');
@@ -117,7 +101,6 @@ export class AuthService {
       ops.push(
         this.getEmpresa(idEmpresa).pipe(
           tap(emp => {
-            this._empresa = emp;
             sessionStorage.setItem(environment.session.NOMBRE_EMPRESA, emp.razonSocial ?? '');
           })
         )
@@ -178,16 +161,5 @@ export class AuthService {
       return JSON.parse(atob(accessToken.split(".")[1]));
     }
     return null;
-  }
-
-  public getusuario(): string | null {
-
-    if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){
-      let username = sessionStorage.getItem(environment.session.USERNAME);
-      if (username != null) {
-        return JSON.parse(username);
-      }
-    }
-    return "";
   }
 }

@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
+import {Injectable} from '@angular/core';
+import {environment} from '../../../environments/environment';
 import CryptoJS from 'crypto-js';
 
 const CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -19,10 +19,10 @@ export class TokenService {
 
   getAccessToken(): string | null {
     if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){
-      if (sessionStorage.getItem(environment.session.ACCESS_TOKEN) != null) {
-        return sessionStorage.getItem(environment.session.ACCESS_TOKEN);
-      } else {
+      if (sessionStorage.getItem(environment.session.ACCESS_TOKEN) == null) {
         return null;
+      } else {
+        return sessionStorage.getItem(environment.session.ACCESS_TOKEN);
       }
     } else {
       return null;
@@ -31,10 +31,10 @@ export class TokenService {
 
   getRefreshToken(): string | null {
     if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){
-      if (sessionStorage.getItem(environment.session.REFRESH_TOKEN) != null) {
-        return sessionStorage.getItem(environment.session.REFRESH_TOKEN);
-      } else {
+      if (sessionStorage.getItem(environment.session.REFRESH_TOKEN) == null) {
         return null;
+      } else {
+        return sessionStorage.getItem(environment.session.REFRESH_TOKEN);
       }
     } else {
       return null;
@@ -67,10 +67,8 @@ export class TokenService {
     const payloadDecoded = atob(payload);
     const values = JSON.parse(payloadDecoded);
     const roles = values.roles;
-    if(roles.indexOf('ROLE_ADMIN')<0){
-      return false;
-    } 
-    return true;
+    return roles.indexOf('ROLE_ADMIN') >= 0;
+
   }
 
   setVerifier(code_verifier: string): void {
@@ -84,17 +82,14 @@ export class TokenService {
   public getVerifier(): string {
     if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){
       let encrypted = sessionStorage.getItem(environment.session.CODE_VERIFIER);
-      if(encrypted == null) {
-        encrypted = '';
-      } 
+      encrypted ??= '';
 
-      const decrypted = CryptoJS.AES.decrypt(encrypted, environment.security.secret_pkce).toString(CryptoJS.enc.Utf8);
-      return decrypted;
+      return CryptoJS.AES.decrypt(encrypted, environment.security.secret_pkce).toString(CryptoJS.enc.Utf8);
     } else {
       return "";
     }
   }
-  
+
   deleteVerifier(): void {
     if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){
       sessionStorage.removeItem(environment.session.CODE_VERIFIER);
@@ -112,10 +107,9 @@ export class TokenService {
 
   generateCodeChallenge(code_verifier: string): string {
     const codeverifierHash = CryptoJS.SHA256(code_verifier).toString(CryptoJS.enc.Base64);
-    const code_challenge = codeverifierHash
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
-    return code_challenge;
+    return codeverifierHash
+      .replaceAll('=', '')
+      .replaceAll('+', '-')
+      .replaceAll('/', '_');
   }
 }
