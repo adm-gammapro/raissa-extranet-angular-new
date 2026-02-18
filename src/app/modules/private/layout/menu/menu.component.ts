@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterModule } from '@angular/router';
-import { MenuItem } from 'primeng/api';
+import {MenuItem, MessageService} from 'primeng/api';
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { MenuService } from '../../../../service/modules/private/administrativo/menu.service';
 import { MenuUsuario } from '../../../../apis/model/module/private/menu-usuario';
@@ -22,13 +22,14 @@ import { Menu } from '../../../../apis/model/module/private/menu';
   styleUrl: './menu.component.scss'
 })
 export class MenuComponent implements OnInit {
-  items: MenuItem[] = []; 
+  items: MenuItem[] = [];
   public nombreEmpresa?: string;
   listaModulos: Modulo[]= [];
   listaPadres: Menu[] = []
   listaOpciones: Menu[] = [];
 
-  constructor(private readonly menuService: MenuService, 
+  constructor(private readonly menuService: MenuService,
+              private readonly messageService: MessageService,
               private readonly activatedRoute: ActivatedRoute) {
     if (sessionStorage.getItem(environment.session.NOMBRE_EMPRESA) != undefined) {
       this.nombreEmpresa = sessionStorage.getItem(environment.session.NOMBRE_EMPRESA)!;
@@ -37,27 +38,35 @@ export class MenuComponent implements OnInit {
     }
   }
 
-  ngOnInit() { 
-    this.activatedRoute.paramMap.subscribe (params => {
+  ngOnInit() {
+    this.activatedRoute.paramMap.subscribe(params => {
       let user: string | null = sessionStorage.getItem(environment.session.USERNAME);
       let idEmpresa: string | null = sessionStorage.getItem(environment.session.ID_EMPRESA);
 
-      if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined') {
+      if (typeof window !== 'undefined' && typeof window.sessionStorage !== 'undefined') {
         if (sessionStorage.getItem(environment.session.MENU_ITEMS)) {
           const menuItemsString = sessionStorage.getItem(environment.session.MENU_ITEMS);
           if (menuItemsString) {
             this.items = JSON.parse(menuItemsString) as MenuItem[];
           }
         } else {
-          this.menuService.getMenuUsuarios(user, idEmpresa)
-          .subscribe(response => {
-            const menuUsuario = response as MenuUsuario;
-            this.items = this.cargarMenu(menuUsuario);
+          this.menuService.getMenuUsuarios(user, idEmpresa).subscribe({
+            next: resp => {
+              this.items = this.cargarMenu(resp);
+              sessionStorage.setItem(environment.session.MENU_ITEMS, JSON.stringify(this.items));
+            },
+            error: err => {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: err?.error?.message || 'No se pudo cargar el menú.'
+              });
+            }
           });
         }
-      } 
-    })
-  } 
+      }
+    });
+  }
 
   cargarMenu(menuUsuario: MenuUsuario): MenuItem[] {
     this.listaModulos = menuUsuario.listModulo;

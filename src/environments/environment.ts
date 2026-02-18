@@ -5,6 +5,7 @@ export const environment = {
   url: {
     base: URL_BASE,
     baseApi: `${URL_BASE}/api`,
+    landing: 'https://www.raissaob.com/landing',
     requestNewPassword: `${URL_BASE}/api/public/login/requestNewPassword`,
     changePassword: `${URL_BASE}/api/public/login/changePassword`
   },
@@ -26,7 +27,7 @@ export const environment = {
   },
   security: {
     authorize_uri: 'https://www.raissaob.com/api/autorizador/oauth2/authorize?',
-    client_id: 'extranet',
+    client_id: 'client_extranet',
     secret_client: 'S3cr3t$$',
     redirect_uri: 'https://www.raissaob.com/extranet/authorized',
     scope: 'openid',

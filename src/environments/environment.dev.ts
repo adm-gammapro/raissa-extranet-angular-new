@@ -5,6 +5,7 @@ export const environment = {
   url: {
     base: URL_BASE,
     baseApi: `${URL_BASE}/api`,
+    landing: 'http://127.0.0.4:4200',
     requestNewPassword: `${URL_BASE}/api/public/login/requestNewPassword`,
     changePassword: `${URL_BASE}/api/public/login/changePassword`
   },
@@ -26,7 +27,7 @@ export const environment = {
   },
   security: {
     authorize_uri: 'http://localhost:9000/oauth2/authorize?',
-    client_id: 'user',
+    client_id: 'client_extranet',
     secret_client: 'S3cr3t$$',
     redirect_uri: 'http://127.0.0.1:4200/authorized',
     scope: 'openid',

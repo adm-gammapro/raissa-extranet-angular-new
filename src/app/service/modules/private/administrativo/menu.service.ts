@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError, map, Observable, throwError } from 'rxjs';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {catchError, EMPTY, map, Observable, throwError} from 'rxjs';
 import { AuthService } from '../../../authorization/auth.service';
 import { MenuItem } from 'primeng/api';
+import {MenuUsuario} from '../../../../apis/model/module/private/menu-usuario';
 
 @Injectable({
   providedIn: 'root'
@@ -15,25 +16,20 @@ export class MenuService {
   constructor(private readonly http: HttpClient,
               private readonly authService: AuthService) { }
 
-  getMenuUsuarios(user: string | null, idEmpresa: string | null):  Observable<any> {
+  getMenuUsuarios(user: string | null, idEmpresa: string | null):  Observable<MenuUsuario> {
 
-    const params = [
-      `usuario=${user}`,
-      `idEmpresa=${idEmpresa}`,
-    ].filter(Boolean).join('&');
+    const params = new HttpParams({ fromObject: {
+        ...(user ? { usuario: user } : {}),
+        ...(idEmpresa ? { idEmpresa: idEmpresa } : {}),
+      }});
 
-    const headers = new HttpHeaders({
-    });
-
-    const url = `${this.url}/listarOpcionesUsuario?${params}`;
-
-    return this.http.get(url, { headers: headers }).pipe(
-      map((response: any) => {
-        return response.body;
-      }),
-      catchError(e => {
-          this.authService.isNoAutorizado(e);
-          return throwError(() => e);
+    return this.http.get<MenuUsuario>(`${this.url}/listarOpcionesUsuario`, { params }).pipe(
+      catchError(err => {
+        this.authService.isNoAutorizado(err);
+        if (err?.status === 401) {
+          return EMPTY;
+        }
+        return throwError(() => err);
       })
     );
   }

@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 import {TokenService} from '../../service/authorization/token.service';
+import {environment} from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
@@ -18,7 +19,7 @@ export class AuthGuard implements CanActivate {
 
     if (logged) return true;
 
-    window.location.href = 'http://127.0.0.4:4200';
+    window.location.href = environment.url.landing;
     return false;
   }
 }

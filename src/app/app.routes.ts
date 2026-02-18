@@ -46,7 +46,7 @@ export const routes: Routes = [
   {path: 'content', component: ContentComponent, canActivate: [AuthGuard]},
   {path: 'authorized', component: AuthorizedComponent},
   {path: 'logout', component: LogoutComponent, canActivate: [AuthGuard]},
-  {path: 'login', component: LoginComponent, canActivate: [AuthGuard]},
+  {path: 'login', component: LoginComponent},
 
   {path: 'usuario', component: UsuarioComponent, canActivate: [AuthGuard]},
   {path: 'form-usuario/:id', component: FormUsuarioComponent, canActivate: [AuthGuard]},
