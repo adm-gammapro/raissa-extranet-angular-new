@@ -1,276 +1,247 @@
 import {CommonModule} from '@angular/common';
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {HeaderComponent} from '../../../layout/header/header.component';
-import {PRIME_NG_MODULES} from '../../../../../config/primeNg/primeng-global-imports';
-import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
+import {Component, EventEmitter, Input, OnInit, Output, signal} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {ConfirmationService, MessageService} from 'primeng/api';
 import {UsuarioService} from '../../../../../service/modules/private/administrativo/usuario.service';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {MessagesService} from '../../../../../service/commons/messages.service';
-import {Util} from '../../../../../utils/util/util.util';
 import {TipoDocService} from '../../../../../service/commons/tipo-doc.service';
-import {TipoDocumento} from '../../../../../apis/model/commons/tipo-documento';
 import {environment} from '../../../../../../environments/environment';
 import {UsuarioRequest} from '../../../../../apis/model/module/private/administrativo/usuario/request/usuario-request';
 import {
   UsuarioResponse
 } from '../../../../../apis/model/module/private/administrativo/usuario/response/usuario-response';
-import {ValidationUtil} from '../../../../../service/commons/validation-util';
+import {Dialog} from 'primeng/dialog';
+import {Button} from 'primeng/button';
+import {InputText} from 'primeng/inputtext';
+import {Select} from 'primeng/select';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {TipoDocumentoResponse} from '../../../../../apis/model/module/private/commons/tipo-documento-response';
 
-interface Expiracion {
-  name: string;
-  code: string;
-}
+const CLASES_USUARIO = [
+  { valor: 'O', descripcion: 'Operativo' },
+  { valor: 'S', descripcion: 'Supervisor' }
+];
 
 @Component({
   selector: 'app-form-usuario',
   standalone: true,
-  imports: [FormsModule,
-    ReactiveFormsModule,
+  imports: [
     CommonModule,
-    HeaderComponent,
-    RouterLink,
-    ...PRIME_NG_MODULES],
+    Dialog,
+    Button,
+    InputText,
+    ReactiveFormsModule,
+    Select,
+    ProgressSpinner,
+  ],
     providers: [ConfirmationService, MessageService, UsuarioService,TipoDocService],
   templateUrl: './form-usuario.component.html',
   styleUrl: './form-usuario.component.scss'
 })
 export class FormUsuarioComponent implements OnInit {
-  protected usuarioRequest: UsuarioRequest = new UsuarioRequest();
-  protected usuarioResponse: UsuarioResponse = new UsuarioResponse();
-  protected usuarioForm: FormGroup;
-  protected tipoDocs: TipoDocumento[] = [];
-  private readonly idEmpresa: string = "";
-  protected expiracion: Expiracion[] | undefined;
-  protected submitted = false;
-  protected items: MenuItem[] | undefined;
-  protected home: MenuItem | undefined;
+  @Input() visible: boolean = false;
+  @Output() visibleChange = new EventEmitter<boolean>();
+  @Input() modo: 'editar' | 'registrar' = 'registrar';
+  @Output() guardarRegistro = new EventEmitter<void>();
 
-  tipoUsuarioOpts = [
-    { label: 'Administrador',      value: 'A' },
-    { label: 'Estándar',           value: 'U' },
-  ];
+  protected tipoDocs: TipoDocumentoResponse[] = [];
 
-  claseUsuarioOpts = [
-    { label: 'Supervisor', value: 'S' },
-    { label: 'Operativo',  value: 'O' },
-  ];
+  @Input() set usuarioData(usuario: UsuarioResponse | null) {
+    if (usuario) {
+      this.cargarDatosEnFormulario(usuario);
+    } else {
+      this.limpiarFormulario();
+    }
+  }
 
-  constructor(private readonly router: Router,
-              private readonly confirmationService: ConfirmationService,
-              private readonly formBuilder: FormBuilder,
-              private readonly messageService: MessageService,
-              private readonly usuarioService: UsuarioService,
-              private readonly activatedRoute: ActivatedRoute,
-              private readonly messagesService: MessagesService,
-              private readonly tipoDocService: TipoDocService) {
+  activate = signal(false);
+  form!: FormGroup;
+  protected idEmpresa!: string;
+  protected clasesUsuario = CLASES_USUARIO;
+  protected loading: boolean = false;
 
-    this.usuarioForm = this.formBuilder.group({
+  constructor(
+    private readonly fb: FormBuilder,
+    private readonly messageService: MessageService,
+    private readonly usuarioService: UsuarioService,
+    private readonly tipoDocService: TipoDocService
+  ) {
+    const idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA);
+    if (idEmpresa) {
+      this.idEmpresa = idEmpresa;
+    }
+
+    this.form = this.fb.group({
       id: [null],
       username: [''],
-      password: [null],
-      nombres: ['', [Validators.required, Validators.maxLength(70)]],
-      correo: ['', [Validators.required, Validators.maxLength(250), Validators.email]],
-      telefono: ['', [Validators.required, Validators.maxLength(20), Util.phoneValidator()]],
-      codigoTipoDocumento: ['', [Validators.required]],
-      apePaterno: ['', [Validators.required, Validators.maxLength(50)]],
-      apeMaterno: ['', [Validators.required, Validators.maxLength(50)]],
-      indicadorExpiracion: ['', [Validators.required]],
-      fechaCambioClave: [null],
-      numeroDocumento: ['', [Validators.required, Validators.maxLength(30)]],
-      fechaExpiracionClave: [null],
-      tipoUsuario: ['', [Validators.required]],
-      claseUsuario: ['', [Validators.required]]
+      nombres: ['', Validators.required],
+      apePaterno: ['', Validators.required],
+      apeMaterno: [''],
+      correo: ['', [Validators.required, Validators.email]],
+      telefono: [''],
+      codigoTipoDocumento: ['', Validators.required],
+      numeroDocumento: ['', Validators.required],
+      tipoUsuario: [''],
+      claseUsuario: ['', Validators.required],
+      idEmpresa: [null]
+    });
+  }
+
+  ngOnInit(): void {
+    this.form.patchValue({
+      idEmpresa: this.idEmpresa ? Number(this.idEmpresa) : null
     });
 
-    if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
-      this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
-    }
+    this.cargarTipoDocumento()
   }
 
   guardar() {
-      if (this.usuarioForm.valid) {
-        this.confirmationService.confirm({
-          message: '¿Está seguro de guardar este registro?',
-          header: 'Confirmación',
-          icon: 'pi pi-exclamation-triangle',
-          acceptLabel: 'Si',
-          rejectLabel: 'No',
-          accept: () => {
+    this.loading = true;
+    this.depurarFormulario();
+    if (this.form.valid) {
+      const request: UsuarioRequest = {
+        id: this.form.get('id')?.value,
+        username: this.form.get('username')?.value,
+        nombres: this.form.get('nombres')?.value,
+        apePaterno: this.form.get('apePaterno')?.value,
+        apeMaterno: this.form.get('apeMaterno')?.value,
+        password: this.form.get('password')?.value,
+        correo: this.form.get('correo')?.value,
+        telefono: this.form.get('telefono')?.value,
+        codigoTipoDocumento: this.form.get('codigoTipoDocumento')?.value,
+        numeroDocumento: this.form.get('numeroDocumento')?.value,
+        tipoUsuario: this.form.get('tipoUsuario')?.value,
+        claseUsuario: this.form.get('claseUsuario')?.value,
+        idEmpresa: Number(this.idEmpresa)
+      };
 
-              this.usuarioRequest = this.usuarioForm.value;
-              this.convertirFecha();
-
-              this.usuarioService.registrar(this.usuarioRequest, Number(this.idEmpresa)).subscribe({
-                next:(response) => {
-                  this.messagesService.setMessages(`Se guardó registro ${response.numeroDocumento} existosamente.`);
-                },
-                error: (err) => {
-                  this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message, life: 5000 });
-                },
-                complete: () => {
-                  this.router.navigate(['/usuario'])
-                }
-             })
-          },reject: () => {
-            this.messageService.add({ severity: 'error', summary: 'Rechazado', detail: 'No se guardó registro', life: 5000 });
-        }
+      if (this.modo === 'registrar') {
+        this.usuarioService.registrarUsuario(request).subscribe({
+          next: (response: UsuarioResponse) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Confirmación',
+              detail: `Se registró el usuario ${response.username} correctamente`
+            });
+            this.guardarRegistro.emit();
+            this.loading = false;
+            this.cerrar();
+          },
+          error: (error) => this.handleError(error)
         });
-
       } else {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error de Validación',
-          detail: 'Se deben ingresar los campos obligatorios y en el formato requerido.',
-          life: 5000
-        });
-        this.usuarioForm.markAllAsTouched();
-      }
-  }
-
-  ngOnInit() {
-    this.cargarTipoDocumento();
-    this.cargarIndicadorExpiracion();
-
-    this.activatedRoute.paramMap.subscribe (params => {
-      let id: number;
-
-      id = Number(params.get('id'));
-
-      if(id!=null && id > 0){
-        this.usuarioService.getUsuario(id).subscribe(response => {
-
-          this.usuarioResponse = response;
-
-          this.usuarioForm.patchValue({
-            id: this.usuarioResponse.id,
-            username: this.usuarioResponse.username,
-            password: this.usuarioResponse.password,
-            nombres: this.usuarioResponse.nombres,
-            correo: this.usuarioResponse.correo,
-            telefono: this.usuarioResponse.telefono,
-            codigoTipoDocumento: this.usuarioResponse.codigoTipoDocumento,
-            apePaterno: this.usuarioResponse.apePaterno,
-            apeMaterno: this.usuarioResponse.apeMaterno,
-            indicadorExpiracion: this.usuarioResponse.indicadorExpiracion,
-
-            fechaCambioClave: this.usuarioResponse.fechaCambioClave,
-            numeroDocumento: this.usuarioResponse.numeroDocumento,
-            fechaExpiracionClave: this.usuarioResponse.fechaExpiracionClave,
-            tipoUsuario: this.usuarioResponse.tipoUsuario,
-          });
-
-          this.aplicarReglasTipoUsuario();
-
-          this.usuarioForm.patchValue({
-            claseUsuario: this.usuarioResponse.claseUsuario
-          });
-
-          if (this.usuarioResponse.fechaCambioClave != "") {
-            this.usuarioForm.patchValue({
-              fechaCambioClave: Util.stringToDate(this.usuarioResponse.fechaCambioClave, 'dd/mm/yyyy', '/')
+        this.usuarioService.actualizarUsuario(request).subscribe({
+          next: (response: UsuarioResponse) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Confirmación',
+              detail: `Se actualizó el usuario ${response.username} correctamente`
             });
-          }
-
-          if (this.usuarioResponse.fechaExpiracionClave != "") {
-            this.usuarioForm.patchValue({
-              fechaExpiracionClave: Util.stringToDate(this.usuarioResponse.fechaExpiracionClave, 'dd/mm/yyyy', '/')
-            });
-          }
+            this.guardarRegistro.emit();
+            this.loading = false;
+            this.cerrar();
+          },
+          error: (error) => this.handleError(error)
         });
       }
-    });
+    } else {
+      this.form.markAllAsTouched();
+      this.activate.set(true);
+      setTimeout(() => {
+        this.activate.set(false);
+      }, 3500);
 
-    this.initializeBreadcrumbs();
-
-    this.suscribirseTipoUsuario();
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error de validación',
+        detail: `Formulario inválido`
+      });
+    }
   }
 
-  public cargarTipoDocumento(): void {
+  private handleError(error: any): void {
+    if (error.status === 502) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error en el servicio'
+      });
+    } else if (error.status === 503) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Servicio no disponible'
+      });
+    } else if (error.status === 400) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error de validación',
+        detail: error.error?.message || 'Datos inválidos'
+      });
+    }
+  }
+
+  protected cerrar() {
+    this.form.reset();
+    this.visibleChange.emit(false);
+    this.limpiarFormulario();
+  }
+
+  protected cargarTipoDocumento(): void {
     this.tipoDocService.getAllTipoDocumentos()
-        .subscribe(response => {
-            this.tipoDocs = response;
-        });
+      .subscribe(response => {
+        this.tipoDocs = response;
+      });
   }
 
-  public cargarIndicadorExpiracion(): void {
-    this.expiracion = [
-      { name: 'Activo', code: 'S' },
-      { name: 'Inactivo', code: 'N' }
-    ];
+  get headerTitle(): string {
+    return this.modo === 'editar' ? 'Actualizar Usuario' : 'Registrar Usuario';
   }
 
-  protected filterAlphanumeric(event: Event): void {
-    Util.filterAlphanumeric(event, this.usuarioForm);
+  private cargarDatosEnFormulario(usuario: UsuarioResponse): void {
+    this.form.patchValue({
+      id: usuario.id,
+      username: usuario.username,
+      nombres: usuario.nombres,
+      apePaterno: usuario.apePaterno,
+      apeMaterno: usuario.apeMaterno,
+      correo: usuario.correo,
+      telefono: usuario.telefono,
+      codigoTipoDocumento: usuario.codigoTipoDocumento,
+      numeroDocumento: usuario.numeroDocumento,
+      tipoUsuario: usuario.tipoUsuario,
+      claseUsuario: usuario.claseUsuario,
+      idEmpresa: usuario.idEmpresa ? Number(usuario.idEmpresa) : null
+    });
+
+    // No cargar la contraseña por seguridad
+    this.form.get('password')?.clearValidators();
+    this.form.get('password')?.updateValueAndValidity();
   }
 
-  protected filterSpecialCharacters(event: Event): void {
-    Util.filterSpecialCharacters(event, this.usuarioForm);
-  }
-
-  protected filterNumeric(event: Event): void {
-    Util.filterNumeric(event, this.usuarioForm);
-  }
-
-  protected isFieldRequired(controlName: string): boolean {
-    return Util.isFieldRequired(controlName, this.usuarioForm);
-  }
-
-  protected convertirFecha(): void {
-    if (this.usuarioRequest.fechaCambioClave != null && this.usuarioRequest.fechaCambioClave != "") {
-      this.usuarioRequest.fechaCambioClave = Util.formatDate(new Date(this.usuarioRequest.fechaCambioClave));
+  private limpiarFormulario(): void {
+    this.form.reset();
+    this.form.get('password')?.setValidators(Validators.required);
+    this.form.get('password')?.updateValueAndValidity();
+    if (this.idEmpresa) {
+      this.form.patchValue({ idEmpresa: Number(this.idEmpresa) });
     }
-    if (this.usuarioRequest.fechaExpiracionClave != null && this.usuarioRequest.fechaExpiracionClave != "") {
-      this.usuarioRequest.fechaExpiracionClave = Util.formatDate(new Date(this.usuarioRequest.fechaExpiracionClave));
-    }
   }
 
-  protected errorMessages: Record<string, Record<string, string>> = {
-    codigoTipoDocumento: { required: 'El campo es requerido' },
-    numeroDocumento: { required: 'El campo es requerido', maxlength: 'Máximo de caracteres excedido' },
-    nombres: { required: 'El campo es requerido', maxlength: 'Máximo de caracteres excedido' },
-    apePaterno: { required: 'El campo es requerido', maxlength: 'Máximo de caracteres excedido' },
-    apeMaterno: { required: 'El campo es requerido', maxlength: 'Máximo de caracteres excedido' },
-    telefono: { required: 'El campo es requerido', maxlength: 'Máximo de caracteres excedido', phoneLength: 'El teléfono debe tener como minimo 7 dígitos.' },
-    correo: { required: 'El campo es requerido', maxlength: 'Máximo de caracteres excedido', email : 'El formato del correo no es válido.' },
-    indicadorExpiracion: { required: 'El campo es requerido', maxlength: 'Máximo de caracteres excedido' }
-  };
+  private depurarFormulario(): void {
+    console.group('🔍 DEPURACIÓN DE FORMULARIO');
 
-  protected isInvalid(ctrl: string) {
-    return ValidationUtil.isInvalid(this.usuarioForm, ctrl, this.submitted);
-  }
+    Object.keys(this.form.controls).forEach(key => {
+      const control = this.form.get(key);
 
-  protected errors(ctrl: string) {
-    return ValidationUtil.errors(this.usuarioForm, ctrl, this.errorMessages[ctrl] || {}, this.submitted);
-  }
-
-  private initializeBreadcrumbs(): void {
-    this.items = [
-      { label: 'Usuarios', routerLink: '/usuario' },
-      { label: 'Formulario' }
-    ];
-    this.home = { icon: 'pi pi-home', routerLink: '/content' };
-  }
-
-  private suscribirseTipoUsuario() {
-    const tipoCtrl = this.usuarioForm.get('tipoUsuario');
-    const claseCtrl = this.usuarioForm.get('claseUsuario');
-
-    tipoCtrl?.valueChanges.subscribe(val => {
-      if (val === 'A') {
-        claseCtrl?.setValue('S', { emitEvent: false });
-        claseCtrl?.disable({ emitEvent: false });
-      } else {
-        claseCtrl?.enable({ emitEvent: false });
-        if (val === 'U') {
-          claseCtrl?.reset('', { emitEvent: false });
+      if (control?.invalid) {
+        if (control.errors) {
+          Object.keys(control.errors).forEach(errorKey => {
+            console.log(`  → ${errorKey}:`, control.errors![errorKey]);
+          });
         }
+        console.groupEnd();
       }
     });
-  }
-
-  aplicarReglasTipoUsuario() {
-    const tipo = this.usuarioForm.get('tipoUsuario')?.value;
-    this.usuarioForm.get('tipoUsuario')?.setValue(tipo); // dispara la suscripción
+    console.groupEnd();
   }
 }

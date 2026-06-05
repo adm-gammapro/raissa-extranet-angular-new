@@ -9,7 +9,9 @@
   <div class="flex border-round bg-gray-100 m-1 border-1 border-300">
     <div class="w-12 flex align-items-center justify-content-center">
       <div class="formgrid grid w-12 flex  pt-5">
-
+        <div class="field col-12 md:col-12 text-center text-red-500 font-bold">
+          Se recomienda realizar actualizaciones a demanda con un intervalo de 5 min. entre solicitudes
+        </div>
         <div class="field col-12 md:col-2" *ngIf="claseUsuarioSesion === 'S'">
         </div>
         <div class="field col-12 md:col-3" *ngIf="claseUsuarioSesion != 'S'">
@@ -28,6 +30,7 @@
           <p-button label="Mostrar resumen de saldos por banco"
                     pTooltip="Posición por banco"
                     tooltipPosition="top"
+                    [outlined]="true"
                     [raised]="true"
                     severity="info"
                     (onClick)="mostrarResumen();"
@@ -37,8 +40,9 @@
           <p-button label="Volver"
                     pTooltip="Volver"
                     tooltipPosition="top"
+                    [outlined]="true"
                     [raised]="true"
-                    severity="info"
+                    severity="contrast"
                     (onClick)="mostrarSaldo()"
                     styleClass="w-full"/>
         </div>
@@ -82,7 +86,7 @@
             <td style="text-align: center;">
               <p-button icon="pi pi-list-check"
                         [rounded]="true"
-                        [text]="true"
+                        [outlined]="true"
                         type="button"
                         severity="secondary"
                         pTooltip="Movimientos"
@@ -91,7 +95,7 @@
                         />
               <p-button icon="pi pi-refresh"
                         [rounded]="true"
-                        [text]="true"
+                        [outlined]="true"
                         type="button"
                         severity="secondary"
                         (onClick)="actualizarSaldosMovimientosPorCuenta(saldo.idCuenta);"

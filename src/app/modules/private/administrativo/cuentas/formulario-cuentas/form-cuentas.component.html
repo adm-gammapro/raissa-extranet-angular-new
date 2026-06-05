@@ -14,14 +14,14 @@
                         <label for="numeroCuenta" class="pl-1">Número de cuenta
                             <span *ngIf="isFieldRequired('numeroCuenta')" style="color: red;">*</span>
                         </label>
-                        <input id="numeroCuenta" 
+                        <input id="numeroCuenta"
                             type="text"
                             pInputText
                             maxlength="23"
                             (input)="filterNumeric($event)"
                             formControlName="numeroCuenta"
-                            [ngClass]="(cuentaForm.get('numeroCuenta')?.errors?.['required'] || cuentaForm.get('numeroCuenta')?.errors?.['maxlength']) && cuentaForm.get('numeroCuenta')?.touched ? 
-                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                            [ngClass]="(cuentaForm.get('numeroCuenta')?.errors?.['required'] || cuentaForm.get('numeroCuenta')?.errors?.['maxlength']) && cuentaForm.get('numeroCuenta')?.touched ?
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full':
                                         'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
                         <div *ngIf="cuentaForm.get('numeroCuenta')?.errors?.['required'] && cuentaForm.get('numeroCuenta')?.touched" class="p-error">
                             El campo es requerido
@@ -35,21 +35,21 @@
                             <span *ngIf="isFieldRequired('codigoInstitucionFinanciera')" style="color: red;">*</span>
                         </label>
                         <p-select
-                            id="codigoInstitucionFinanciera" 
-                            [options]="bancos" 
+                            id="codigoInstitucionFinanciera"
+                            [options]="bancos"
                             formControlName="codigoInstitucionFinanciera"
-                            [showClear]="true" 
+                            [showClear]="true"
                             styleClass="w-full"
-                            [ngClass]="(cuentaForm.get('codigoInstitucionFinanciera')?.errors?.['required']) && cuentaForm.get('codigoInstitucionFinanciera')?.touched ? 
-                                'dropdown-invalid' : 
+                            [ngClass]="(cuentaForm.get('codigoInstitucionFinanciera')?.errors?.['required']) && cuentaForm.get('codigoInstitucionFinanciera')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            [panelStyleClass]="(cuentaForm.get('codigoInstitucionFinanciera')?.errors?.['required']) && cuentaForm.get('codigoInstitucionFinanciera')?.touched ? 
-                                'dropdown-invalid' : 
+                            [panelStyleClass]="(cuentaForm.get('codigoInstitucionFinanciera')?.errors?.['required']) && cuentaForm.get('codigoInstitucionFinanciera')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            optionLabel="nombre" 
+                            optionLabel="nombre"
                             optionValue="codigo"
                             [filter]="true"
-                            filterBy="nombre" 
+                            filterBy="nombre"
                             placeholder="Selecciona institución financiera">
                         </p-select>
 
@@ -62,18 +62,18 @@
                             <span *ngIf="isFieldRequired('monedaCuenta')" style="color: red;">*</span>
                         </label>
                         <p-select
-                            id="monedaCuenta" 
-                            [options]="monedas" 
+                            id="monedaCuenta"
+                            [options]="monedas"
                             formControlName="monedaCuenta"
-                            [showClear]="true" 
+                            [showClear]="true"
                             styleClass="w-full"
-                            [ngClass]="(cuentaForm.get('monedaCuenta')?.errors?.['required']) && cuentaForm.get('monedaCuenta')?.touched ? 
-                                'dropdown-invalid' : 
+                            [ngClass]="(cuentaForm.get('monedaCuenta')?.errors?.['required']) && cuentaForm.get('monedaCuenta')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            [panelStyleClass]="(cuentaForm.get('monedaCuenta')?.errors?.['required']) && cuentaForm.get('monedaCuenta')?.touched ? 
-                                'dropdown-invalid' : 
+                            [panelStyleClass]="(cuentaForm.get('monedaCuenta')?.errors?.['required']) && cuentaForm.get('monedaCuenta')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            optionLabel="descripcion" 
+                            optionLabel="descripcion"
                             optionValue="valor"
                             placeholder="Selecciona Moneda">
                         </p-select>
@@ -87,18 +87,18 @@
                             <span *ngIf="isFieldRequired('codigoAgrupacion')" style="color: red;">*</span>
                         </label>
                         <p-select
-                            id="codigoAgrupacion" 
-                            [options]="agrupaciones" 
+                            id="codigoAgrupacion"
+                            [options]="agrupaciones"
                             formControlName="codigoAgrupacion"
-                            [showClear]="true" 
+                            [showClear]="true"
                             styleClass="w-full"
-                            [ngClass]="(cuentaForm.get('codigoAgrupacion')?.errors?.['required']) && cuentaForm.get('codigoAgrupacion')?.touched ? 
-                                'dropdown-invalid' : 
+                            [ngClass]="(cuentaForm.get('codigoAgrupacion')?.errors?.['required']) && cuentaForm.get('codigoAgrupacion')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            [panelStyleClass]="(cuentaForm.get('codigoAgrupacion')?.errors?.['required']) && cuentaForm.get('codigoAgrupacion')?.touched ? 
-                                'dropdown-invalid' : 
+                            [panelStyleClass]="(cuentaForm.get('codigoAgrupacion')?.errors?.['required']) && cuentaForm.get('codigoAgrupacion')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            optionLabel="nombreAgrupacionCliente" 
+                            optionLabel="nombreAgrupacionCliente"
                             optionValue="codigo"
                             placeholder="Selecciona Agrupacion">
                         </p-select>
@@ -112,18 +112,18 @@
                             <span *ngIf="isFieldRequired('frecuencia')" style="color: red;">*</span>
                         </label>
                         <p-select
-                            id="frecuencia" 
-                            [options]="frecuencias" 
+                            id="frecuencia"
+                            [options]="frecuencias"
                             formControlName="codigoFrecuenciaActualizacion"
-                            [showClear]="true" 
+                            [showClear]="true"
                             styleClass="w-full"
-                            [ngClass]="(cuentaForm.get('frecuencia')?.errors?.['required']) && cuentaForm.get('frecuencia')?.touched ? 
-                                'dropdown-invalid' : 
+                            [ngClass]="(cuentaForm.get('frecuencia')?.errors?.['required']) && cuentaForm.get('frecuencia')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            [panelStyleClass]="(cuentaForm.get('frecuencia')?.errors?.['required']) && cuentaForm.get('frecuencia')?.touched ? 
-                                'dropdown-invalid' : 
+                            [panelStyleClass]="(cuentaForm.get('frecuencia')?.errors?.['required']) && cuentaForm.get('frecuencia')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            optionLabel="descripcionFrecuencia" 
+                            optionLabel="descripcionFrecuencia"
                             optionValue="codigo"
                             placeholder="Selecciona frecuencia">
                         </p-select>
@@ -137,18 +137,18 @@
                             <span *ngIf="isFieldRequired('tipoCuenta')" style="color: red;">*</span>
                         </label>
                         <p-select
-                            id="tipoCuenta" 
-                            [options]="tipoCuentas" 
+                            id="tipoCuenta"
+                            [options]="tipoCuentas"
                             formControlName="tipoCuenta"
-                            [showClear]="true" 
+                            [showClear]="true"
                             styleClass="w-full"
-                            [ngClass]="(cuentaForm.get('tipoCuenta')?.errors?.['required']) && cuentaForm.get('tipoCuenta')?.touched ? 
-                                'dropdown-invalid' : 
+                            [ngClass]="(cuentaForm.get('tipoCuenta')?.errors?.['required']) && cuentaForm.get('tipoCuenta')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            [panelStyleClass]="(cuentaForm.get('tipoCuenta')?.errors?.['required']) && cuentaForm.get('tipoCuenta')?.touched ? 
-                                'dropdown-invalid' : 
+                            [panelStyleClass]="(cuentaForm.get('tipoCuenta')?.errors?.['required']) && cuentaForm.get('tipoCuenta')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            optionLabel="descripcion" 
+                            optionLabel="descripcion"
                             optionValue="valor"
                             placeholder="Selecciona tipo cuenta">
                         </p-select>
@@ -159,18 +159,18 @@
                     </div>
                     <div class="field col-12 md:col-5"></div>
                     <div class="field col-12 md:col-1">
-                        <p-button label="Guardar" 
-                                pTooltip="Guardar" 
-                                [outlined]="true" 
-                                severity="secondary" 
+                        <p-button label="Guardar"
+                                pTooltip="Guardar"
+                                  [raised]="true"
+                                  severity="info"
                                 (onClick)="guardar();"
                                 [styleClass]="'w-full'"/>
                     </div>
                     <div class="field col-12 md:col-1">
-                        <p-button label="Volver" 
-                                pTooltip="Volver" 
-                                [outlined]="true" 
-                                severity="secondary" 
+                        <p-button label="Volver"
+                                pTooltip="Volver"
+                                [outlined]="true"
+                                severity="contrast"
                                 [routerLink]="['/cuentas']"
                                 [styleClass]="'w-full'"/>
                     </div>
@@ -181,6 +181,5 @@
         </div>
     </p-panel>
 
-    
+
 </form>
-    

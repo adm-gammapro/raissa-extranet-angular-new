@@ -1,0 +1,205 @@
+<div class="flex justify-content-center">
+  <p-dialog
+    [header]="headerTitle"
+    [modal]="true"
+    [(visible)]="visible"
+    [style]="{ width: '80rem', maxWidth: '90vw' }"
+    [closable]="false"
+    [dismissableMask]="false"
+    [styleClass]="'p-dialog-header-icons-hidden'"
+    (onHide)="cerrarModal()"
+  >
+    <!-- HEADER -->
+    <ng-template #header>
+      <div class="flex align-items-center gap-2">
+        <i class="pi pi-cog" style="color: #3b82f6;"></i>
+        <h2 class="font-bold m-0 white-space-nowrap">{{ headerTitle }}</h2>
+      </div>
+    </ng-template>
+
+    <!-- Botón Nuevo -->
+    <div class="flex justify-content-end mb-4">
+      <p-button
+        label="Nueva Configuración"
+        icon="pi pi-plus"
+        severity="success"
+        (onClick)="abrirFormularioNuevo()"
+        [disabled]="isLoading"
+      ></p-button>
+    </div>
+
+    <!-- Tabla de Configuraciones -->
+    <p-table
+      [value]="configuraciones"
+      [loading]="isLoading"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      stripedRows
+      [rowHover]="true"
+      [size]="'small'"
+    >
+      <ng-template #header>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>RUC</th>
+          <th>Sistema</th>
+          <th>Perfil</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-config>
+        <tr>
+          <td>{{ config.idConfiguracion }}</td>
+          <td>{{ config.clienteRazonSocial }}</td>
+          <td>{{ config.clienteRuc }}</td>
+          <td>{{ config.sistemaNombre }}</td>
+          <td>{{ config.perfilDescripcion }} ({{ config.perfilAbreviatura }})</td>
+          <td class="text-center">
+            <div class="flex align-items-center justify-content-center gap-1">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                severity="info"
+                [outlined]="true"
+                pTooltip="Editar"
+                tooltipPosition="left"
+                size="small"
+                (onClick)="abrirFormularioEditar(config)"
+              ></p-button>
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                severity="danger"
+                [outlined]="true"
+                pTooltip="Eliminar"
+                tooltipPosition="left"
+                size="small"
+                (onClick)="eliminarConfiguracion($event, config)"
+              ></p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #empty>
+        <div class="text-center py-4" style="color: #6b7280;">
+          No hay configuraciones registradas para este usuario
+        </div>
+      </ng-template>
+    </p-table>
+
+    <!-- FOOTER -->
+    <ng-template #footer>
+      <div class="flex justify-content-end pt-2">
+        <p-button
+          label="Cerrar"
+          [outlined]="true"
+          severity="secondary"
+          (onClick)="cerrarModal()"
+        ></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Diálogo de Formulario de Configuración -->
+  <p-dialog
+    [header]="formDialogTitle"
+    [modal]="true"
+    [(visible)]="showFormDialog"
+    [style]="{ width: '35rem', maxWidth: '90vw' }"
+    [closable]="false"
+    [dismissableMask]="false"
+    [styleClass]="'p-dialog-header-icons-hidden'"
+    (onHide)="cerrarFormulario()"
+  >
+    <div class="p-3">
+      <form [formGroup]="configForm" class="flex flex-column gap-3">
+        <!-- Combo Cliente -->
+        <div class="flex flex-column gap-1">
+          <label class="text-sm font-medium" style="color: #374151;">Cliente *</label>
+          <p-select
+            formControlName="clienteId"
+            [options]="clientes"
+            optionLabel="razonSocial"
+            optionValue="id"
+            placeholder="Seleccione un cliente"
+            class="w-full"
+            appendTo="body"
+            [loading]="isLoading"
+            [style]="{ width: '100%' }"
+          >
+            <ng-template pTemplate="empty">No hay clientes disponibles</ng-template>
+          </p-select>
+          <small class="text-red-500" style="color: #f44336; font-size: 0.75rem;" *ngIf="configForm.get('clienteId')?.invalid && configForm.get('clienteId')?.touched">
+            El cliente es requerido
+          </small>
+        </div>
+
+        <!-- Combo Sistema -->
+        <div class="flex flex-column gap-1">
+          <label class="text-sm font-medium" style="color: #374151;">Sistema *</label>
+          <p-select
+            formControlName="sistemaId"
+            [options]="sistemas"
+            optionLabel="nombre"
+            optionValue="id"
+            placeholder="Seleccione un sistema"
+            class="w-full"
+            appendTo="body"
+            [loading]="isLoading"
+            [style]="{ width: '100%' }"
+          >
+            <ng-template pTemplate="empty">No hay sistemas disponibles</ng-template>
+          </p-select>
+          <small class="text-red-500" style="color: #f44336; font-size: 0.75rem;" *ngIf="configForm.get('sistemaId')?.invalid && configForm.get('sistemaId')?.touched">
+            El sistema es requerido
+          </small>
+        </div>
+
+        <!-- Combo Perfil -->
+        <div class="flex flex-column gap-1">
+          <label class="text-sm font-medium" style="color: #374151;">Perfil *</label>
+          <p-select
+            formControlName="perfilId"
+            [options]="perfiles"
+            optionLabel="descripcion"
+            optionValue="id"
+            placeholder="Seleccione un perfil"
+            class="w-full"
+            appendTo="body"
+            [loading]="isLoading"
+            [style]="{ width: '100%' }"
+          >
+            <ng-template pTemplate="empty">No hay perfiles disponibles</ng-template>
+          </p-select>
+          <small class="text-red-500" style="color: #f44336; font-size: 0.75rem;" *ngIf="configForm.get('perfilId')?.invalid && configForm.get('perfilId')?.touched">
+            El perfil es requerido
+          </small>
+        </div>
+      </form>
+    </div>
+
+    <ng-template #footer>
+      <div class="flex justify-content-end gap-2">
+        <p-button
+          label="Cancelar"
+          [outlined]="true"
+          severity="secondary"
+          (onClick)="cerrarFormulario()"
+          [disabled]="isSaving"
+        ></p-button>
+        <p-button
+          [label]="isEditing ? 'Actualizar' : 'Guardar'"
+          severity="primary"
+          (onClick)="guardarConfiguracion()"
+          [loading]="isSaving"
+          [disabled]="isSaving"
+        ></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>
+
+<p-toast position="top-center"></p-toast>
+<p-confirmDialog></p-confirmDialog>

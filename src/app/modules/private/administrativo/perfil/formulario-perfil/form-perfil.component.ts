@@ -167,10 +167,7 @@ export class FormPerfilComponent implements OnInit {
   }
 
   private populateForm(response: any): void {
-    console.log(response);
     this.perfilResponse = response;
-
-    console.log(this.perfilResponse);
 
     this.perfilForm.patchValue({
       codigo: response.codigo,

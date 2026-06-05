@@ -1,5 +1,6 @@
 import { AbstractControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
 import { EstadoRegistroEnum, EstadoRegistroValue } from "../../apis/model/enums/estado-registro";
+import {SortOrderEnum} from '../../apis/model/enums/sort-order.enum';
 
 export class Util {
     public static filterAlphanumeric(event: Event, myForm: FormGroup): void {
@@ -220,4 +221,10 @@ export class Util {
       }
       return mensage;
     }
+
+  public static mapSortOrder(primeNgOrder: number | null | undefined): SortOrderEnum | undefined {
+    if (primeNgOrder === 1 || primeNgOrder === null) return SortOrderEnum.ASC;
+    if (primeNgOrder === -1) return SortOrderEnum.DESC;
+    return undefined;
+  }
 }

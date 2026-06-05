@@ -26,8 +26,8 @@ export class SeleccionComponent implements OnInit {
   seleccionado?:Empresa;
   public selectionForm: FormGroup;
 
-  constructor(private readonly empresaService: EmpresaService, 
-              private readonly activatedRoute: ActivatedRoute, 
+  constructor(private readonly empresaService: EmpresaService,
+              private readonly activatedRoute: ActivatedRoute,
               private readonly formBuilder: FormBuilder,
               private readonly messageService: MessageService,
               private readonly router: Router) {
@@ -35,7 +35,6 @@ export class SeleccionComponent implements OnInit {
       seleccion: ['', Validators.required]
     });
 
-    console.log(sessionStorage.getItem(environment.session.ID_EMPRESA));
   }
 
   public seleccionarEmpresa(): void {

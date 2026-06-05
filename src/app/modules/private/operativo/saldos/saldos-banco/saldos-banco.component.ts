@@ -36,6 +36,8 @@ export class SaldosBancoComponent implements OnInit {
 
   constructor(private readonly activatedRoute: ActivatedRoute,
               private readonly router: Router,
+              private readonly messageService: MessageService,
+              private readonly confirmationService: ConfirmationService,
               private readonly saldosService: SaldosService) {
     if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
       this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
@@ -50,31 +52,57 @@ export class SaldosBancoComponent implements OnInit {
   }
 
   actualizarSaldosMovimientos() {
-    this.loading = true;
+    this.confirmationService.confirm({
+      message: 'Se enviará un solicitud de actualización de saldos y movimientos para todas las cuentas de esta entidad financiera. ' +
+        '<br> <div class="text-center font-bold mt-3">¿Desea confirmar la acción?</div>',
+      header: 'Confirmación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      acceptButtonStyleClass: 'p-button-info',
+      rejectButtonStyleClass: 'p-button-secondary',
+      accept: () => {
+        this.loading = true;
 
-    this.saldosService.actualizarSaldosMovimientosPorBanco(Number(this.idEmpresa),
-      this.idBanco).subscribe({
-      next: () => {
-        this.loading = false;  // Ocultar el spinner
-        this.reloadPage();
-      },
-      error: () => {
-        this.loading = false;
+        this.saldosService.actualizarSaldosMovimientosPorBanco(Number(this.idEmpresa), this.idBanco);
+        setTimeout(() => {
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Procesando',
+            detail: 'La actualización se está ejecutando en segundo plano, revisar el monitor de procesos para seguimiento.',
+            life: 5000
+          });
+
+          this.loading = false;
+
+        }, 1000);
       }
     });
   }
 
   actualizarSaldosMovimientosPorCuenta(codigoCuenta: number) {
-    this.loading = true;
+    this.confirmationService.confirm({
+      message: 'Se enviará un solicitud de actualización de saldos y movimientos para esta cuenta.' +
+        '<br> <div class="text-center font-bold mt-3">¿Desea confirmar la acción?</div>',
+      header: 'Confirmación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      acceptButtonStyleClass: 'p-button-info',
+      rejectButtonStyleClass: 'p-button-secondary',
+      accept: () => {
+        this.loading = true;
 
-    this.saldosService.actualizarSaldosMovimientos(Number(this.idEmpresa),
-      codigoCuenta).subscribe({
-      next: () => {
-        this.loading = false;  // Ocultar el spinner
-        this.reloadPage();
-      },
-      error: (err) => {
-        this.loading = false;
+        this.saldosService.actualizarSaldosMovimientos(Number(this.idEmpresa),
+          codigoCuenta).subscribe({
+          next: () => {
+            this.loading = false;  // Ocultar el spinner
+            this.reloadPage();
+          },
+          error: (err) => {
+            this.loading = false;
+          }
+        });
       }
     });
   }

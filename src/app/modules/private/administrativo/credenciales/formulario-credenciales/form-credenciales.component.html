@@ -14,14 +14,14 @@
                         <label for="nombreReferencial" class="pl-1">Nombre referencial
                             <span *ngIf="isFieldRequired('nombreReferencial')" style="color: red;">*</span>
                         </label>
-                        <input id="nombreReferencial" 
+                        <input id="nombreReferencial"
                             type="text"
                             pInputText
                             maxlength="50"
                             (input)="filterAlphanumeric($event)"
                             formControlName="nombreReferencial"
-                            [ngClass]="(credencialForm.get('nombreReferencial')?.errors?.['required'] || credencialForm.get('nombreReferencial')?.errors?.['maxlength']) && credencialForm.get('usuario')?.touched ? 
-                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                            [ngClass]="(credencialForm.get('nombreReferencial')?.errors?.['required'] || credencialForm.get('nombreReferencial')?.errors?.['maxlength']) && credencialForm.get('usuario')?.touched ?
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full':
                                         'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
                         <div *ngIf="credencialForm.get('nombreReferencial')?.errors?.['required'] && credencialForm.get('nombreReferencial')?.touched" class="p-error">
                             El campo es requerido
@@ -35,14 +35,14 @@
                         <label for="usuario" class="pl-1">Usuario
                             <span *ngIf="isFieldRequired('usuario')" style="color: red;">*</span>
                         </label>
-                        <input id="usuario" 
+                        <input id="usuario"
                             type="text"
                             pInputText
                             maxlength="50"
                             (input)="filterAlphanumeric($event)"
                             formControlName="usuario"
-                            [ngClass]="(credencialForm.get('usuario')?.errors?.['required'] || credencialForm.get('usuario')?.errors?.['maxlength']) && credencialForm.get('usuario')?.touched ? 
-                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                            [ngClass]="(credencialForm.get('usuario')?.errors?.['required'] || credencialForm.get('usuario')?.errors?.['maxlength']) && credencialForm.get('usuario')?.touched ?
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full':
                                         'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
                         <div *ngIf="credencialForm.get('usuario')?.errors?.['required'] && credencialForm.get('usuario')?.touched" class="p-error">
                             El campo es requerido
@@ -55,14 +55,14 @@
                         <label for="clave" class="pl-1">Clave
                             <span *ngIf="isFieldRequired('clave')" style="color: red;">*</span>
                         </label>
-                        <input id="clave" 
+                        <input id="clave"
                             type="text"
                             pInputText
                             maxlength="15"
                             (input)="filterAlphanumeric($event)"
                             formControlName="clave"
-                            [ngClass]="(credencialForm.get('clave')?.errors?.['required'] || credencialForm.get('clave')?.errors?.['maxlength']) && credencialForm.get('clave')?.touched ? 
-                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                            [ngClass]="(credencialForm.get('clave')?.errors?.['required'] || credencialForm.get('clave')?.errors?.['maxlength']) && credencialForm.get('clave')?.touched ?
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full':
                                         'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
                         <div *ngIf="credencialForm.get('clave')?.errors?.['required'] && credencialForm.get('clave')?.touched" class="p-error">
                             El campo es requerido
@@ -75,14 +75,14 @@
                         <label for="referencia" class="pl-1">Adicional
                             <span *ngIf="isFieldRequired('referencia')" style="color: red;">*</span>
                         </label>
-                        <input id="referencia" 
+                        <input id="referencia"
                             type="text"
                             (input)="filterAlphanumeric($event);"
                             formControlName="referencia"
-                            pInputText 
+                            pInputText
                             maxlength="20"
-                            [ngClass]="(credencialForm.get('referencia')?.errors?.['required'] || credencialForm.get('referencia')?.errors?.['maxlength'] ) && credencialForm.get('referencia')?.touched ? 
-                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full': 
+                            [ngClass]="(credencialForm.get('referencia')?.errors?.['required'] || credencialForm.get('referencia')?.errors?.['maxlength'] ) && credencialForm.get('referencia')?.touched ?
+                                        'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid border-red-500 border-round appearance-none outline-none focus:border-primary w-full':
                                         'text-base h-3rem text-color surface-overlay p-1 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full'">
                         <div *ngIf="credencialForm.get('referencia')?.errors?.['required'] && credencialForm.get('referencia')?.touched" class="p-error">
                             El campo es requerido
@@ -96,18 +96,18 @@
                             <span *ngIf="isFieldRequired('codigoFrecuenciaActualizacion')" style="color: red;">*</span>
                         </label>
                         <p-select
-                            id="codigoFrecuenciaActualizacion" 
-                            [options]="frecuencias" 
+                            id="codigoFrecuenciaActualizacion"
+                            [options]="frecuencias"
                             formControlName="codigoFrecuenciaActualizacion"
-                            [showClear]="true" 
+                            [showClear]="true"
                             styleClass="w-full"
-                            [ngClass]="(credencialForm.get('codigoFrecuenciaActualizacion')?.errors?.['required']) && credencialForm.get('codigoFrecuenciaActualizacion')?.touched ? 
-                                'dropdown-invalid' : 
+                            [ngClass]="(credencialForm.get('codigoFrecuenciaActualizacion')?.errors?.['required']) && credencialForm.get('codigoFrecuenciaActualizacion')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            [panelStyleClass]="(credencialForm.get('codigoFrecuenciaActualizacion')?.errors?.['required']) && credencialForm.get('codigoFrecuenciaActualizacion')?.touched ? 
-                                'dropdown-invalid' : 
+                            [panelStyleClass]="(credencialForm.get('codigoFrecuenciaActualizacion')?.errors?.['required']) && credencialForm.get('codigoFrecuenciaActualizacion')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            optionLabel="descripcionFrecuencia" 
+                            optionLabel="descripcionFrecuencia"
                             optionValue="codigo"
                             placeholder="Selecciona frecuencia">
                         </p-select>
@@ -121,18 +121,18 @@
                             <span *ngIf="isFieldRequired('codigoProveedor')" style="color: red;">*</span>
                         </label>
                         <p-select
-                            id="codigoProveedor" 
-                            [options]="proveedores" 
+                            id="codigoProveedor"
+                            [options]="proveedores"
                             formControlName="codigoProveedor"
-                            [showClear]="true" 
+                            [showClear]="true"
                             styleClass="w-full"
-                            [ngClass]="(credencialForm.get('codigoProveedor')?.errors?.['required']) && credencialForm.get('codigoProveedor')?.touched ? 
-                                'dropdown-invalid' : 
+                            [ngClass]="(credencialForm.get('codigoProveedor')?.errors?.['required']) && credencialForm.get('codigoProveedor')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            [panelStyleClass]="(credencialForm.get('codigoProveedor')?.errors?.['required']) && credencialForm.get('codigoProveedor')?.touched ? 
-                                'dropdown-invalid' : 
+                            [panelStyleClass]="(credencialForm.get('codigoProveedor')?.errors?.['required']) && credencialForm.get('codigoProveedor')?.touched ?
+                                'dropdown-invalid' :
                                 'dropdown-valid'"
-                            optionLabel="nombre" 
+                            optionLabel="nombre"
                             optionValue="codigo"
                             (onChange)="onChangeProveedor($event);"
                             placeholder="Selecciona Proveedor">
@@ -145,18 +145,18 @@
 
                     <div class="field col-12 md:col-5"></div>
                     <div class="field col-12 md:col-1">
-                        <p-button label="Guardar" 
-                                pTooltip="Guardar" 
-                                [outlined]="true" 
-                                severity="secondary" 
+                        <p-button label="Guardar"
+                                pTooltip="Guardar"
+                                  [raised]="true"
+                                  severity="info"
                                 (onClick)="guardar();"
                                 [styleClass]="'w-full'"/>
                     </div>
                     <div class="field col-12 md:col-1">
-                        <p-button label="Volver" 
-                                pTooltip="Volver" 
-                                [outlined]="true" 
-                                severity="secondary" 
+                        <p-button label="Volver"
+                                pTooltip="Volver"
+                                [outlined]="true"
+                                severity="contrast"
                                 [routerLink]="['/credenciales']"
                                 [styleClass]="'w-full'"/>
                     </div>
@@ -167,6 +167,5 @@
         </div>
     </p-panel>
 
-    
+
 </form>
-    

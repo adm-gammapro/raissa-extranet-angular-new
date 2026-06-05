@@ -11,6 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MessagesService } from '../../../../../service/commons/messages.service';
 import { Util } from '../../../../../utils/util/util.util';
 import { ConfiguracionForm } from '../../../../../apis/model/module/private/configuracion-form';
+import {environment} from '../../../../../../environments/environment';
 
 @Component({
   selector: 'app-form-configuracion',
@@ -25,21 +26,27 @@ import { ConfiguracionForm } from '../../../../../apis/model/module/private/conf
   styleUrl: './form-configuracion.component.scss'
 })
 export class FormConfiguracionComponent {
+  private idEmpresa: string = "";
   public configuracion: Configuracion = new Configuracion();
   public job: JobClienteProgramacion = new JobClienteProgramacion();
   public listJobs: JobClienteProgramacion[] = [];
+  public codigoJob: number = 0;
   public codigoServicioCliente: number = 0;
   public configuracionForm: FormGroup;
   public configuracionFormulario: ConfiguracionForm = new ConfiguracionForm();
   public datos;
 
-  constructor(private readonly router: Router, 
-    private readonly confirmationService: ConfirmationService, 
+  constructor(private readonly router: Router,
+    private readonly confirmationService: ConfirmationService,
     private readonly formBuilder: FormBuilder,
-    private readonly messageService: MessageService, 
-    private readonly configuracionService: ConfiguracionService, 
+    private readonly messageService: MessageService,
+    private readonly configuracionService: ConfiguracionService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly messagesService: MessagesService) {
+
+    if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
+      this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
+    }
 
     this.configuracionForm = this.formBuilder.group({
         codigoJobCliente: [''],
@@ -87,7 +94,7 @@ export class FormConfiguracionComponent {
       { label: '22:00', value: '22:00:00' },
       { label: '23:00', value: '23:00:00' },
     ];
-  
+
   }
 
   public guardar(): void {
@@ -111,7 +118,7 @@ export class FormConfiguracionComponent {
       });
 
       return;
-    } 
+    }
 
     if (this.configuracionForm.invalid) {
       this.messageService.add({
@@ -181,7 +188,7 @@ export class FormConfiguracionComponent {
       this.configuracion.codigoServicioCliente = this.codigoServicioCliente;
       this.configuracion.descripcionJobCliente = this.configuracionFormulario.descripcionJobCliente;
       this.configuracion.listaJobClienteProgramacion = this.listJobs;
-
+      this.configuracion.codigoCliente = Number(this.idEmpresa);
 
         this.confirmationService.confirm({
             message: '¿Está seguro de realizar esta acción?',
@@ -191,20 +198,41 @@ export class FormConfiguracionComponent {
             rejectIcon:"No",
             rejectButtonStyleClass:"p-button-text",
             accept: () => {
-                this.configuracionService.create(this.configuracion).subscribe({
-                  next:(response) => {
-                    this.messagesService.setMessages('Registro actualizado satisfactoriamente.');
-                  },
-                  error: (err) => {
-                    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Hubo un error al registrar configuración', life: 5000 });
-                  },
-                  complete: () => {
-                    this.router.navigate(['/configuracion'])
-                  }
-                });
-              //} else {
-                
-              //}
+                if(this.codigoJob==0){
+                  this.configuracionService.create(this.configuracion).subscribe({
+                    next: (response) => {
+                      this.messagesService.setMessages('Registro creado satisfactoriamente.');
+                    },
+                    error: (err) => {
+                      this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Hubo un error al registrar configuración',
+                        life: 5000
+                      });
+                    },
+                    complete: () => {
+                      this.router.navigate(['/configuracion'])
+                    }
+                  });
+                } else {
+                  this.configuracionService.update(this.configuracion).subscribe({
+                    next: (response) => {
+                      this.messagesService.setMessages('Registro actualizado satisfactoriamente.');
+                    },
+                    error: (err) => {
+                      this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Hubo un error al registrar configuración',
+                        life: 5000
+                      });
+                    },
+                    complete: () => {
+                      this.router.navigate(['/configuracion'])
+                    }
+                  });
+                }
             },
             reject: () => {
               this.messageService.add({ severity: 'error', summary: 'Rechazado', detail: 'No se realizó registro', life: 5000 });
@@ -229,13 +257,14 @@ export class FormConfiguracionComponent {
         this.codigoServicioCliente = codigoServicioCliente;
       }
       if (id != 0) {
+        this.codigoJob = id;
         this.configuracionService.getConfiguracion(id).subscribe(response => {
           this.configuracion = response;
           this.configuracionFormulario.codigoJobCliente = this.configuracion.codigoJobCliente;
           this.configuracionFormulario.descripcionJobCliente = this.configuracion.descripcionJobCliente;
           this.configuracionFormulario.nombreServicioAplicacion = this.configuracion.nombreServicioAplicacion;
-          this.configuracionFormulario.codigoServicioCliente = this.codigoServicioCliente;
-          
+          this.configuracionFormulario.codigoServicioCliente = this.configuracion.codigoServicioCliente;
+
           this.cargarDetalleConfiguracion();
 
           this.configuracionForm.patchValue({

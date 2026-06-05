@@ -21,8 +21,6 @@ export class ReportesService {
       'Content-Type': 'application/json'
     });
 
-    console.log('Datos enviados:', search);
-  
     return this.http.post(url, search, { headers, responseType: 'blob' }).pipe(
       map((response: Blob) => response),
       catchError(e => {

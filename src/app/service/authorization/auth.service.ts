@@ -67,7 +67,6 @@ export class AuthService {
     }
 
     if (e.status == 403) {
-      console.log('No se pudo verificar acceso a la aplicación');
       return true;
     }
     return false;
@@ -122,7 +121,7 @@ export class AuthService {
     const headers = new HttpHeaders({
 
     });
-    const url = `${environment.url.base}/seguridad/obtenerUsuarioByUsername?${params}`;
+    const url = `${environment.url.base}/usuario/obtenerUsuarioByUsername?${params}`;
 
     return this.httpClient.get(url, { headers: headers }).pipe(
       map((response: any) => {

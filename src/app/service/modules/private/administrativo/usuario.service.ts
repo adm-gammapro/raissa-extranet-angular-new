@@ -11,14 +11,14 @@ import {buildPageableParams} from '../../../commons/http-request-handler.service
 import {UsuarioRequest} from '../../../../apis/model/module/private/administrativo/usuario/request/usuario-request';
 import {UsuarioResponse} from '../../../../apis/model/module/private/administrativo/usuario/response/usuario-response';
 import {
-  UsuarioPerfilRequest
-} from '../../../../apis/model/module/private/administrativo/usuario/request/usuario-perfil-request';
-import {
   UsuarioCuentaSearch
 } from '../../../../apis/model/module/private/administrativo/usuario/request/usuario-cuenta-search';
 import {
   UsuarioCuentaRequest
 } from '../../../../apis/model/module/private/administrativo/usuario/request/usuario-cuenta-request';
+import {
+  UsuarioSearchResponse
+} from '../../../../apis/model/module/private/administrativo/usuario/response/usuario-search-response';
 
 @Injectable({
   providedIn: 'root'
@@ -31,90 +31,6 @@ export class UsuarioService {
 
   constructor(private readonly http: HttpClient,
               private readonly authService: AuthService) {
-  }
-
-  getUsuariosPage(page: number,
-                  estadoRegistro: string | undefined,
-                  nombreUsuario: string | undefined,
-                  idEmpresa: number | undefined,
-                  cantReg: number): Observable<any> {
-
-    let usuarioSearch: UsuarioSearch = {
-      nombreUsuario: nombreUsuario ?? "",
-      estadoRegistro: estadoRegistro ?? "",
-      idEmpresa: idEmpresa ?? 0
-    };
-
-    const direction: 'ASC' | 'DESC' = 'ASC';
-    const pageable = {
-      page: page,
-      size: cantReg,
-      sort: {
-        property: "id",
-        direction: direction
-      }
-    };
-
-    const url = `${this.urlSeguridad}/listarUsuarios`;
-
-    return this.http.post(url, usuarioSearch, {params: buildPageableParams(pageable)}).pipe(
-      map((response: any) => response),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  registrar(usuario: UsuarioRequest, idEmpresa: number): Observable<UsuarioResponse> {
-    usuario.idEmpresa = idEmpresa;
-    const headers = new HttpHeaders({});
-
-    let url
-    if (usuario.id != null && usuario.id > 0) {
-      url = `${this.urlSeguridad}/actualizar-usuario`;
-    } else {
-      url = `${this.urlSeguridad}/registrar-usuario`;
-    }
-
-    return this.http.post<any>(url, usuario, {headers: headers}).pipe(
-      map((response: any) => response.body as UsuarioResponse),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  eliminar(codigo: number): Observable<Usuario> {
-
-    const url = `${this.urlSeguridad}/eliminar-usuario/${codigo}`;
-
-    return this.http.delete<Usuario>(url).pipe(
-      catchError((e) => {
-        return throwError(() => e);
-      })
-    );
-  }
-
-  getUsuario(id: number): Observable<UsuarioResponse> {
-    const params = [
-      `codigoUsuario=${id}`,
-    ].filter(Boolean).join('&');
-
-    const headers = new HttpHeaders({});
-
-    const url = `${this.urlSeguridad}/obtenerUsuario?${params}`;
-
-    return this.http.get(url, {headers: headers}).pipe(
-      map((response: any) => {
-        return response;
-      }),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
   }
 
   actualizarPerfil(usuario: UsuarioRequest): Observable<UsuarioResponse> {
@@ -153,45 +69,6 @@ export class UsuarioService {
     );
   }
 
-  getUsuarioPerfiles(idUsuario: number, idEmpresa: string): Observable<any> {
-    const params = [
-      `idUsuario=${idUsuario}`,
-      `idEmpresa=${idEmpresa}`,
-    ].filter(Boolean).join('&');
-
-    const headers = new HttpHeaders({});
-
-    const url = `${this.urlUsuario}/listarUsuarioPerfil?${params}`;
-
-    return this.http.get(url, {headers: headers}).pipe(
-      map((response: any) => {
-        return response;
-      }),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  public vincularEmpresa(idEmpresa: number, idUsuario: number) {
-    let usuarioCliente: UsuarioCliente = new UsuarioCliente();
-    usuarioCliente.codigoCliente = idEmpresa;
-    usuarioCliente.codigoUsuario = idUsuario;
-
-    const headers = new HttpHeaders({});
-
-    const url = `${this.urlSeguridad}/vincularEmpresas`;
-
-    return this.http.post<any>(url, usuarioCliente, {headers: headers}).pipe(
-      map((response: any) => response.body as Usuario),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
   public desVincularEmpresa(idUsuarioCliente: number) {
     let usuarioCliente: UsuarioCliente = new UsuarioCliente();
     usuarioCliente.codigo = idUsuarioCliente;
@@ -219,34 +96,6 @@ export class UsuarioService {
     const url = `${this.urlSeguridad}/resetear-password`;
 
     return this.http.post<any>(url, resetPassword, {headers: headers}).pipe(
-      map((response: any) => response),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  public vincularPerfil(vincularPerfiles: UsuarioPerfilRequest) {
-    const headers = new HttpHeaders({});
-
-    const url = `${this.urlUsuario}/vincular-usuario-perfil`;
-
-    return this.http.post<any>(url, vincularPerfiles, {headers: headers}).pipe(
-      map((response: any) => response),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  public desVincularPerfil(desvincularPerfiles: UsuarioPerfilRequest) {
-    const headers = new HttpHeaders({});
-
-    const url = `${this.urlUsuario}/desvincular-usuario-perfil`;
-
-    return this.http.post<any>(url, desvincularPerfiles, {headers: headers}).pipe(
       map((response: any) => response),
       catchError(e => {
         this.authService.isNoAutorizado(e);
@@ -383,5 +232,83 @@ export class UsuarioService {
         return throwError(() => e);
       })
     );
+  }
+
+  /**
+   * Registrar un nuevo usuario
+   */
+  registrarUsuario(request: UsuarioRequest): Observable<UsuarioResponse> {
+    return this.http.post<UsuarioResponse>(
+      `${this.urlUsuario}/registrar-usuario`,
+      request
+    ).pipe(
+      map((response: any) => response),
+      catchError(err => this.handleError(err))
+    );
+  }
+
+  /**
+   * Actualizar un usuario existente
+   */
+  actualizarUsuario(request: UsuarioRequest): Observable<UsuarioResponse> {
+    return this.http.post<UsuarioResponse>(
+      `${this.urlUsuario}/actualizar-usuario`,
+      request
+    ).pipe(
+      map((response: any) => response),
+      catchError(err => this.handleError(err))
+    );
+  }
+
+  /**
+   * Eliminar (dar de baja) un usuario por código
+   */
+  eliminarUsuario(codigo: number): Observable<UsuarioResponse> {
+    return this.http.post<UsuarioResponse>(
+      `${this.urlUsuario}/eliminar-usuario/${codigo}`,
+      {}
+    ).pipe(
+      map((response: any) => response),
+      catchError(err => this.handleError(err))
+    );
+  }
+
+  /**
+   * Listar usuarios con paginación y filtros
+   */
+  listarUsuariosPage(search: UsuarioSearch): Observable<UsuarioSearchResponse> {
+    return this.http.post<UsuarioSearchResponse>(
+      `${this.urlUsuario}/listarUsuarios`,
+      search
+    ).pipe(
+      map((response: any) => response),
+      catchError(err => this.handleError(err))
+    );
+  }
+
+  /**
+   * Obtener un usuario por código
+   */
+  obtenerUsuario(codigoUsuario?: number): Observable<UsuarioResponse> {
+    let params: any = {};
+    if (codigoUsuario) {
+      params.codigoUsuario = codigoUsuario;
+    }
+    return this.http.get<UsuarioResponse>(
+      `${this.urlUsuario}/obtenerUsuario`,
+      { params }
+    ).pipe(
+      map((response: any) => response),
+      catchError(err => this.handleError(err))
+    );
+  }
+
+  // Manejo de errores común
+  private handleError(err: any) {
+    this.authService.isNoAutorizado(err);
+    if (err?.status === 401) {
+      return throwError(() => new Error('Unauthorized'));
+    }
+    return throwError(() => err);
   }
 }

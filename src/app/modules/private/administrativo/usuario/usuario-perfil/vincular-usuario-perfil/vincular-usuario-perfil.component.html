@@ -1,0 +1,77 @@
+<div class="flex justify-content-center">
+  <p-dialog
+    [header]="headerTitle"
+    [modal]="true"
+    [(visible)]="visible"
+    [style]="{ width: '60rem' }"
+    [closable]="false"
+    [dismissableMask]="false"
+    [styleClass]="'p-dialog-header-icons-hidden'"
+  >
+    <ng-template #header>
+      <div class="flex align-items-center gap-2">
+        <i class="pi pi-id-card" style="color: #3b82f6;"></i>
+        <h2 class="font-bold m-0 white-space-nowrap">{{ headerTitle }}</h2>
+      </div>
+    </ng-template>
+
+    <div class="p-0">
+      <!-- Títulos de columnas -->
+      <div class="grid mb-3 text-center">
+        <div class="col-12 md:col-6 text-sm font-medium" style="color: #4b5563;">
+          Perfiles Disponibles
+        </div>
+        <div class="col-12 md:col-6 text-sm font-medium" style="color: #4b5563;">
+          Perfiles Asignados
+        </div>
+      </div>
+
+      <p-picklist
+        [source]="sourcePerfiles"
+        [target]="targetPerfiles"
+        [dragdrop]="true"
+        [responsive]="true"
+        [sourceStyle]="{ height: '25rem' }"
+        [targetStyle]="{ height: '25rem' }"
+        [showSourceControls]="false"
+        [showTargetControls]="false"
+        breakpoint="1400px"
+      >
+        <ng-template let-perfil pTemplate="item">
+          <!-- Sin hover personalizado, PrimeNG maneja la selección -->
+          <div class="flex align-items-center p-2 gap-3 w-full transition-colors p-border-round">
+            <div class="flex-1">
+              <div class="font-medium text-sm" style="color: #1f2937;">{{ perfil.descripcion }}</div>
+              <div class="text-xs" style="color: #6b7280;">{{ perfil.abreviatura }} - {{ perfil.nombreComercial }}</div>
+            </div>
+            <i class="pi pi-chevron-right" style="color: #cbd5e1; font-size: 0.75rem;"></i>
+          </div>
+        </ng-template>
+      </p-picklist>
+
+      <div *ngIf="isLoading" class="flex justify-content-center align-items-center py-3 mt-2">
+        <i class="pi pi-spin pi-spinner" style="color: #3b82f6; font-size: 1.25rem;"></i>
+        <span class="ml-2 text-sm" style="color: #4b5563;">Cargando...</span>
+      </div>
+    </div>
+
+    <ng-template #footer>
+      <div class="flex justify-content-end gap-2 pt-3">
+        <p-button
+          label="Cancelar"
+          [outlined]="true"
+          severity="secondary"
+          (onClick)="cerrar()"
+          [disabled]="isLoading"
+        ></p-button>
+        <p-button
+          label="Guardar Cambios"
+          severity="primary"
+          (onClick)="aplicarCambios($event)"
+          [loading]="isLoading"
+          [disabled]="isLoading"
+        ></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>

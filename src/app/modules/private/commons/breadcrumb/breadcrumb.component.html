@@ -1,0 +1,16 @@
+<div class="bg-white flex justify-right p-2">
+  <p-breadcrumb styleClass="max-w-full border-none bg-transparent" [model]="itemsBread">
+    <ng-template #item let-item>
+      @if (item.route) {
+        <a [routerLink]="item.route" class="flex items-center gap-2 no-underline hover:opacity-80 transition-opacity">
+          @if (item.icon) {
+            <span class="{{ item.icon }} text-gray-600"></span>
+          }
+          <span class="text-blue-600 font-semibold text-sm">{{ item.label }}</span>
+        </a>
+      } @else {
+        <p-tag severity="info" [value]="item.label" class="text-sm font-medium" />
+      }
+    </ng-template>
+  </p-breadcrumb>
+</div>

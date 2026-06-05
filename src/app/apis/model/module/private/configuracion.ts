@@ -5,6 +5,7 @@ export class Configuracion {
         descripcionJobCliente!: string;
         codigoServicioCliente!: number;
         nombreServicioAplicacion!: string;
+        codigoCliente!: number;
         listaJobClienteProgramacion: JobClienteProgramacion[] = [];
 
 }

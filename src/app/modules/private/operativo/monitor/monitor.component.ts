@@ -83,22 +83,22 @@ export class MonitorComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.activatedRoute.paramMap.subscribe(params => {        
+        this.activatedRoute.paramMap.subscribe(params => {
             let pagina = Number(params.get("pagina")) || 0;
             let cantReg = Number(params.get("cantReg")) || 5;
             let fechaInicial = params.get("fechaInicio");
             let fechaFinal = params.get("fechaFinal");
-      
+
             this.paginator.numeroPagina = pagina;
             this.paginator.cantidadRegistros = cantReg;
-      
+
             const today = new Date();
             const lastWeek = new Date();
             lastWeek.setDate(today.getDate() - 14);
-      
+
             fechaInicial = fechaInicial && fechaInicial !== "null" && fechaInicial !== "-" ? fechaInicial : lastWeek.toISOString().split("T")[0];
             fechaFinal = fechaFinal && fechaFinal !== "null" && fechaFinal !== "-" ? fechaFinal : today.toISOString().split("T")[0];
-      
+
             this.rangeDates = [this.parseFechaLocal(fechaInicial), this.parseFechaLocal(fechaFinal)];
 
             this.cargarProcesos(fechaInicial, fechaFinal);
@@ -123,15 +123,49 @@ export class MonitorComponent implements OnInit, OnDestroy {
             });
     }
 
-    actualizarProgreso() {
-        this.procesos.forEach(proceso => {
-            proceso.valuesProgreso = [
-                { label: "Procesadas", color: "#34d399", value: (proceso.registrosProcesados / proceso.registrosTotales) * 100 },
-                { label: "Erroneas", color: "#f44336", value: (proceso.registrosErrados / proceso.registrosTotales) * 100 },
-                { label: "Pendientes", color: "#fbbf24", value: (proceso.registrosPendientes / proceso.registrosTotales) * 100 }
-            ];
+  actualizarProgreso() {
+    this.procesos.forEach(proceso => {
+      const total = proceso.registrosTotales || 0;
+      const procesadas = proceso.registrosProcesados || 0;
+      const erroneas = proceso.registrosErrados || 0;
+      const pendientes = proceso.registrosPendientes || 0;
+
+      // Función auxiliar para calcular porcentaje seguro
+      const calcularPorcentaje = (parte: number, total: number): number => {
+        if (total <= 0 || parte <= 0) return 0;
+        const pct = (parte / total) * 100;
+        return isNaN(pct) || !isFinite(pct) ? 0 : Math.min(100, Math.max(0, pct));
+      };
+
+      proceso.valuesProgreso = [
+        {
+          label: "Procesadas",
+          color: "#34d399",
+          value: calcularPorcentaje(procesadas, total)
+        },
+        {
+          label: "Erroneas",
+          color: "#f44336",
+          value: calcularPorcentaje(erroneas, total)
+        },
+        {
+          label: "Pendientes",
+          color: "#fbbf24",
+          value: calcularPorcentaje(pendientes, total)
+        }
+      ];
+
+      // Opcional: Validar que los porcentajes sumen 100% (ajustar si es necesario)
+      const suma = proceso.valuesProgreso.reduce((sum, item) => sum + item.value, 0);
+      if (suma > 0 && total > 0 && Math.abs(suma - 100) > 0.1) {
+        // Redondeo para evitar pequeños errores de punto flotante
+        const factor = 100 / suma;
+        proceso.valuesProgreso.forEach(item => {
+          item.value = parseFloat((item.value * factor).toFixed(2));
         });
-    }
+      }
+    });
+  }
 
     ngOnDestroy() {
         if (this.actualizacionSub) {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, OnInit} from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PRIME_NG_MODULES } from '../../../../config/primeNg/primeng-global-imports';
 import { HeaderComponent } from '../../layout/header/header.component';
@@ -18,7 +18,7 @@ import { MessagesService } from '../../../../service/commons/messages.service';
   imports: [FormsModule,
     ReactiveFormsModule,
     CommonModule,
-    ...PRIME_NG_MODULES, 
+    ...PRIME_NG_MODULES,
     HeaderComponent,
     RouterLink],
 providers: [ConfirmationService, MessageService, ConfiguracionService],
@@ -26,7 +26,7 @@ schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './configuracion.component.html',
   styleUrl: './configuracion.component.scss'
 })
-export class ConfiguracionComponent {
+export class ConfiguracionComponent implements OnInit {
   private idEmpresa: string = "";
   private aplicacionEntorno!: AplicacionEntorno;
   private servicioCliente!: ServicioCliente;
@@ -71,18 +71,18 @@ export class ConfiguracionComponent {
   }
 
   ngOnInit() {
-    this.configuracionService.getAplicacionEntorno(this.idEmpresa).subscribe(response => {
-      this.aplicacionEntorno = response;
+    //this.configuracionService.getAplicacionEntorno(this.idEmpresa).subscribe(response => {
+      //this.aplicacionEntorno = response;
 
-      this.configuracionService.getServicioCliente(Number(this.idEmpresa), this.aplicacionEntorno.codigoAplicacionEntorno).subscribe(response => {
-        this.servicioCliente = response;
+      //this.configuracionService.getServicioCliente(Number(this.idEmpresa), this.aplicacionEntorno.codigoAplicacionEntorno).subscribe(response => {
+        //this.servicioCliente = response;
 
-        this.codigoServicioCliente = this.servicioCliente.codigoServicioCliente;
-        this.configuracionService.getJobs(this.codigoServicioCliente).subscribe(response => {
+        //this.codigoServicioCliente = this.servicioCliente.codigoServicioCliente;
+        this.configuracionService.getJobs(Number(this.idEmpresa)).subscribe(response => {
           this.listarJobCliente = response;
         });
-      });
-    });
+      //});
+    //});
   }
 
   reloadPage() {

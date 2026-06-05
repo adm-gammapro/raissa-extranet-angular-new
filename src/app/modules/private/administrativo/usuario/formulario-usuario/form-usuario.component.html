@@ -1,246 +1,136 @@
-<app-header></app-header>
-<p-toast/>
-<p-confirmDialog/>
-<form [formGroup]="usuarioForm">
-  <p-panel>
-    <div class="card flex justify-center">
-      <p-breadcrumb class="max-w-full" [model]="items" [home]="home" />
-    </div>
+<div class="flex justify-content-center">
+  <p-dialog
+    header="Usuario"
+    [modal]="true"
+    [(visible)]="visible"
+    [style]="{ width: '55rem', maxWidth: '90vw' }"
+    [closable]="false"
+    [styleClass]="'p-dialog-header-icons-hidden'"
+  >
+    <!-- HEADER -->
+    <ng-template #header>
+      <div class="flex align-items-center gap-2">
+        <h2 class="font-bold m-0 white-space-nowrap">{{ headerTitle }}</h2>
+      </div>
+    </ng-template>
 
-    <div class="flex border-round bg-gray-100 p-3 m-3 border-1 border-300">
+    <!-- BODY -->
+    <form [formGroup]="form" class="flex flex-column">
+      <input type="hidden" formControlName="id">
+      <input type="hidden" formControlName="username">
+      <input type="hidden" formControlName="idEmpresa">
 
-      <div class="w-12 p-3 flex align-items-center justify-content-center">
-        <div class="formgrid grid">
-          <div>
-            <input type="hidden" formControlName="id" id="id">
-            <input type="hidden" formControlName="password" id="password">
-            <input type="hidden" formControlName="username" id="username">
-          </div>
+      <!-- Grid de 2 columnas - FORZADO -->
+      <div class="grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 0; padding: 0.5rem;">
 
-          <div class="field col-12 md:col-3">
-            <label for="codigoTipoDocumento" class="pl-1">Tipo de documento
-              <span *ngIf="isFieldRequired('codigoTipoDocumento')" style="color: red;">*</span>
-            </label>
-            <p-select
-              id="codigoTipoDocumento"
-              [options]="tipoDocs"
-              formControlName="codigoTipoDocumento"
-              [showClear]="true"
-              class="w-full"
-              [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('codigoTipoDocumento') }"
-              [panelStyleClass]="isInvalid('codigoTipoDocumento') ? 'ng-invalid ng-dirty' : 'dropdown-valid'"
-              optionLabel="descripcion"
-              optionValue="codigo"
-              placeholder="Selecciona documento"
-            >
-            </p-select>
+        <!-- Campo: Nombres -->
+        <div class="flex flex-column gap-1" style="min-width: 0;">
+          <label for="nombres" class="text-sm font-medium" style="color: #374151;">Nombres *</label>
+          <input id="nombres" type="text" pInputText formControlName="nombres" style="width: 100%;"/>
+          @if (form.get('nombres')?.touched && form.get('nombres')?.errors?.['required']) {
+            <small style="color: #f44336; font-size: 0.75rem;">Campo obligatorio</small>
+          }
+        </div>
 
-            <div *ngFor="let msg of errors('codigoTipoDocumento')" class="pl-2">
-              <p-message severity="error" variant="simple" size="small">{{ msg }}</p-message>
-            </div>
-          </div>
+        <!-- Campo: Apellido Paterno -->
+        <div class="flex flex-column gap-1" style="min-width: 0;">
+          <label for="apePaterno" class="text-sm font-medium" style="color: #374151;">Apellido Paterno *</label>
+          <input id="apePaterno" type="text" pInputText formControlName="apePaterno" style="width: 100%;"/>
+          @if (form.get('apePaterno')?.touched && form.get('apePaterno')?.errors?.['required']) {
+            <small style="color: #f44336; font-size: 0.75rem;">Campo obligatorio</small>
+          }
+        </div>
 
-          <div class="field col-12 md:col-2">
-            <label for="numeroDocumento" class="pl-1">Número de documento
-              <span *ngIf="isFieldRequired('numeroDocumento')" style="color: red;">*</span>
-            </label>
-            <input id="numeroDocumento"
-                   pInputText
-                   (input)="filterNumeric($event)"
-                   class="w-full"
-                   formControlName="numeroDocumento"
-                   [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('numeroDocumento') }"/>
-            <div *ngFor="let msg of errors('numeroDocumento')" class="pl-2">
-              <p-message severity="error" variant="simple" size="small">{{ msg }}</p-message>
-            </div>
-          </div>
+        <!-- Campo: Apellido Materno -->
+        <div class="flex flex-column gap-1" style="min-width: 0;">
+          <label for="apeMaterno" class="text-sm font-medium" style="color: #374151;">Apellido Materno</label>
+          <input id="apeMaterno" type="text" pInputText formControlName="apeMaterno" style="width: 100%;"/>
+        </div>
 
-          <div class="field col-12 md:col-3">
-            <label for="nombres" class="pl-1">Nombres
-              <span *ngIf="isFieldRequired('nombres')" style="color: red;">*</span>
-            </label>
-            <input id="nombres"
-                   class="w-full"
-                   (input)="filterAlphanumeric($event);"
-                   formControlName="nombres"
-                   pInputText
-                   maxlength="70"
-                   [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('nombres') }"/>
-            <div *ngFor="let msg of errors('nombres')" class="pl-2">
-              <p-message severity="error" variant="simple" size="small">{{ msg }}</p-message>
-            </div>
-          </div>
+        <!-- Campo: Correo -->
+        <div class="flex flex-column gap-1" style="min-width: 0;">
+          <label for="correo" class="text-sm font-medium" style="color: #374151;">Correo Electrónico *</label>
+          <input id="correo" type="email" pInputText formControlName="correo" style="width: 100%;"/>
+          @if (form.get('correo')?.touched && form.get('correo')?.errors) {
+            @if (form.get('correo')?.errors?.['required']) {
+              <small style="color: #f44336; font-size: 0.75rem;">Campo obligatorio</small>
+            }
+            @if (form.get('correo')?.errors?.['email']) {
+              <small style="color: #f44336; font-size: 0.75rem;">Correo inválido</small>
+            }
+          }
+        </div>
 
-          <div class="field col-12 md:col-2">
-            <label for="apePaterno" class="pl-1">Apellido Paterno
-              <span *ngIf="isFieldRequired('apePaterno')" style="color: red;">*</span>
-            </label>
-            <input id="apePaterno"
-                   class="w-full"
-                   pInputText
-                   (input)="filterAlphanumeric($event)"
-                   formControlName="apePaterno"
-                   maxlength="9"
-                   [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('apePaterno') }"/>
-            <div *ngFor="let msg of errors('apePaterno')" class="pl-2">
-              <p-message severity="error" variant="simple" size="small">{{ msg }}</p-message>
-            </div>
-          </div>
+        <!-- Campo: Teléfono -->
+        <div class="flex flex-column gap-1" style="min-width: 0;">
+          <label for="telefono" class="text-sm font-medium" style="color: #374151;">Teléfono</label>
+          <input id="telefono" type="text" pInputText formControlName="telefono" style="width: 100%;"/>
+        </div>
 
-          <div class="field col-12 md:col-2">
-            <label for="apeMaterno" class="pl-1">Apellido materno
-              <span *ngIf="isFieldRequired('apeMaterno')" style="color: red;">*</span>
-            </label>
-            <input id="apeMaterno"
-                   class="w-full"
-                   pInputText
-                   (input)="filterAlphanumeric($event)"
-                   formControlName="apeMaterno"
-                   [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('apeMaterno') }"/>
-            <div *ngFor="let msg of errors('apeMaterno')" class="pl-2">
-              <p-message severity="error" variant="simple" size="small">{{ msg }}</p-message>
-            </div>
-          </div>
+        <!-- Campo: Tipo Documento -->
+        <div class="flex flex-column gap-1" style="min-width: 0;">
+          <label for="tipoDoc" class="text-sm font-medium" style="color: #374151;">Tipo Documento *</label>
+          <p-select
+            id="tipoDoc"
+            formControlName="codigoTipoDocumento"
+            [options]="tipoDocs"
+            optionLabel="descripcion"
+            optionValue="codigo"
+            placeholder="Selecciona tipo"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+          ></p-select>
+          @if (form.get('codigoTipoDocumento')?.touched && form.get('codigoTipoDocumento')?.errors?.['required']) {
+            <small style="color: #f44336; font-size: 0.75rem;">Campo obligatorio</small>
+          }
+        </div>
 
-          <div class="field col-12 md:col-2">
-            <label for="telefono" class="pl-1">Teléfono
-              <span *ngIf="isFieldRequired('telefono')" style="color: red;">*</span>
-            </label>
-            <input id="telefono"
-                   class="w-full"
-                   pInputText
-                   (input)="filterNumeric($event)"
-                   formControlName="telefono"
-                   [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('telefono') }"/>
-            <div *ngFor="let msg of errors('telefono')" class="pl-2">
-              <p-message severity="error" variant="simple" size="small">{{ msg }}</p-message>
-            </div>
-          </div>
+        <!-- Campo: Número Documento -->
+        <div class="flex flex-column gap-1" style="min-width: 0;">
+          <label for="numeroDocumento" class="text-sm font-medium" style="color: #374151;">Número Documento *</label>
+          <input id="numeroDocumento" type="text" pInputText formControlName="numeroDocumento" style="width: 100%;"/>
+          @if (form.get('numeroDocumento')?.touched && form.get('numeroDocumento')?.errors?.['required']) {
+            <small style="color: #f44336; font-size: 0.75rem;">Campo obligatorio</small>
+          }
+        </div>
 
-          <div class="field col-12 md:col-4">
-            <label for="correo" class="pl-1">Correo
-              <span *ngIf="isFieldRequired('correo')" style="color: red;">*</span>
-            </label>
-            <input id="correo"
-                   class="w-full"
-                   pInputText
-                   (input)="filterSpecialCharacters($event)"
-                   formControlName="correo"
-                   [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('correo') }"/>
-            <div *ngFor="let msg of errors('correo')" class="pl-2">
-              <p-message severity="error" variant="simple" size="small">{{ msg }}</p-message>
-            </div>
-          </div>
-
-          <div class="field col-12 md:col-2">
-            <label for="fechaCambioClave" class="pl-1">Fecha cambio de clave
-              <span *ngIf="isFieldRequired('fechaCambioClave')" style="color: red;">*</span>
-            </label>
-            <p-datepicker id="fechaCambioClave"
-                          [readonlyInput]="true"
-                          formControlName="fechaCambioClave"
-                          styleClass="w-full"
-                          dateFormat="dd/mm/yy"
-                          placeholder="Selecciona una fecha">
-
-            </p-datepicker>
-          </div>
-
-          <div class="field col-12 md:col-2">
-            <label for="indicadorExpiracion" class="pl-1">Indicador Expiración
-              <span *ngIf="isFieldRequired('indicadorExpiracion')" style="color: red;">*</span>
-            </label>
-            <p-select
-              id="indicadorExpiracion"
-              [options]="expiracion"
-              formControlName="indicadorExpiracion"
-              [showClear]="true"
-              class="w-full"
-              [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('indicadorExpiracion') }"
-              [panelStyleClass]="isInvalid('indicadorExpiracion') ? 'ng-invalid ng-dirty' : 'dropdown-valid'"
-              optionLabel="name"
-              optionValue="code"
-              placeholder="Selecciona Indicador">
-            </p-select>
-            <div *ngFor="let msg of errors('indicadorExpiracion')" class="pl-2">
-              <p-message severity="error" variant="simple" size="small">{{ msg }}</p-message>
-            </div>
-          </div>
-
-          <div class="field col-12 md:col-2">
-            <label for="fechaExpiracionClave" class="pl-1">Fecha de expiración
-              <span *ngIf="isFieldRequired('fechaExpiracionClave')" style="color: red;">*</span>
-            </label>
-            <p-datepicker id="fechaExpiracionClave"
-                          [readonlyInput]="true"
-                          formControlName="fechaExpiracionClave"
-                          styleClass="w-full"
-                          placeholder="Selecciona una fecha">
-            </p-datepicker>
-          </div>
-          <div class="field col-12 md:col-3">
-            <label for="tipoUsuario" class="pl-1">Tipo de usuario
-              <span *ngIf="isFieldRequired('tipoUsuario')" style="color: red;">*</span>
-            </label>
-            <p-select
-              id="tipoUsuario"
-              [options]="tipoUsuarioOpts"
-              formControlName="tipoUsuario"
-              [showClear]="true"
-              class="w-full"
-              [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('tipoUsuario') }"
-              [panelStyleClass]="isInvalid('tipoUsuario') ? 'ng-invalid ng-dirty' : 'dropdown-valid'"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Selecciona tipo de usuario">
-            </p-select>
-            <div *ngFor="let msg of errors('tipoUsuario')" class="pl-2">
-              <p-message severity="error" variant="simple" size="small">{{ msg }}</p-message>
-            </div>
-          </div>
-
-          <div class="field col-12 md:col-3">
-            <label for="claseUsuario" class="pl-1">Clase de usuario
-              <span *ngIf="isFieldRequired('claseUsuario')" style="color: red;">*</span>
-            </label>
-            <p-select
-              id="claseUsuario"
-              [options]="claseUsuarioOpts"
-              formControlName="claseUsuario"
-              [showClear]="true"
-              class="w-full"
-              [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('claseUsuario') }"
-              [panelStyleClass]="isInvalid('claseUsuario') ? 'ng-invalid ng-dirty' : 'dropdown-valid'"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Selecciona clase de usuario">
-            </p-select>
-            <div *ngFor="let msg of errors('claseUsuario')" class="pl-2">
-              <p-message severity="error" variant="simple" size="small">{{ msg }}</p-message>
-            </div>
-          </div>
-          <div class="field col-12 md:col-4"></div>
-          <div class="field col-12 md:col-5"></div>
-          <div class="field col-12 md:col-1">
-            <p-button label="Guardar"
-                      pTooltip="Guardar"
-                      [outlined]="true"
-                      severity="secondary"
-                      (onClick)="guardar();"
-                      [styleClass]="'w-full'"/>
-          </div>
-          <div class="field col-12 md:col-1">
-            <p-button label="Volver"
-                      pTooltip="Volver"
-                      [outlined]="true"
-                      severity="secondary"
-                      [routerLink]="['/usuario']"
-                      [styleClass]="'w-full'"/>
-          </div>
-          <div class="field col-12 md:col-5"></div>
+        <!-- Campo: Clase Usuario -->
+        <div class="flex flex-column gap-1" style="min-width: 0;">
+          <label for="claseUsuario" class="text-sm font-medium" style="color: #374151;">Clase Usuario *</label>
+          <p-select
+            id="claseUsuario"
+            formControlName="claseUsuario"
+            [options]="clasesUsuario"
+            optionLabel="descripcion"
+            optionValue="valor"
+            placeholder="Selecciona clase"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+          ></p-select>
+          @if (form.get('claseUsuario')?.touched && form.get('claseUsuario')?.errors?.['required']) {
+            <small style="color: #f44336; font-size: 0.75rem;">Campo obligatorio</small>
+          }
         </div>
       </div>
+    </form>
 
-    </div>
-  </p-panel>
-</form>
+    <!-- FOOTER -->
+    <ng-template #footer>
+      <div class="flex justify-content-end gap-2 pt-3">
+        <p-button label="Cancelar" [outlined]="true" severity="info" (onClick)="cerrar()"></p-button>
+        <p-button label="Guardar" [outlined]="true" severity="success" (onClick)="guardar()"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>
+
+<p-dialog [modal]="true" [(visible)]="loading" [style]="{ width: '20rem' }" [closable]="false">
+  <div class="flex flex-column align-items-center gap-4 py-4">
+    <span class="text-sm font-medium" style="color: #4b5563;">Procesando registro</span>
+    <p-progress-spinner
+      class="w-16 h-16"
+      strokeWidth="8"
+      fill="var(--surface-ground)"
+      animationDuration=".5s"/>
+  </div>
+</p-dialog>

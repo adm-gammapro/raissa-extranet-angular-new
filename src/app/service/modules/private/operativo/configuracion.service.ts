@@ -13,11 +13,11 @@ import { JobCliente } from '../../../../apis/model/module/private/job-cliente';
   providedIn: 'root'
 })
 export class ConfiguracionService {
-  private urlPlataformaAplicacion: string = environment.url.base + '/plataforma/aplicacion';
-  private urlPlataformaCliente: string = environment.url.base + '/plataforma/cliente';
+  private readonly urlPlataformaAplicacion: string = environment.url.base + '/plataforma/aplicacion';
+  private readonly  urlPlataformaCliente: string = environment.url.base + '/plataforma/cliente';
 
-  constructor(private http: HttpClient,
-              private authService: AuthService) { }
+  constructor(private readonly  http: HttpClient,
+              private readonly  authService: AuthService) { }
 
   create(configuracion: Configuracion): Observable<Configuracion> {
     const headers = new HttpHeaders({
@@ -84,34 +84,9 @@ export class ConfiguracionService {
     );
   }
 
-  getServicioCliente(idEmpresa: number,
-                     codigoAplicacionEntorno: number): Observable<ServicioCliente> {
+  getJobs(codigoCliente: number): Observable<JobCliente[]> {
     const params = [
-      `codigoCliente=${idEmpresa}`,
-      `codigoAplicacionEntorno=${codigoAplicacionEntorno}`,
-      `soloJobs=true`,
-      `estadoRegistro=S`,
-    ].filter(Boolean).join('&');
-
-    const headers = new HttpHeaders({
-    });
-
-    const url = `${this.urlPlataformaCliente}/listarServicioCliente?${params}`;
-
-    return this.http.get(url, { headers: headers }).pipe(
-      map((response: any) => {
-        return response.body;
-      }),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  getJobs(codigoServicioCliente: number): Observable<JobCliente[]> {
-    const params = [
-      `codigoServicioCliente=${codigoServicioCliente}`,
+      `codigoCliente=${codigoCliente}`,
       `estadoRegistro=S`,
     ].filter(Boolean).join('&');
 

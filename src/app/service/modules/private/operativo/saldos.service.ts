@@ -4,7 +4,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../../authorization/auth.service';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { Resumen } from '../../../../apis/model/module/private/resumen';
-import { Ejecucion } from '../../../../apis/model/module/private/ejecucion';
 import { EjecucionRequest } from '../../../../apis/model/module/private/operativo/saldos/request/ejecucion-request';
 
 @Injectable({
@@ -136,16 +135,12 @@ export class SaldosService {
     ejecucionRequest.codigoCliente = codigoCliente;
     ejecucionRequest.codigoIfi = codigoIfi;
 
-    const headers = new HttpHeaders({
-    });
-
     const url = `${this.urlEjecucion}/ejecutarConsultaPosicionGeneralOnline`;
 
-    return this.http.post<any>(url, ejecucionRequest, { headers: headers }).pipe(
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
+    this.http.post(url, ejecucionRequest).subscribe({
+      error: (err) => {
+          console.error('Error enviando solicitud a la cola de Rabbit:', err);
+      }
+    });
   }
 }

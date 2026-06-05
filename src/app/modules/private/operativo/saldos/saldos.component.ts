@@ -55,6 +55,7 @@ export class SaldosComponent implements OnInit {
               private readonly formBuilder: FormBuilder,
               private readonly router: Router,
               private readonly saldosService: SaldosService,
+              private readonly confirmationService: ConfirmationService,
               private readonly institucionFinancieraService: InstitucionFinancieraService,
               private readonly reportesService: ReportesService) {
     if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
@@ -80,15 +81,27 @@ export class SaldosComponent implements OnInit {
   }
 
   actualizarSaldosMovimientos() {
-    this.loading = true;
+    this.confirmationService.confirm({
+      message: 'Se enviará un solicitud de actualización de saldos y movimientos para todas las cuentas de todas las instituciones financieras.' +
+        '<br> <div class="text-center font-bold mt-3">¿Desea confirmar la acción?</div>',
+      header: 'Confirmación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      acceptButtonStyleClass: 'p-button-info',
+      rejectButtonStyleClass: 'p-button-secondary',
+      accept: () => {
+        this.loading = true;
 
-    this.saldosService.actualizarSaldosMovimientosGeneral(Number(this.idEmpresa)).subscribe({
-      next: () => {
-        this.loading = false;  // Ocultar el spinner
-        this.reloadPage();
-      },
-      error: () => {
-        this.loading = false;
+        this.saldosService.actualizarSaldosMovimientosGeneral(Number(this.idEmpresa)).subscribe({
+          next: () => {
+            this.loading = false;  // Ocultar el spinner
+            this.reloadPage();
+          },
+          error: () => {
+            this.loading = false;
+          }
+        });
       }
     });
   }

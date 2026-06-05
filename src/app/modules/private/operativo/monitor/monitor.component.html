@@ -7,23 +7,23 @@
       <div class="formgrid grid w-12 flex  pt-5">
         <div class="field col-12 md:col-3">
           <p-floatLabel>
-            <p-datepicker inputId="fechas" 
-                        [(ngModel)]="rangeDates" 
-                        selectionMode="range" 
+            <p-datepicker inputId="fechas"
+                        [(ngModel)]="rangeDates"
+                        selectionMode="range"
                         [readonlyInput]="true"
-                        dateFormat="dd/mm/yy" />
+                        dateFormat="dd/mm/yy"></p-datepicker>
             <label for="fechas">Rango de fechas</label>
           </p-floatLabel>
         </div>
 
         <div class="field col-12 md:col-7"></div>
         <div class="field col-12 md:col-2 text-right">
-          <p-button label="Buscar" 
-                    pTooltip="Buscar" 
-                    [outlined]="true" 
-                    severity="secondary" 
+          <p-button label="Buscar"
+                    pTooltip="Buscar"
+                    [outlined]="true"
+                    severity="secondary"
                     (onClick)="busqueda();"
-                    styleClass="w-full" 
+                    styleClass="w-full"
                     tooltipPosition="left" />
         </div>
       </div>
@@ -57,18 +57,17 @@
             <td style="text-align: right">{{proceso.registrosErrados}}</td>
             <td style="text-align: right">{{proceso.registrosPendientes}}</td>
             <td>
-                <p-meterGroup [value]="proceso.valuesProgreso" />
+                <p-meterGroup [value]="proceso.valuesProgreso"></p-meterGroup>
             </td>
             <td style="text-align: center;">
-              <p-button icon="pi pi-bars" 
-                      [rounded]="true" 
-                      [text]="true" 
-                      type="button" 
-                      pRipple
+              <p-button icon="pi pi-bars"
+                      [rounded]="true"
+                      [text]="true"
+                      type="button"
                       severity="secondary"
-                      pTooltip="Detalle" 
-                      tooltipPosition="top" 
-                      [disabled]="esBotonDeshabilitado(proceso)" 
+                      pTooltip="Detalle"
+                      tooltipPosition="top"
+                      [disabled]="esBotonDeshabilitado(proceso)"
                       [routerLink]="['/detalle-monitor', proceso.codigo ]"/>
             </td>
           </tr>
