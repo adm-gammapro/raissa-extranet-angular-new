@@ -1,0 +1,150 @@
+<app-header></app-header>
+<div class="container-dashboard p-4" *ngIf="!loading; else loadingTemplate">
+  <div class="grid">
+    <!-- Header del Dashboard -->
+    <div class="col-12">
+      <div class="card-header">
+        <h1 class="text-2xl font-bold">Dashboard de Tarifario</h1>
+        <p class="text-secondary">Resumen de consumo y suscripción</p>
+      </div>
+    </div>
+
+    <!-- Tarjeta de Información Principal -->
+    <div class="col-12 md:col-6 lg:col-3">
+      <div class="card shadow-2 p-4">
+        <div class="flex align-items-center justify-content-between mb-3">
+          <h3 class="text-lg font-semibold m-0">Sistema</h3>
+          <i class="pi pi-server text-primary text-xl"></i>
+        </div>
+        <p class="text-2xl font-bold m-0">{{dashboardData?.sistema}}</p>
+        <p class="text-secondary mt-2">Plan: {{dashboardData?.plan}}</p>
+      </div>
+    </div>
+
+    <!-- Tarjeta de Estado de Suscripción (usando getEstadoSuscripcion) -->
+    <div class="col-12 md:col-6 lg:col-3">
+      <div class="card shadow-2 p-4">
+        <div class="flex align-items-center justify-content-between mb-3">
+          <h3 class="text-lg font-semibold m-0">Estado</h3>
+          <i class="pi pi-check-circle text-xl" [ngClass]="{
+            'text-green-500': getEstadoSuscripcion() === 'success',
+            'text-orange-500': getEstadoSuscripcion() === 'warning',
+            'text-red-500': getEstadoSuscripcion() === 'danger'
+          }"></i>
+        </div>
+        <p class="text-xl font-bold m-0" [ngClass]="{
+          'text-green-500': getEstadoSuscripcion() === 'success',
+          'text-orange-500': getEstadoSuscripcion() === 'warning',
+          'text-red-500': getEstadoSuscripcion() === 'danger'
+        }">
+          {{dashboardData?.suscripcionActiva ? (dashboardData?.periodoPrueba ? 'Período de Prueba' : 'Activa') : 'Inactiva'}}
+        </p>
+        <p class="text-secondary mt-2" *ngIf="dashboardData?.periodoPrueba">
+          <i class="pi pi-info-circle mr-1"></i> Período de prueba activo
+        </p>
+      </div>
+    </div>
+
+    <!-- Tarjeta de Fechas -->
+    <div class="col-12 md:col-6 lg:col-3">
+      <div class="card shadow-2 p-4">
+        <div class="flex align-items-center justify-content-between mb-3">
+          <h3 class="text-lg font-semibold m-0">Vigencia</h3>
+          <i class="pi pi-calendar text-primary text-xl"></i>
+        </div>
+        <p class="text-sm">Inicio: {{dashboardData?.fechaInicio | date:'dd/MM/yyyy'}}</p>
+        <p class="text-sm mt-1">Fin: {{dashboardData?.fechaFin | date:'dd/MM/yyyy'}}</p>
+        <p class="text-xl font-bold mt-2" [ngClass]="{
+          'text-green-500': getDiasRestantesClase() === 'success',
+          'text-orange-500': getDiasRestantesClase() === 'warning',
+          'text-red-500': getDiasRestantesClase() === 'danger'
+        }">
+          {{dashboardData?.diasRestantes}} días restantes
+        </p>
+      </div>
+    </div>
+
+    <!-- Tarjeta de Consumo General -->
+    <div class="col-12 md:col-6 lg:col-3">
+      <div class="card shadow-2 p-4">
+        <div class="flex align-items-center justify-content-between mb-3">
+          <h3 class="text-lg font-semibold m-0">Consumo General</h3>
+          <i class="pi pi-chart-line text-primary text-xl"></i>
+        </div>
+        <div class="text-center">
+          <p class="text-3xl font-bold" [ngClass]="getPorcentajeColor()">
+            {{dashboardData?.porcentajeConsumo | number:'1.0-0'}}%
+          </p>
+          <p-progressBar [value]="dashboardData?.porcentajeConsumo || 0"
+                         [style]="{'height': '10px'}"
+                         [styleClass]="dashboardData && dashboardData.porcentajeConsumo > 80 ? 'p-progressbar-danger' : ''">
+          </p-progressBar>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Consumo de Usuarios -->
+    <div class="col-12 lg:col-6">
+      <div class="card shadow-2 p-4">
+        <div class="flex align-items-center justify-content-between mb-3">
+          <h3 class="text-lg font-semibold m-0">Consumo de Usuarios</h3>
+          <i class="pi pi-users text-primary text-xl"></i>
+        </div>
+
+        <div class="consumo-container">
+          <div class="flex justify-content-between mb-2">
+            <span>Utilizados: <strong>{{dashboardData?.usuariosUtilizados}}</strong></span>
+            <span>Contratados: <strong>{{dashboardData?.usuariosContratados}}</strong></span>
+            <span>Disponibles: <strong>{{dashboardData?.usuariosDisponibles}}</strong></span>
+          </div>
+          <p-progressBar [value]="getPorcentajeUsuarios()"
+                         [style]="{'height': '15px'}"
+                         [styleClass]="getColorProgresoUsuarios()">
+          </p-progressBar>
+
+          <div class="mt-3 text-center">
+            <p class="text-xl font-bold">{{dashboardData?.usuariosUtilizados}} / {{dashboardData?.usuariosContratados}}</p>
+            <p class="text-secondary">Usuarios en uso ({{getPorcentajeUsuarios() | number:'1.0-0'}}%)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Consumo de Consumos -->
+    <div class="col-12 lg:col-6">
+      <div class="card shadow-2 p-4">
+        <div class="flex align-items-center justify-content-between mb-3">
+          <h3 class="text-lg font-semibold m-0">Consumo de Operaciones</h3>
+          <i class="pi pi-chart-bar text-primary text-xl"></i>
+        </div>
+
+        <div class="consumo-container">
+          <div class="flex justify-content-between mb-2">
+            <span>Utilizados: <strong>{{dashboardData?.consumosUtilizados}}</strong></span>
+            <span>Contratados: <strong>{{dashboardData?.consumosContratados}}</strong></span>
+            <span>Disponibles: <strong>{{dashboardData?.consumosDisponibles}}</strong></span>
+          </div>
+          <p-progressBar [value]="getPorcentajeConsumos()"
+                         [style]="{'height': '15px'}"
+                         [styleClass]="getColorProgresoConsumos()">
+          </p-progressBar>
+
+          <div class="mt-3 text-center">
+            <p class="text-xl font-bold">{{dashboardData?.consumosUtilizados}} / {{dashboardData?.consumosContratados}}</p>
+            <p class="text-secondary">Operaciones realizadas ({{getPorcentajeConsumos() | number:'1.0-0'}}%)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Template de Carga -->
+<ng-template #loadingTemplate>
+  <div class="flex justify-content-center align-items-center" style="min-height: 400px;">
+    <div class="flex flex-column align-items-center">
+      <p-progressSpinner strokeWidth="4" diameter="50"></p-progressSpinner>
+      <p class="mt-3 text-secondary">Cargando dashboard...</p>
+    </div>
+  </div>
+</ng-template>

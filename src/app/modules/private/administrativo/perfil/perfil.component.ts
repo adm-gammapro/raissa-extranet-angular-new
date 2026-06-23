@@ -1,242 +1,234 @@
-import {AfterViewInit, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, ViewChild} from '@angular/core';
-import {ConfirmationService, MenuItem, MessageService, ToastMessageOptions} from 'primeng/api';
-import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, ViewChild} from '@angular/core';
+import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
+import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {Estado} from '../../../../apis/model/commons/estado';
 import {CommonModule} from '@angular/common';
-import {PRIME_NG_MODULES} from '../../../../config/primeNg/primeng-global-imports';
-import {PaginatorComponent} from '../../commons/paginator/paginator.component';
 import {HeaderComponent} from '../../layout/header/header.component';
-import {FormPerfilModuloComponent} from './perfil-modulo/form-perfil-modulo.component';
-import {Paginator} from '../../../../apis/model/commons/paginator';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {PerfilService} from '../../../../service/modules/private/administrativo/perfil.service';
 import {environment} from '../../../../../environments/environment';
 import {Util} from '../../../../utils/util/util.util';
 import {PerfilResponse} from '../../../../apis/model/module/private/administrativo/perfil/response/perfil-response';
-import {EstadoRegistroEnum} from '../../../../apis/model/enums/estado-registro';
+import {Table, TableLazyLoadEvent, TableModule} from 'primeng/table';
+import {PerfilSearch} from '../../../../apis/model/module/private/administrativo/perfil/request/perfil-search';
+import {
+  PerfilSearchResponse
+} from '../../../../apis/model/module/private/administrativo/perfil/response/perfil-search-response';
+import {BreadcrumbComponent} from '../../commons/breadcrumb/breadcrumb.component';
+import {Button} from 'primeng/button';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {IftaLabel} from 'primeng/iftalabel';
+import {InputText} from 'primeng/inputtext';
+import {Select} from 'primeng/select';
+import {Toast} from 'primeng/toast';
+import {Tooltip} from 'primeng/tooltip';
+import {Card} from 'primeng/card';
+import {EstadoRegistroLabelPipe} from '../../../../apis/model/pipe/estado-registro-label.pipe';
+import {FormPerfilComponent} from './formulario-perfil/form-perfil.component';
+import {VincularPerfilClientes} from './vincular-perfil-clientes/vincular-perfil-clientes';
+import {VincularPerfilOpciones} from './vincular-perfil-opciones/vincular-perfil-opciones';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [FormsModule,
-    ReactiveFormsModule,
+  imports: [
     CommonModule,
-    ...PRIME_NG_MODULES,
-    PaginatorComponent,
+    BreadcrumbComponent,
+    Button,
+    ConfirmDialog,
+    IftaLabel,
+    InputText,
+    ReactiveFormsModule,
+    Select,
+    TableModule,
+    Toast,
+    Tooltip,
+    Card,
+    EstadoRegistroLabelPipe,
+    FormPerfilComponent,
     HeaderComponent,
-    FormPerfilModuloComponent,
-    RouterLink],
+    VincularPerfilClientes,
+    VincularPerfilOpciones,
+  ],
   providers: [ConfirmationService, MessageService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './perfil.component.html',
   styleUrl: './perfil.component.scss'
 })
-export class PerfilComponent implements OnInit, AfterViewInit {
-  @ViewChild(FormPerfilModuloComponent) formPerfilModuloComponent!: FormPerfilModuloComponent;
-  protected mostrarPerfilOpcion = false;
-  protected perfiles: PerfilResponse[] = [];
-  protected nombreSearch: string | undefined;
-  protected estadoSearch: string | undefined;
-  protected mostrarHijo = false;
-  protected perfilSearchForm: FormGroup;
+export class PerfilComponent {
+  protected idEmpresa!: string;
+  protected perfiles!: PerfilResponse[];
+  protected filtroForm: FormGroup;
+  protected loading: boolean = false;
+  protected totalRecords: number = 0;
+  protected registrosMostrados = 0;
   protected estados: Estado[] = Estado.estados;
-  private readonly idEmpresa: string = "";
-  protected items: MenuItem[] | undefined;
-  protected home: MenuItem | undefined;
-  private pendingToast: ToastMessageOptions | null = null;
+  visibleForm: boolean = false;
+  modoUso: 'editar' | 'registrar' = 'registrar';
+  selectedPerfil!: PerfilResponse | null;
+  @ViewChild('dt') dt!: Table;
+  protected actualizacionManual: boolean = false;
+  protected modalClientesVisible = false;
+  protected perfilSeleccionadoId = 1;
 
-  paginator: Paginator = new Paginator();//esta variable se debe declarar para usar el paginador de los apis, no de primeng
+  protected modalOpcionesVisible = false;
+  protected perfilSeleccionadoOpcionId = 1;
 
-  constructor(private readonly confirmationService: ConfirmationService,
-              private readonly activatedRoute: ActivatedRoute,
-              private readonly router: Router,
-              private readonly formBuilder: FormBuilder,
-              private readonly messageService: MessageService,
-              private readonly perfilService: PerfilService) {
+  protected misItems: MenuItem[] = [
+    { icon: 'pi pi-home', route: '/dashboard' },
+    { label: 'Perfiles' }
+  ];
 
-    this.perfilSearchForm = this.formBuilder.group({
-      nombreSearch: new FormControl(this.nombreSearch, [Validators.maxLength(50)]),
-      estadoSearch: new FormControl('T'),
+  constructor(
+    private readonly confirmationService: ConfirmationService,
+    private readonly messageService: MessageService,
+    private readonly fb: FormBuilder,
+    private readonly perfilService: PerfilService
+  ) {
+    const idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA);
+    if (idEmpresa) {
+      this.idEmpresa = idEmpresa;
+    }
+
+    this.filtroForm = this.fb.group({
+      descripcion: [''],
+      abreviatura: [''],
+      estadoRegistro: ['S']
     });
-
-    if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
-      this.idEmpresa = sessionStorage.getItem(environment.session.ID_EMPRESA)!;
-    }
   }
 
-  cambioPagina(event: any) {//este metodo se debe replicar en todas las tablas donde se quiera usar paginador
-    if (event.primerRegistroVisualizado != undefined) {
-      this.paginator.primerRegistroVisualizado = event.primerRegistroVisualizado;
-    }
-    if (event.cantidadRegistros != undefined) {
-      this.paginator.cantidadRegistros = event.cantidadRegistros;
-    }
-    if (event.numeroPagina != undefined) {
-      this.paginator.numeroPagina = event.numeroPagina;
-    }
+  filtrar() {
+    this.actualizacionManual = true;
+    this.loading = true;
+    this.dt.reset();
+    this.dt.rows = 5;
 
-    this.busqueda();
+    setTimeout(() => {
+      const fakeLazyEvent: TableLazyLoadEvent = {
+        first: 0,
+        rows: 5,
+        sortField: 'descripcion',
+        sortOrder: 1
+      };
+      this.actualizacionManual = false;
+      this.loadLazy(fakeLazyEvent);
+    }, 100);
   }
 
-  filterAlphanumeric(event: Event): void {
-    Util.filterAlphanumeric(event, this.perfilSearchForm);
+  loadLazy(event: TableLazyLoadEvent) {
+    if (this.actualizacionManual) return;
+
+    const firstValue = event.first ?? 0;
+    const rowsValue = event.rows ?? 5;
+    const { estadoRegistro, descripcion, abreviatura } = this.filtroForm.value;
+
+    const request: PerfilSearch = {
+      page: Math.floor(firstValue / (rowsValue || 1)),
+      size: rowsValue,
+      sortField: event.sortField as string,
+      sortOrder: Util.mapSortOrder(event.sortOrder),
+      descripcion: descripcion || undefined,
+      abreviatura: abreviatura || undefined,
+      estadoRegistro: estadoRegistro || undefined,
+      codigoCliente: this.idEmpresa ? Number(this.idEmpresa) : undefined
+    };
+
+    this.perfilService.listarPerfilesPage(request).subscribe({
+      next: (response: PerfilSearchResponse) => {
+        this.perfiles = response.list;
+        this.registrosMostrados = response.list.length;
+        this.totalRecords = response.totalElements;
+        this.loading = false;
+      },
+      error: (error) => {
+        this.loading = false;
+        this.handleError(error);
+      }
+    });
   }
 
-  esBotonDeshabilitado(perfil: PerfilResponse): boolean {
-    return Util.mapEstadoRegistro(perfil.estadoRegistro) === EstadoRegistroEnum.NO_VIGENTE;
+  limpiarFiltros() {
+    this.filtroForm.reset({
+      descripcion: '',
+      abreviatura: '',
+      estadoRegistro: 'S'
+    });
+    this.filtrar();
   }
 
-  eliminarFila(event: Event, perfilParam: PerfilResponse) {
+  protected nuevo() {
+    this.selectedPerfil = null;
+    this.modoUso = 'registrar';
+    this.visibleForm = true;
+  }
+
+  protected editar(codigo: number) {
+    this.perfilService.obtenerPerfil(codigo).subscribe({
+      next: (response: PerfilResponse) => {
+        this.selectedPerfil = response;
+        this.modoUso = 'editar';
+        this.visibleForm = true;
+      },
+      error: (error) => this.handleError(error)
+    });
+  }
+
+  protected guardar() {
+    this.filtrar();
+  }
+
+  protected delete(event: Event, codigo: number) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: '¿Está seguro de dar de baja este registro?',
-      header: 'Confirmación',
-      icon: 'pi pi-exclamation-triangle',
+      message: '¿Estás seguro de dar de baja este perfil?',
+      header: 'Eliminar Perfil',
+      icon: 'pi pi-info-circle',
       rejectButtonProps: {
-        label: 'No',
-        severity: 'danger',
-        icon: 'pi pi-times',
-        outlined: true
+        label: 'Cancelar',
+        severity: 'success'
       },
       acceptButtonProps: {
-        label: 'Si',
-        icon: 'pi pi-check',
-        severity: 'info',
-        outlined: true
+        label: 'Eliminar',
+        severity: 'danger'
       },
       accept: () => {
-        this.perfilService.eliminar(perfilParam.codigo).subscribe({
-          next: () => {
-            this.perfiles = this.perfiles.filter(p => p.codigo !== perfilParam.codigo);
-
-            // Ajusta total de registros
-            this.paginator.totalRegistros = Math.max(0, (this.paginator.totalRegistros ?? 0) - 1);
-
-            // Si la página quedó vacía y no es la primera, retrocede
-            if (this.perfiles.length === 0 && this.paginator.numeroPagina > 0) {
-              this.paginator.numeroPagina = this.paginator.numeroPagina - 1;
-            }
-
+        this.perfilService.eliminarPerfil(codigo).subscribe({
+          next: (response: PerfilResponse) => {
             this.messageService.add({
               severity: 'success',
-              summary: 'Eliminado',
-              detail: 'Registro eliminado correctamente',
-              life: 4000
+              summary: 'Confirmación',
+              detail: `Se dio de baja el perfil ${response.descripcion} correctamente`
             });
-
-            this.loadPerfiles();
+            this.filtrar();
           },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: err.error.message,
-              life: 5000
-            });
-          }
-        })
-      },
-      reject: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Rechazado',
-          detail: 'No se dió de baja al registro',
-          life: 5000
+          error: (error) => this.handleError(error)
         });
       }
     });
   }
 
-  ngOnInit() {
-    const toast = history.state?.toast as ToastMessageOptions | undefined;
-    if (toast?.detail) {
-      this.pendingToast = toast;
-      this.router.navigate([], { replaceUrl: true });
-    }
+  protected abrirModalClientes(idPerfil: number) {
+    this.perfilSeleccionadoId = idPerfil;
+    this.modalClientesVisible = true;
+  }
 
-    this.activatedRoute.paramMap.subscribe(params => {
-      const pagina = Util.parseOrDefault(params.get('pagina'), 0);
-      const cantReg = Util.parseOrDefault(params.get('cantReg'), 5);
-      const estado = Util.getEstado(params.get('estadoSearch'));
-      const perfil = params.get('nombreSearch') ?? "";
+  protected abrirModalOpciones(idPerfil: number) {
+    this.perfilSeleccionadoOpcionId = idPerfil;
+    this.modalOpcionesVisible = true;
+  }
 
-      // Configuración del paginador
-      this.paginator.numeroPagina = pagina;
-      this.paginator.cantidadRegistros = cantReg;
-      this.estadoSearch = estado === "T" ? "" : estado;
-      this.nombreSearch = perfil;
-
-      this.loadPerfiles();
-
-      this.estadoSearch = this.estadoSearch ? this.estadoSearch : "T";
-
-      this.perfilSearchForm.patchValue({
-        nombreSearch: this.nombreSearch,
-        estadoSearch: this.estadoSearch
+  private handleError(error: any): void {
+    if (error.status === 502) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error en el servicio'
       });
-
-      this.initializeBreadcrumbs();
-    });
-  }
-
-  ngAfterViewInit() {
-    if (this.pendingToast) {
-      this.messageService.add(this.pendingToast);
-      this.pendingToast = null;
-      this.router.navigate([], { replaceUrl: true });
-    }
-  }
-
-  busqueda() {
-    this.nombreSearch = this.perfilSearchForm.controls['nombreSearch'].value;
-    this.estadoSearch = this.perfilSearchForm.controls['estadoSearch'].value;
-    if (this.nombreSearch === null) {
-      this.nombreSearch = "";
-    }
-    if (this.estadoSearch === null) {
-      this.estadoSearch = "T";
-    }
-
-    this.router.navigate(['/perfil', this.paginator.numeroPagina, this.paginator.cantidadRegistros, this.nombreSearch, this.estadoSearch]);
-  }
-
-  reloadPage() {
-    this.router.navigateByUrl('/content-web', {skipLocationChange: true}).then(() => {
-      this.router.navigate(['/perfil']);
-    });
-  }
-
-  mostrarModal(idPerfil: number): void {
-    this.formPerfilModuloComponent.cargarModelo(idPerfil);
-    this.mostrarHijo = true; // Mostrar el componente hijo (modal)
-  }
-
-  cerrarModal(): void {
-    this.mostrarHijo = false; // Cerrar el componente hijo
-  }
-
-  onGuardado() {
-    this.mostrarPerfilOpcion = false;
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Éxito',
-      detail: 'Registro guardado satisfactoriamente.',
-      life: 4000
-    });
-  }
-
-  private loadPerfiles(): void {
-    this.perfilService
-      .getPerfilesPage(this.paginator.numeroPagina, this.estadoSearch, this.nombreSearch, this.paginator.cantidadRegistros, Number(this.idEmpresa))
-      .subscribe(response => {
-        this.perfiles = response.content as PerfilResponse[];
-        this.paginator.totalRegistros = response.totalElements;
-        this.paginator.primerRegistroVisualizado = response.pageable.offset;
+    } else if (error.status === 503) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Servicio no disponible'
       });
-  }
-
-  private initializeBreadcrumbs(): void {
-    this.items = [{ label: 'Perfiles' }];
-    this.home = { icon: 'pi pi-home', routerLink: '/content' };
+    }
   }
 }

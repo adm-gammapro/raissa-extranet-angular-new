@@ -1,105 +1,89 @@
-<app-header></app-header>
-<p-toast/>
-<p-confirmDialog/>
-<form [formGroup]="perfilForm">
-  <p-panel>
-    <div class="card flex justify-center">
-      <p-breadcrumb class="max-w-full" [model]="items" [home]="home" />
-    </div>
+<div class="flex justify-content-center">
+  <p-dialog
+    header="Perfil"
+    [modal]="true"
+    [(visible)]="visible"
+    [style]="{ width: '35rem', maxWidth: '90vw' }"
+    closable="false"
+    [styleClass]="'p-dialog-header-icons-hidden'">
+    <!-- HEADER -->
+    <ng-template #header>
+      <div class="flex align-items-center gap-2">
+        <h2 class="font-bold m-0 white-space-nowrap">{{ headerTitle }}</h2>
+      </div>
+    </ng-template>
 
-    <div class="flex border-round bg-gray-100 p-3 m-3 border-1 border-300">
+    <!-- BODY -->
+    <form [formGroup]="form" class="flex flex-column">
+      <p-panel class="mb-3 border-none shadow-none">
+        <input type="hidden" formControlName="codigo">
 
-      <div class="w-12 p-3 flex align-items-center justify-content-center">
-        <div class="formgrid grid">
-          <div>
-            <input type="hidden" formControlName="codigo" id="codigo">
-          </div>
-          <div class="field col-12 md:col-1"></div>
-          <div class="field col-12 md:col-3">
-            <label for="descripcion" class="pl-1">Descripción
-              <span *ngIf="isFieldRequired('descripcion')" style="color: red;">*</span>
-            </label>
-            <input id="descripcion"
-                   class="w-full"
-                   pInputText
-                   maxlength="100"
-                   (input)="filterAlphanumeric($event)"
-                   formControlName="descripcion"
-                   [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('descripcion') }"/>
-            <div *ngFor="let msg of errors('descripcion')" class="pl-2">
-              <p-message severity="error" variant="simple" size="small">{{ msg }}</p-message>
-            </div>
-          </div>
-
-          <div class="field col-12 md:col-2">
-            <label for="abreviatura" class="pl-1">Abreviatura
-              <span *ngIf="isFieldRequired('abreviatura')" style="color: red;">*</span>
-            </label>
-            <input id="abreviatura"
-                   class="w-full"
-                   (input)="filterAlphanumeric($event);"
-                   formControlName="abreviatura"
-                   pInputText
-                   maxlength="20"
-                   [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('abreviatura') }"/>
-            <div *ngFor="let msg of errors('abreviatura')" class="pl-2">
-              <p-message severity="error" variant="simple" size="small">{{ msg }}</p-message>
-            </div>
+        <div class="flex flex-column gap-3 p-2">
+          <!-- Campo: Descripción -->
+          <div class="flex flex-column gap-1">
+            <label for="descripcion" class="text-sm font-medium" style="color: #374151;">Descripción *</label>
+            <input type="text" id="descripcion" pInputText formControlName="descripcion" class="w-full" style="width: 100%;"/>
+            @if (form.get('descripcion')?.touched && form.get('descripcion')?.errors) {
+              @if (form.get('descripcion')?.errors?.['required']) {
+                <small style="color: #f44336; font-size: 0.75rem;">Campo obligatorio</small>
+              }
+              @if (form.get('descripcion')?.errors?.['minlength']) {
+                <small style="color: #f44336; font-size: 0.75rem;">Mínimo 3 caracteres</small>
+              }
+              @if (form.get('descripcion')?.errors?.['maxlength']) {
+                <small style="color: #f44336; font-size: 0.75rem;">Máximo 100 caracteres</small>
+              }
+            }
           </div>
 
-          <div class="field col-12 md:col-3">
-            <label for="nombreComercial" class="pl-1">Nombre comercial
-              <span *ngIf="isFieldRequired('nombreComercial')" style="color: red;">*</span>
-            </label>
-            <input id="nombreComercial"
-                   class="w-full"
-                   pInputText
-                   (input)="filterAlphanumeric($event)"
-                   formControlName="nombreComercial"
-                   maxlength="100"
-                   [ngClass]="{ 'ng-invalid ng-dirty': isInvalid('nombreComercial') }"/>
-            <div *ngFor="let msg of errors('nombreComercial')" class="pl-2">
-              <p-message severity="error" variant="simple" size="small">{{ msg }}</p-message>
-            </div>
+          <!-- Campo: Abreviatura -->
+          <div class="flex flex-column gap-1">
+            <label for="abreviatura" class="text-sm font-medium" style="color: #374151;">Referencia *</label>
+            <input type="text" id="abreviatura" pInputText formControlName="abreviatura" class="w-full" style="width: 100%;"/>
+            @if (form.get('abreviatura')?.touched && form.get('abreviatura')?.errors) {
+              @if (form.get('abreviatura')?.errors?.['required']) {
+                <small style="color: #f44336; font-size: 0.75rem;">Campo obligatorio</small>
+              }
+              @if (form.get('abreviatura')?.errors?.['pattern']) {
+                <small style="color: #f44336; font-size: 0.75rem;">Solo mayúsculas, números y guión bajo</small>
+              }
+              @if (form.get('abreviatura')?.errors?.['maxlength']) {
+                <small style="color: #f44336; font-size: 0.75rem;">Máximo 20 caracteres</small>
+              }
+            }
           </div>
 
-          <div class="field col-12 md:col-2">
-            <label for="fechaCaducidad" class="pl-1">Fecha de caducidad
-              <span *ngIf="isFieldRequired('fechaCaducidad')" style="color: red;">*</span>
-            </label>
-            <p-datepicker id="fechaCaducidad"
-                          [readonlyInput]="true"
-                          formControlName="fechaCaducidad"
-                          styleClass="w-full"
-                          dateFormat="dd/mm/yy"
-                          placeholder="Selecciona una fecha">
+          <!-- Campo: Nombre Comercial -->
+          <div class="flex flex-column gap-1">
+            <label for="nombreComercial" class="text-sm font-medium" style="color: #374151;">Referencia destino</label>
+            <input type="text" id="nombreComercial" pInputText formControlName="nombreComercial" class="w-full" style="width: 100%;"/>
+            @if (form.get('nombreComercial')?.touched && form.get('nombreComercial')?.errors?.['maxlength']) {
+              <small style="color: #f44336; font-size: 0.75rem;">Máximo 100 caracteres</small>
+            }
+          </div>
+
+          <!-- Campo: Fecha Caducidad -->
+          <div class="flex flex-column gap-1">
+            <label for="fechaCaducidad" class="text-sm font-medium" style="color: #374151;">Fecha de Caducidad</label>
+            <p-datepicker
+              id="fechaCaducidad"
+              formControlName="fechaCaducidad"
+              dateFormat="dd/mm/yy"
+              class="w-full"
+              [style]="{width: '100%'}"
+              appendTo="body">
             </p-datepicker>
           </div>
-          <div class="field col-12 md:col-1"></div>
-
-          <div class="field col-12 md:col-5"></div>
-          <div class="field col-12 md:col-1">
-            <p-button label="Guardar"
-                      pTooltip="Guardar"
-                      [outlined]="true"
-                      severity="secondary"
-                      (onClick)="guardar();"
-                      [styleClass]="'w-full'"/>
-          </div>
-          <div class="field col-12 md:col-1">
-            <p-button label="Volver"
-                      pTooltip="Volver"
-                      [outlined]="true"
-                      severity="secondary"
-                      [routerLink]="['/perfil']"
-                      [styleClass]="'w-full'"/>
-          </div>
-          <div class="field col-12 md:col-5"></div>
         </div>
+      </p-panel>
+    </form>
+
+    <!-- FOOTER -->
+    <ng-template #footer>
+      <div class="flex justify-content-end gap-2 pt-3">
+        <p-button label="Cancelar" [outlined]="true" severity="info" (onClick)="cerrar()"></p-button>
+        <p-button label="Guardar" [outlined]="true" severity="success" (onClick)="guardar()"></p-button>
       </div>
-
-    </div>
-  </p-panel>
-
-
-</form>
+    </ng-template>
+  </p-dialog>
+</div>

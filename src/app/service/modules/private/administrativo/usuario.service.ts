@@ -3,8 +3,6 @@ import {Injectable} from '@angular/core';
 import {environment} from '../../../../../environments/environment';
 import {catchError, map, Observable, throwError} from 'rxjs';
 import {AuthService} from '../../../authorization/auth.service';
-import {Usuario} from '../../../../apis/model/module/private/usuario';
-import {UsuarioCliente} from '../../../../apis/model/module/private/usuario-cliente';
 import {ResetPassword} from '../../../../apis/model/module/private/reset-password';
 import {UsuarioSearch} from '../../../../apis/model/module/private/administrativo/usuario/request/usuario-search';
 import {buildPageableParams} from '../../../commons/http-request-handler.service';
@@ -47,45 +45,6 @@ export class UsuarioService {
     );
   }
 
-  getUsuariosEmpresas(idUsuario: number, idUsuarioSession: number): Observable<any> {
-    const params = [
-      `idUsuario=${idUsuario}`,
-      `idUsuarioSession=${idUsuarioSession}`,
-      `estadoRegistro=S`,
-    ].filter(Boolean).join('&');
-
-    const headers = new HttpHeaders({});
-
-    const url = `${this.urlSeguridad}/listarEmpresasUsuarioPage?${params}`;
-
-    return this.http.get(url, {headers: headers}).pipe(
-      map((response: any) => {
-        return response.body;
-      }),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  public desVincularEmpresa(idUsuarioCliente: number) {
-    let usuarioCliente: UsuarioCliente = new UsuarioCliente();
-    usuarioCliente.codigo = idUsuarioCliente;
-
-    const headers = new HttpHeaders({});
-
-    const url = `${this.urlSeguridad}/desvincularEmpresas`;
-
-    return this.http.post<any>(url, usuarioCliente, {headers: headers}).pipe(
-      map((response: any) => response.body as Usuario),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
   public cambiarPassword(idUsuario: number, password: string): Observable<any> {
     let resetPassword: ResetPassword = new ResetPassword();
     resetPassword.id = idUsuario;
@@ -103,21 +62,6 @@ export class UsuarioService {
       })
     );
   }
-
-  public vincularEmpresaPerfil(usuarioCliente: UsuarioCliente) {
-    const headers = new HttpHeaders({});
-
-    const url = `${this.urlSeguridad}/vincularEmpresas`;
-
-    return this.http.post<any>(url, usuarioCliente, {headers: headers}).pipe(
-      map((response: any) => response.body as UsuarioCliente),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
 
   getUsuariosCuentaPage(page: number,
                         estadoRegistro: string | undefined,

@@ -47,7 +47,7 @@ export class HeaderWebComponent implements OnInit {
   }
 
   onLogout(): void {
-    this.tokenService.clear();
-    location.href = environment.security.logout_url;
+    //this.tokenService.clear();
+    //location.href = environment.security.logout_url;
   }
 }

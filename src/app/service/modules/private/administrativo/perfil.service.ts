@@ -2,31 +2,101 @@ import {Injectable} from '@angular/core';
 import {environment} from '../../../../../environments/environment';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {AuthService} from '../../../authorization/auth.service';
-import {Perfil} from '../../../../apis/model/module/private/perfil';
 import {catchError, map, Observable, throwError} from 'rxjs';
-import {Aplicacion} from '../../../../apis/model/module/private/aplicacion';
-import {ModuloRequest} from '../../../../apis/model/module/private/request/modulo-request';
-import {buildPageableParams} from '../../../commons/http-request-handler.service';
 import {PerfilSearch} from '../../../../apis/model/module/private/administrativo/perfil/request/perfil-search';
 import {PerfilResponse} from '../../../../apis/model/module/private/administrativo/perfil/response/perfil-response';
 import {PerfilRequest} from '../../../../apis/model/module/private/administrativo/perfil/request/perfil-request';
 import {
   PerfilOpcionRequest
 } from '../../../../apis/model/module/private/administrativo/perfil/request/perfil-opcion-request';
+import {
+  PerfilSearchResponse
+} from '../../../../apis/model/module/private/administrativo/perfil/response/perfil-search-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PerfilService {
-  private readonly urlSeguridad: string = environment.url.base + '/seguridad';
   private readonly urlPerfil: string = environment.url.base + '/perfil';
-  private readonly urlPlataforma: string = environment.url.base + '/plataforma/aplicacion';
 
-  constructor(private http: HttpClient,
-              private authService: AuthService) {
+  constructor(private readonly http: HttpClient,
+              private readonly authService: AuthService) {
   }
 
-  getPerfilesPage(page: number,
+  private handleError(err: any): Observable<never> {
+    this.authService.isNoAutorizado(err);
+    return throwError(() => err);
+  }
+
+  /**
+   * Registrar un nuevo perfil
+   */
+  registrarPerfil(request: PerfilRequest): Observable<PerfilResponse> {
+    return this.http.post<PerfilResponse>(
+      `${this.urlPerfil}/registrar-perfil`,
+      request
+    ).pipe(
+      map((response: any) => response),
+      catchError(err => this.handleError(err))
+    );
+  }
+
+  /**
+   * Actualizar un perfil existente
+   */
+  actualizarPerfil(request: PerfilRequest): Observable<PerfilResponse> {
+    return this.http.post<PerfilResponse>(
+      `${this.urlPerfil}/actualizar-perfil`,
+      request
+    ).pipe(
+      map((response: any) => response),
+      catchError(err => this.handleError(err))
+    );
+  }
+
+  /**
+   * Eliminar (dar de baja) un perfil por código
+   */
+  eliminarPerfil(codigo: number): Observable<PerfilResponse> {
+    return this.http.post<PerfilResponse>(
+      `${this.urlPerfil}/eliminar-perfil/${codigo}`,
+      {}
+    ).pipe(
+      map((response: any) => response),
+      catchError(err => this.handleError(err))
+    );
+  }
+
+  /**
+   * Listar perfiles con paginación y filtros
+   */
+  listarPerfilesPage(search: PerfilSearch): Observable<PerfilSearchResponse> {
+    return this.http.post<PerfilSearchResponse>(
+      `${this.urlPerfil}/listarPerfil`,
+      search
+    ).pipe(
+      map((response: any) => response),
+      catchError(err => this.handleError(err))
+    );
+  }
+
+  /**
+   * Obtener un perfil por código
+   */
+  obtenerPerfil(codigoPerfil?: number): Observable<PerfilResponse> {
+    let params: any = {};
+    if (codigoPerfil) {
+      params.codigoPerfil = codigoPerfil;
+    }
+    return this.http.get<PerfilResponse>(
+      `${this.urlPerfil}/obtenerPerfil`,
+      { params }
+    ).pipe(
+      map((response: any) => response),
+      catchError(err => this.handleError(err))
+    );
+  }
+  /*getPerfilesPage(page: number,
                   estadoRegistro: string | undefined,
                   nombrePerfil: string | undefined,
                   cantReg: number,
@@ -110,36 +180,7 @@ export class PerfilService {
         return throwError(() => e);
       })
     );
-  }
-
-  getAllPerfiles(): Observable<any> {
-    const headers = new HttpHeaders({});
-
-    const url = `${this.urlSeguridad}/listarAllPerfil`;
-
-    return this.http.get(url, {headers: headers}).pipe(
-      map((response: any) => {
-        (response.body.content as Perfil[]).map(perfil => {
-          perfil.descripcion = perfil.descripcion.toUpperCase();
-          perfil.abreviatura = perfil.abreviatura.toUpperCase();
-          perfil.nombreComercial = perfil.nombreComercial.toUpperCase();
-          perfil.abreviatura = perfil.abreviatura.toUpperCase();
-          if (perfil.estadoRegistro === 'S') {
-            perfil.estadoRegistro = 'ACTIVO';
-          } else {
-            perfil.estadoRegistro = 'INACTIVO';
-          }
-
-          return perfil;
-        });
-        return response.body;
-      }),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
+  }*/
 
   getPerfilModulos(idPerfil: number): Observable<any> {
     const params = [
@@ -153,26 +194,6 @@ export class PerfilService {
     return this.http.get(url, {headers: headers}).pipe(
       map((response: any) => {
         return response;
-      }),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  getPerfilMenus(idPerfil: number): Observable<any> {
-    const params = [
-      `idPerfil=${idPerfil}`,
-    ].filter(Boolean).join('&');
-
-    const headers = new HttpHeaders({});
-
-    const url = `${this.urlSeguridad}/listarPerfilMenus?${params}`;
-
-    return this.http.get(url, {headers: headers}).pipe(
-      map((response: any) => {
-        return response.body;
       }),
       catchError(e => {
         this.authService.isNoAutorizado(e);
@@ -202,49 +223,6 @@ export class PerfilService {
 
     return this.http.post<any>(url, moduloRequest, {headers: headers}).pipe(
       map((response: any) => response),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  getPerfilesEstadoRegistro(idEmpresa: string, idUsuario: string): Observable<any> {
-    const params = [
-      `estadoRegistro=S`,
-      `idEmpresa=${idEmpresa}`,
-      `idUsuario=${idUsuario}`,
-    ].filter(Boolean).join('&');
-
-    const headers = new HttpHeaders({});
-
-    const url = `${this.urlSeguridad}/listarAllPerfiles?${params}`;
-
-    return this.http.get(url, {headers: headers}).pipe(
-      map((response: any) => {
-        return response.body;
-      }),
-      catchError(e => {
-        this.authService.isNoAutorizado(e);
-        return throwError(() => e);
-      })
-    );
-  }
-
-  getPerfilesEmpresa(idUsuario: number, idEmpresa: number): Observable<Perfil[]> {
-    const params = [
-      `idUsuario=${idUsuario}`,
-      `idEmpresa=${idEmpresa}`,
-    ].filter(Boolean).join('&');
-
-    const headers = new HttpHeaders({});
-
-    const url = `${this.urlSeguridad}/list-perfiles-empresa?${params}`;
-
-    return this.http.get(url, {headers: headers}).pipe(
-      map((response: any) => {
-        return response;
-      }),
       catchError(e => {
         this.authService.isNoAutorizado(e);
         return throwError(() => e);

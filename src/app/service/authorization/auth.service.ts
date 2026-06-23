@@ -34,7 +34,7 @@ export class AuthService {
     return this.httpClient.post<any>(this.token_url, body, httpOptions);
   }
 
-  public token(): string | null {
+  /*public token(): string | null {
     if (this._token != null && this._token !="") {
       return this._token;
     } else {
@@ -48,7 +48,7 @@ export class AuthService {
       }
     }
     return null;
-  }
+  }*/
 
   public logout(): void {
     this._token = null;
@@ -160,5 +160,12 @@ export class AuthService {
       return JSON.parse(atob(accessToken.split(".")[1]));
     }
     return null;
+  }
+
+  confirmAndLogout(): void {
+    this.logout();
+    //this.tokenService.clear();
+
+    window.location.href = environment.security.logout_url;
   }
 }

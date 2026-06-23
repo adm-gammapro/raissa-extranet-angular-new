@@ -1,0 +1,62 @@
+.container-dashboard {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+
+  .card-header {
+    margin-bottom: 1.5rem;
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #7f8c8d;
+    }
+  }
+
+  .card {
+    border-radius: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .consumo-container {
+    .p-progressbar {
+      border-radius: 10px;
+
+      &.p-progressbar-danger {
+        .p-progressbar-value {
+          background-color: #ef4444;
+        }
+      }
+
+      &.p-progressbar-warning {
+        .p-progressbar-value {
+          background-color: #f59e0b;
+        }
+      }
+    }
+  }
+}
+
+// Estilos personalizados para PrimeNG
+::ng-deep {
+  .p-progressbar {
+    border-radius: 10px;
+    overflow: hidden;
+
+    .p-progressbar-value {
+      transition: width 0.5s ease-in-out;
+    }
+  }
+
+  .p-card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+  }
+}

@@ -8,7 +8,6 @@ import {Paginator} from '../../../../apis/model/commons/paginator';
 import {Util} from '../../../../utils/util/util.util';
 import {Estado} from '../../../../apis/model/commons/estado';
 import {environment} from '../../../../../environments/environment';
-import {FormUsuarioPerfilComponent} from './usuario-perfil/form-usuario-perfil.component';
 import {UsuarioResponse} from '../../../../apis/model/module/private/administrativo/usuario/response/usuario-response';
 import {EstadoRegistroLabelPipe} from '../../../../apis/model/pipe/estado-registro-label.pipe';
 import {
@@ -72,7 +71,6 @@ export class UsuarioComponent implements OnInit {
   protected loading: boolean = false;
   protected totalRecords: number = 0;
   protected registrosMostrados = 0;
-  @ViewChild(FormUsuarioPerfilComponent) formUsuarioPerfilComponent!: FormUsuarioPerfilComponent;
   protected items: MenuItem[] | undefined;
   protected home: MenuItem | undefined;
   protected usuarios!: UsuarioResponse[];

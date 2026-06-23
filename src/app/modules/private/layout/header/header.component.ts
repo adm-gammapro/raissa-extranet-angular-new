@@ -11,6 +11,7 @@ import {Util} from '../../../../utils/util/util.util';
 import {ValidationUtil} from '../../../../service/commons/validation-util';
 import {UsuarioService} from '../../../../service/modules/private/administrativo/usuario.service';
 import {UsuarioRequest} from '../../../../apis/model/module/private/administrativo/usuario/request/usuario-request';
+import {AuthService} from '../../../../service/authorization/auth.service';
 
 const STRONG_PWD_REGEX = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
 
@@ -48,7 +49,9 @@ export class HeaderComponent implements OnInit {
   constructor(private readonly tokenService: TokenService,
               private readonly fb: FormBuilder,
               private readonly msg: MessageService,
-              private readonly usuarioService: UsuarioService) {
+              private readonly confirmationService: ConfirmationService,
+              private readonly usuarioService: UsuarioService,
+              private readonly authService: AuthService) {
     if (sessionStorage.getItem(environment.session.NOMBRE_EMPRESA) != undefined) {
       this.nombreEmpresa = sessionStorage.getItem(environment.session.NOMBRE_EMPRESA);
     }
@@ -113,8 +116,21 @@ export class HeaderComponent implements OnInit {
   }
 
   onLogout(): void {
-    this.tokenService.clear();
-    location.href = environment.security.logout_url;
+    this.confirmationService.confirm({
+      header: 'Cerrar Sesión',
+      message: '¿Está seguro que desea cerrar la sesión?',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'SÍ',
+      rejectLabel: 'NO',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-info',
+      accept: () => {
+        this.authService.confirmAndLogout();
+      },
+      reject: () => {
+        console.log('Logout cancelado');
+      }
+    });
   }
 
   mostrarPerfil(): void {

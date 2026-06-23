@@ -12,7 +12,8 @@ export class TokenService {
   constructor() { }
 
   setTokens(access_token: string, refresh_token: string): void {
-    this.clear();
+    sessionStorage.clear();
+    //this.clear();
     sessionStorage.setItem(environment.session.ACCESS_TOKEN, access_token);
     sessionStorage.setItem(environment.session.REFRESH_TOKEN, refresh_token);
   }
@@ -29,7 +30,7 @@ export class TokenService {
     }
   }
 
-  getRefreshToken(): string | null {
+  /*getRefreshToken(): string | null {
     if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){
       if (sessionStorage.getItem(environment.session.REFRESH_TOKEN) == null) {
         return null;
@@ -39,16 +40,24 @@ export class TokenService {
     } else {
       return null;
     }
-  }
+  }*/
 
-  clear(): void {
+  /*clear(): void {
     if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){
       sessionStorage.removeItem(environment.session.ACCESS_TOKEN);
       sessionStorage.removeItem(environment.session.REFRESH_TOKEN);
       sessionStorage.removeItem(environment.session.USERNAME);
       sessionStorage.removeItem(environment.session.CODE_VERIFIER);
+      sessionStorage.removeItem(environment.session.ID_EMPRESA);
+      sessionStorage.removeItem(environment.session.NOMBRE_EMPRESA);
+      sessionStorage.removeItem(environment.session.NOMBRES_USUARIO);
+      sessionStorage.removeItem(environment.session.APELLIDO_PATERNO_USUARIO_SESSION);
+      sessionStorage.removeItem(environment.session.APELLIDO_MATERNO_USUARIO_SESSION);
+      sessionStorage.removeItem(environment.session.CORREO_USUARIO_SESSION);
+      sessionStorage.removeItem(environment.session.TELEFONO_USUARIO_SESSION);
+      sessionStorage.removeItem(environment.session.MENU_ITEMS);
     }
-  }
+  }*/
 
   isLogged(): boolean {
     if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){
@@ -58,7 +67,7 @@ export class TokenService {
     }
   }
 
-  isAdmin(): boolean {
+  /*isAdmin(): boolean {
     if(!this.isLogged()) {
       return false;
     }
@@ -69,7 +78,7 @@ export class TokenService {
     const roles = values.roles;
     return roles.indexOf('ROLE_ADMIN') >= 0;
 
-  }
+  }*/
 
   setVerifier(code_verifier: string): void {
     if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){

@@ -28,17 +28,14 @@ import {
 import {SaldosComponent} from './modules/private/operativo/saldos/saldos.component';
 import {SaldosBancoComponent} from './modules/private/operativo/saldos/saldos-banco/saldos-banco.component';
 import {MovimientosComponent} from './modules/private/operativo/saldos/movimientos/movimientos.component';
-import {
-  TableUsuarioClienteComponent
-} from './modules/private/administrativo/usuario/usuario-empresa/table/table-usuario-cliente.component';
-import {
-  FormUsuarioClienteComponent
-} from './modules/private/administrativo/usuario/usuario-empresa/form/form-usuario-cliente.component';
 import {MonitorComponent} from './modules/private/operativo/monitor/monitor.component';
 import {DetalleMonitorComponent} from './modules/private/operativo/monitor/detalle-monitor/detalle-monitor.component';
 import {UsuarioCuentaComponent} from './modules/private/administrativo/usuario/usuario-cuenta/usuario-cuenta.component';
 import {LoginComponent} from './config/login/login.component';
 import {AuthGuard} from './config/guard/auth.guard';
+import {
+  TarifarioDashboardComponent
+} from './modules/private/administrativo/tarifario/tarifario-dashboard/tarifario-dashboard.component';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'content', pathMatch: 'full'},
@@ -51,8 +48,6 @@ export const routes: Routes = [
   {path: 'usuario', component: UsuarioComponent, canActivate: [AuthGuard]},
   {path: 'form-usuario/:id', component: FormUsuarioComponent, canActivate: [AuthGuard]},
   {path: 'usuario/:pagina/:cantReg/:nombreSearch/:estadoSearch', component: UsuarioComponent, canActivate: [AuthGuard]},
-  {path: 'usuario-empresa/:id', component: TableUsuarioClienteComponent, canActivate: [AuthGuard]},
-  {path: 'form-usuario-cliente/:id', component: FormUsuarioClienteComponent, canActivate: [AuthGuard]},
   {path: 'usuario-cuenta/:idUsuario', component: UsuarioCuentaComponent, canActivate: [AuthGuard]},
 
   {path: 'perfil', component: PerfilComponent, canActivate: [AuthGuard]},
@@ -115,4 +110,6 @@ export const routes: Routes = [
     component: DetalleMonitorComponent,
     canActivate: [AuthGuard]
   },
+
+  {path: 'tarifario', component: TarifarioDashboardComponent, canActivate: [AuthGuard]},
 ];
