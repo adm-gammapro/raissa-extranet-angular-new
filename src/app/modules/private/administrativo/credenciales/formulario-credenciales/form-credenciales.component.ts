@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderComponent } from '../../../layout/header/header.component';
 import { PRIME_NG_MODULES } from '../../../../../config/primeNg/primeng-global-imports';
@@ -15,6 +15,10 @@ import { FrecuenciaActualizacionResponse } from '../../../../../apis/model/modul
 import { ProveedorResponse } from '../../../../../apis/model/module/private/operativo/proveedor/response/proveedor-response';
 import { CredencialesResponse } from '../../../../../apis/model/module/private/operativo/credenciales/response/credenciales-response';
 import { CredencialesRequest } from '../../../../../apis/model/module/private/operativo/credenciales/request/credenciales-request';
+import {InstitucionFinancieraService} from '../../../../../service/commons/institucion-financiera.service';
+import {
+  InstitucionFinancieraResponse
+} from '../../../../../apis/model/module/private/commons/institucion-financiera-response';
 
 @Component({
   selector: 'app-form-credenciales',
@@ -29,22 +33,24 @@ import { CredencialesRequest } from '../../../../../apis/model/module/private/op
   templateUrl: './form-credenciales.component.html',
   styleUrl: './form-credenciales.component.scss'
 })
-export class FormCredencialesComponent {
+export class FormCredencialesComponent implements OnInit {
   credencialesResponse: CredencialesResponse = new CredencialesResponse();
   credencialesRequest: CredencialesRequest = new CredencialesRequest();
   public proveedores: ProveedorResponse[] = [];
   public frecuencias: FrecuenciaActualizacionResponse[] = [];
   public credencialForm: FormGroup;
   public idEmpresa: string = "";
+  public bancos: InstitucionFinancieraResponse[]=[];
 
-  constructor(private readonly router: Router, 
-              private readonly confirmationService: ConfirmationService, 
+  constructor(private readonly router: Router,
+              private readonly confirmationService: ConfirmationService,
               private readonly formBuilder: FormBuilder,
-              private readonly messageService: MessageService, 
-              private readonly proveedorService: ProveedorService, 
+              private readonly messageService: MessageService,
+              private readonly proveedorService: ProveedorService,
               private readonly activatedRoute: ActivatedRoute,
               private readonly messagesService: MessagesService,
               private readonly credencialesService: CredencialesService,
+              private readonly institucionFinancieraService: InstitucionFinancieraService,
               private readonly cuentasService: CuentasService) {
 
     this.credencialForm = this.formBuilder.group({
@@ -55,6 +61,7 @@ export class FormCredencialesComponent {
       referencia: [''],
       codigoFrecuenciaActualizacion: ['', Validators.required],
       codigoProveedor: ['', Validators.required],
+      codigoBanco: ['', Validators.required],
     });
 
     if (sessionStorage.getItem(environment.session.ID_EMPRESA) != undefined) {
@@ -80,17 +87,17 @@ export class FormCredencialesComponent {
 
       const campoReferencia = this.credencialForm.get('referencia');
       if (proveedor.indicadorValorAdicional) {
-        campoReferencia?.setValidators([Validators.required]); 
+        campoReferencia?.setValidators([Validators.required]);
       } else {
         campoReferencia?.clearValidators();
       }
-  
+
       campoReferencia?.updateValueAndValidity();
     });
   }
 
   guardar() {
-    
+
       if (this.credencialForm.valid) {
         this.confirmationService.confirm({
           message: '¿Está seguro de guardar este registro?',
@@ -130,12 +137,12 @@ export class FormCredencialesComponent {
             this.messageService.add({ severity: 'error', summary: 'Rechazado', detail: 'No se guardó registro', life: 5000 });
         }
         });
-        
+
       } else {
         this.messageService.add({
           severity: 'error',
           summary: 'Error de Validación',
-          detail: 'Se deben ingresar los campos obligatorios y en el formato requerido.', 
+          detail: 'Se deben ingresar los campos obligatorios y en el formato requerido.',
           life: 5000
         });
         this.credencialForm.markAllAsTouched();
@@ -145,12 +152,13 @@ export class FormCredencialesComponent {
   ngOnInit() {
     this.cargarProveedor();
     this.cargarFrecuencia();
+    this.cargarBanco();
 
     this.activatedRoute.paramMap.subscribe (params => {
       let id: number | null;
 
       id = Number(params.get('id'));
-                      
+
       if(id!=null && id>0){
         this.credencialesService.getCredencial(id, Number(this.idEmpresa)).subscribe(response => {
           this.credencialesResponse = response;
@@ -162,7 +170,8 @@ export class FormCredencialesComponent {
             clave: this.credencialesResponse.clave,
             referencia: this.credencialesResponse.referencia,
             codigoFrecuenciaActualizacion: this.credencialesResponse.frecuenciaActualizacion.codigo,
-            codigoProveedor: this.credencialesResponse.proveedor.codigo
+            codigoProveedor: this.credencialesResponse.proveedor.codigo,
+            codigoBanco: this.credencialesResponse.codigoBanco,
           });
         });
       }
@@ -175,5 +184,11 @@ export class FormCredencialesComponent {
 
   isFieldRequired(controlName: string): boolean {
     return Util.isFieldRequired(controlName, this.credencialForm);
+  }
+
+  private cargarBanco(): void {
+    this.institucionFinancieraService.getAllBancos(Number(this.idEmpresa)).subscribe(response => {
+      this.bancos = response;
+    });
   }
 }

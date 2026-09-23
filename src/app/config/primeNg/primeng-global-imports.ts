@@ -41,7 +41,6 @@ import { Breadcrumb } from 'primeng/breadcrumb';
 import { Message } from 'primeng/message';
 import { TreeTableModule } from 'primeng/treetable';
 import { IftaLabelModule } from 'primeng/iftalabel';
-import { MeterGroup } from 'primeng/metergroup';
 
 export const PRIME_NG_MODULES = [
     ButtonModule,
@@ -87,6 +86,5 @@ export const PRIME_NG_MODULES = [
     Message,
     TreeTableModule,
     IftaLabelModule,
-    MeterGroup
     // Agrega más módulos aquí
   ];

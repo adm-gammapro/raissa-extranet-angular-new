@@ -6,5 +6,6 @@ export class CredencialesRequest {
     referencia!: string;
     codigoProveedor!: string;
     codigoCliente!: number;
+    codigoBanco!: string;
     codigoFrecuenciaActualizacion!: string;
 }

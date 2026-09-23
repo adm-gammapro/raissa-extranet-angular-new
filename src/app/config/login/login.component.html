@@ -1,1 +1,256 @@
+<div class="login-bg flex align-items-center justify-content-center min-h-screen p-3">
+  <p-toast position="top-right"></p-toast>
 
+  <div class="w-full max-w-30rem">
+    <p-card styleClass="shadow-6 border-round-2xl fadeinup bg-gray-100">
+
+      <!-- Header con logo -->
+      <ng-template pTemplate="header">
+        <div class="text-center pt-5 pb-2 px-3">
+          <img src="assets/images/Raissa-logo-final-conFondo.png"
+               alt="Raissa Logo"
+               class="w-20rem sm:w-28rem mb-3">
+          <h2 class="text-2xl sm:text-3xl font-semibold text-900 m-0">
+            Iniciar Sesión
+          </h2>
+        </div>
+      </ng-template>
+
+      <!-- ===== PASO 1: FORMULARIO DE CREDENCIALES ===== -->
+      <form *ngIf="pasoActual === 'credenciales'"
+            [formGroup]="credencialesForm"
+            (ngSubmit)="onValidarUsuario()"
+            novalidate
+            class="flex flex-column gap-3">
+
+        <!-- Tipo de Documento -->
+        <div class="flex flex-column gap-2">
+          <label for="tipoDoc" class="text-sm font-medium text-700 flex align-items-center gap-2">
+            <i class="pi pi-id-card"></i>
+            Tipo de documento
+          </label>
+          <p-inputgroup>
+            <p-inputgroup-addon>
+              <i class="pi pi-map"></i>
+            </p-inputgroup-addon>
+            <p-select
+              id="tipoDoc"
+              formControlName="tipoDoc"
+              [options]="tiposDocumento"
+              optionLabel="label"
+              optionValue="value"
+              styleClass="w-full"
+              placeholder="Seleccione tipo de documento"/>
+          </p-inputgroup>
+
+        </div>
+
+        <!-- Número de Documento -->
+        <div class="flex flex-column gap-2">
+          <label for="usuario" class="text-sm font-medium text-700 flex align-items-center gap-2">
+            <i class="pi pi-hashtag"></i>
+            Número de documento
+          </label>
+          <span class="p-input-icon-left w-full">
+            <p-inputgroup>
+                <p-inputgroup-addon>
+                    <i class="pi pi-user"></i>
+                </p-inputgroup-addon>
+                <input pInputText id="usuario"
+                       formControlName="usuario"
+                       class="w-full"
+                       placeholder="Ingrese su número de documento"/>
+            </p-inputgroup>
+          </span>
+          <small
+            *ngIf="credencialesForm.get('usuario')?.invalid && credencialesForm.get('usuario')?.touched"
+            class="p-error flex align-items-center gap-1 mt-1">
+            <i class="pi pi-exclamation-circle text-xs"></i>
+            <span class="text-xs">Ingrese un número de documento válido</span>
+          </small>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="flex flex-column gap-2">
+          <label for="password" class="text-sm font-medium text-700 flex align-items-center gap-2">
+            <i class="pi pi-lock"></i>
+            Contraseña
+          </label>
+          <p-password
+            id="password"
+            formControlName="password"
+            [feedback]="false"
+            [toggleMask]="true"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            placeholder="Ingrese su contraseña"
+            autocomplete="off"
+            (onBlur)="onPasswordBlur($event)"
+            [inputId]="'password'">
+          </p-password>
+
+          <small
+            *ngIf="credencialesForm.get('password')?.invalid && credencialesForm.get('password')?.touched"
+            class="p-error flex align-items-center gap-1 mt-1">
+            <i class="pi pi-exclamation-circle text-xs"></i>
+            <span class="text-xs">Ingrese password válido</span>
+          </small>
+        </div>
+
+        <!-- Botón Validar -->
+        <div class="w-full mt-3">
+          <p-button
+            type="submit"
+            styleClass="w-full justify-content-center"
+            [disabled]="!puedeValidar"
+            [loading]="isLoading"
+            icon="pi pi-search"
+            [raised]="true"
+            severity="info"
+            label="Validar">
+          </p-button>
+        </div>
+      </form>
+
+      <!-- ===== PASO 2: POST-VALIDACIÓN ===== -->
+      <div *ngIf="pasoActual === 'validado'" class="flex flex-column gap-3">
+        <!-- Resumen del usuario -->
+        <div class="p-3 border-round-xl surface-card shadow-1">
+          <div class="grid m-0">
+            <div class="col-6 p-2">
+              <div class="flex flex-column gap-1">
+                <span class="text-xs text-500 flex align-items-center gap-1">
+                  <i class="pi pi-id-card"></i>
+                  Tipo Doc.
+                </span>
+                <span class="text-base font-bold text-900">
+                  {{ credencialesForm.get('tipoDoc')?.value }}
+                </span>
+              </div>
+            </div>
+            <div class="col-6 p-2">
+              <div class="flex flex-column gap-1">
+                <span class="text-xs text-500 flex align-items-center gap-1">
+                  <i class="pi pi-hashtag"></i>
+                  N° Documento
+                </span>
+                <span class="text-base font-bold text-900">
+                  {{ credencialesForm.get('usuario')?.value }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selector de Empresa (solo para tipo C - Cliente) -->
+        <div *ngIf="tipoUsuario === 'C' && empresas.length > 0" class="flex flex-column gap-2">
+          <label for="empresaSelect" class="text-sm font-medium text-700 flex align-items-center gap-2">
+            <i class="pi pi-building"></i>
+            Empresa
+          </label>
+          <p-select
+            id="empresaSelect"
+            [options]="empresas"
+            [(ngModel)]="empresaSeleccionada"
+            optionLabel="nombre"
+            styleClass="w-full"
+            placeholder="Seleccionar empresa"
+            [showClear]="true"
+            (onChange)="onEmpresaChange($event)">
+            <ng-template let-empresa pTemplate="selectedItem">
+              <div class="flex align-items-center gap-2" *ngIf="empresa">
+                <i class="pi pi-building text-primary"></i>
+                <span>{{ empresa.nombre }}</span>
+              </div>
+            </ng-template>
+            <ng-template let-empresa pTemplate="item">
+              <div class="flex align-items-center gap-2 p-2">
+                <i class="pi pi-building text-primary"></i>
+                <span>{{ empresa.nombre }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+          <small class="text-500 text-xs flex align-items-center gap-1">
+            <i class="pi pi-info-circle"></i>
+            Seleccione la empresa a la que desea acceder
+          </small>
+        </div>
+
+        <!-- Campo contraseña (solo lectura) -->
+        <div class="flex flex-column gap-2">
+          <label for="passwordConfirm" class="text-sm font-medium text-700 flex align-items-center gap-2">
+            <i class="pi pi-lock"></i>
+            Contraseña
+          </label>
+
+          <p-password
+            id="passwordConfirm"
+            [feedback]="false"
+            [toggleMask]="true"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [disabled]="true"
+            [ngModel]="credencialesForm.get('password')?.value"
+            placeholder="••••••••">
+          </p-password>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="w-full mt-1">
+          <p-button
+            type="button"
+            styleClass="w-full justify-content-center"
+            [disabled]="!puedeIniciarSesion"
+            [loading]="isLoading"
+            icon="pi pi-sign-in"
+            label="Iniciar Sesión"
+            [raised]="true"
+            severity="info"
+            (onClick)="onIniciarSesion()">
+          </p-button>
+        </div>
+        <div class="w-full">
+          <p-button
+            type="button"
+            styleClass="w-full justify-content-center"
+            [disabled]="isLoading"
+            icon="pi pi-arrow-left"
+            label="Volver"
+            [raised]="true"
+            severity="secondary"
+            (onClick)="onVolver()">
+          </p-button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <ng-template pTemplate="footer">
+        <div class="text-center pt-2">
+          <a routerLink="/recuperar-password"
+             class="no-underline text-cyan-500 hover:text-cyan-700 font-medium text-sm transition-colors transition-duration-200 inline-flex align-items-center gap-1 cursor-pointer">
+            <i class="pi pi-question-circle"></i>
+            ¿Olvidé mi contraseña?
+          </a>
+
+          <div
+            class="mt-4 flex flex-column sm:flex-row justify-content-center align-items-center gap-2 sm:gap-3 text-xs text-500">
+            <span class="flex align-items-center gap-1">
+              <i class="pi pi-shield text-green-500"></i>
+              Conexión segura
+            </span>
+            <span class="hidden sm:inline text-300">|</span>
+            <span class="flex align-items-center gap-1">
+              <i class="pi pi-clock text-blue-500"></i>
+              Disponible 24/7
+            </span>
+          </div>
+
+          <div class="mt-3 text-xs text-400">
+            Copyright © 2023. All rights reserved.
+          </div>
+        </div>
+      </ng-template>
+
+    </p-card>
+  </div>
+</div>

@@ -35,6 +35,8 @@ export const environment = {
     response_mode: 'form_post',
     code_challenge_method: 'S256',
     token_url: "https://www.raissaob.com/api/autorizador/oauth2/token",
+    validacion_url: "https://www.raissaob.com/api/autorizador/api/validar_usuario",
+    custom_login_url: "https://www.raissaob.com/api/autorizador/custom-login",
     grant_type: "authorization_code",
     resource_url: 'https://www.raissaob.com/api/extranet/resource/',//esta es la ruta del servicio del server resource
     logout_url: 'https://www.raissaob.com/api/autorizador/logout',

@@ -11,6 +11,8 @@ export class CredencialesResponse {
     proveedor!: ProveedorResponse;
     frecuenciaActualizacion!: FrecuenciaActualizacionResponse;
     razonSocialCliente!: string;
+    codigoBanco!: string;
+    descripcionBanco!: string;
     estadoRegistro!: EstadoRegistroEnum;
     audiFechIns!: string;
 }

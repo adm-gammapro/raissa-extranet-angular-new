@@ -1,58 +1,54 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../../environments/environment';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {catchError, forkJoin, map, mapTo, Observable, of, tap, throwError} from 'rxjs';
 import {Cliente} from '../../apis/model/module/private/cliente';
 import {UsuarioResponse} from '../../apis/model/module/private/administrativo/usuario/response/usuario-response';
+import {TokenService} from './token.service';
+import {EmpresaDto} from '../../apis/model/module/private/administrativo/empresa/empresa-simple';
+
+export interface ValidacionUsuario {
+  status: 'A' | 'C' | 'E';
+  empresas?: EmpresaDto[];
+  mensaje?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  public _token?: string | null;
+  private readonly validarUsuarioUrl = environment.security.validacion_url;
+  private readonly customLoginUrl = environment.security.custom_login_url;
   private readonly token_url = environment.security.token_url;
+  public _token?: string | null;
 
   constructor(private readonly httpClient: HttpClient,
-              private readonly router: Router) { }
+              private readonly router: Router,
+              private readonly tokenService: TokenService) {
+  }
 
   public getToken(code: string, code_verifier: string): Observable<any> {
     let body = new URLSearchParams();
-    body.set('grant_type',environment.security.grant_type);
-    body.set('client_id',environment.security.client_id);
-    body.set('redirect_uri',environment.security.redirect_uri);
-    body.set('scope',environment.security.scope);
-    body.set('code_verifier',code_verifier);
-    body.set('code',code);
-    const basic_auth = 'Basic ' + btoa(environment.security.client_id+':'+environment.security.secret_client);
+    body.set('grant_type', environment.security.grant_type);
+    body.set('client_id', environment.security.client_id);
+    body.set('redirect_uri', environment.security.redirect_uri);
+    body.set('scope', environment.security.scope);
+    body.set('code_verifier', code_verifier);
+    body.set('code', code);
+    const basic_auth = 'Basic ' + btoa(environment.security.client_id + ':' + environment.security.secret_client);
     const headers_object = new HttpHeaders({
       'Content-Type': 'application/x-www-form-urlencoded',
       'Accept': '*/*',
       'Authorization': basic_auth
     });
-    const httpOptions = { headers: headers_object}
+    const httpOptions = {headers: headers_object}
     return this.httpClient.post<any>(this.token_url, body, httpOptions);
   }
 
-  /*public token(): string | null {
-    if (this._token != null && this._token !="") {
-      return this._token;
-    } else {
-      if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){
-        if ((this._token == null) && (sessionStorage.getItem(environment.session.ACCESS_TOKEN) != null && sessionStorage.getItem(environment.session.ACCESS_TOKEN) != undefined)) {
-          if (sessionStorage.getItem(environment.session.ACCESS_TOKEN) != undefined) {
-            this._token = sessionStorage.getItem(environment.session.ACCESS_TOKEN);
-            return this._token;
-          }
-        }
-      }
-    }
-    return null;
-  }*/
-
   public logout(): void {
     this._token = null;
-    if(typeof window !== 'undefined'  && typeof window.sessionStorage !== 'undefined'){
+    if (typeof window !== 'undefined' && typeof window.sessionStorage !== 'undefined') {
       sessionStorage.clear();
     }
   }
@@ -113,44 +109,40 @@ export class AuthService {
     return forkJoin(ops).pipe(mapTo(void 0));
   }
 
-  public getUsuario(username: string):  Observable<UsuarioResponse> {
+  public getUsuario(username: string): Observable<UsuarioResponse> {
     const params = [
       `username=${username}`,
     ].filter(Boolean).join('&');
 
-    const headers = new HttpHeaders({
-
-    });
+    const headers = new HttpHeaders({});
     const url = `${environment.url.base}/usuario/obtenerUsuarioByUsername?${params}`;
 
-    return this.httpClient.get(url, { headers: headers }).pipe(
+    return this.httpClient.get(url, {headers: headers}).pipe(
       map((response: any) => {
         return response.body;
       }),
       catchError((e) => {
-          this.isNoAutorizado(e);
-          return throwError(() => e);
+        this.isNoAutorizado(e);
+        return throwError(() => e);
       })
     );
   }
 
-  public getEmpresa(idEmpresa: string):  Observable<Cliente> {
+  public getEmpresa(idEmpresa: string): Observable<Cliente> {
     const params = [
       `idEmpresa=${idEmpresa}`,
     ].filter(Boolean).join('&');
 
-    const headers = new HttpHeaders({
-
-    });
+    const headers = new HttpHeaders({});
     const url = `${environment.url.base}/plataforma/cliente/obtenerCliente?${params}`;
 
-    return this.httpClient.get(url, { headers: headers }).pipe(
+    return this.httpClient.get(url, {headers: headers}).pipe(
       map((response: any) => {
         return response.body;
       }),
       catchError((e) => {
-          this.isNoAutorizado(e);
-          return throwError(() => e);
+        this.isNoAutorizado(e);
+        return throwError(() => e);
       })
     );
   }
@@ -162,10 +154,81 @@ export class AuthService {
     return null;
   }
 
-  confirmAndLogout(): void {
+  public confirmAndLogout(): void {
     this.logout();
-    //this.tokenService.clear();
-
     window.location.href = environment.security.logout_url;
+  }
+
+  public validarUsuario(tipoDoc: string, usuario: string, password: string): Observable<ValidacionUsuario> {
+    return this.httpClient.post<ValidacionUsuario>(this.validarUsuarioUrl, {
+      tipoDoc,
+      usuario,
+      password
+    });
+  }
+
+  public realizarLogin(username: string,
+                       password: string,
+                       empresa?: string): void {
+    // Generar PKCE
+    const codeVerifier = this.tokenService.generateCodeVerifier();
+    this.tokenService.setVerifier(codeVerifier);
+    const codeChallenge = this.tokenService.generateCodeChallenge(codeVerifier);
+
+    // Parámetros OAuth
+    const oauthParams = {
+      client_id: environment.security.client_id,
+      redirect_uri: environment.security.redirect_uri,
+      scope: environment.security.scope,
+      response_type: environment.security.response_type,
+      response_mode: environment.security.response_mode,
+      code_challenge_method: environment.security.code_challenge_method,
+      code_challenge: codeChallenge
+    };
+
+    const httpParams = new HttpParams({fromObject: oauthParams});
+    const authUrl = environment.security.authorize_uri + httpParams.toString();
+
+    // Crear formulario
+    const formData = new URLSearchParams();
+    formData.append('username', username);
+    formData.append('password', password);
+    formData.append('redirect_uri', authUrl);
+    if (empresa) {
+      formData.append('empresa', empresa);
+    }
+
+    console.log('📤 Enviando formulario de login...');
+    console.log('📍 Auth URL:', authUrl);
+
+    // Crear un formulario HTML y enviarlo directamente
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = this.customLoginUrl;
+    form.style.display = 'none';
+
+    const addHiddenField = (name: string, value: string): void => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    };
+
+    addHiddenField('username', username);
+    addHiddenField('password', password);
+    addHiddenField('redirect_uri', authUrl);
+    if (empresa) {
+      addHiddenField('empresa', empresa);
+    }
+
+    // Agregar el formulario al DOM y enviarlo
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  // Construir username compuesto (tipoDoc_numeroDoc)
+  buildUsername(tipoDoc: string, usuario: string): string {
+    return `${tipoDoc}_${usuario}`;
   }
 }

@@ -35,6 +35,8 @@ export const environment = {
     response_mode: 'form_post',
     code_challenge_method: 'S256',
     token_url: "http://localhost:9000/oauth2/token",
+    validacion_url: "http://localhost:9000/api/validar_usuario",
+    custom_login_url: "http://localhost:9000/custom-login",
     grant_type: "authorization_code",
     resource_url: 'http://localhost:8082/resource/',//esta es la ruta del servicio del server resource
     logout_url: 'http://localhost:9000/logout',

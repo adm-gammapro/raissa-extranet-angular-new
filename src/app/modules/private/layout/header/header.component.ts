@@ -2,7 +2,6 @@ import {CommonModule} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
 import {PRIME_NG_MODULES} from '../../../../config/primeNg/primeng-global-imports';
 import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
-import {TokenService} from '../../../../service/authorization/token.service';
 import {environment} from '../../../../../environments/environment';
 import {AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MenuComponent} from '../menu/menu.component';
@@ -24,7 +23,7 @@ const STRONG_PWD_REGEX = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
     ...PRIME_NG_MODULES,
     MenuComponent,
     RouterLink],
-  providers: [ConfirmationService, MessageService, TokenService],
+  providers: [ConfirmationService, MessageService],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
@@ -46,8 +45,7 @@ export class HeaderComponent implements OnInit {
   protected passwordMeters: { label: string; color: string; value: number }[] = [];
   protected passwordProgress = 0;
 
-  constructor(private readonly tokenService: TokenService,
-              private readonly fb: FormBuilder,
+  constructor(private readonly fb: FormBuilder,
               private readonly msg: MessageService,
               private readonly confirmationService: ConfirmationService,
               private readonly usuarioService: UsuarioService,
